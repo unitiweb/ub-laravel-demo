@@ -1,0 +1,14 @@
+tunnels:
+  arbitrary_tunnel_name:
+    proto: http
+    hostname: unitibudget.local.ngrok.io
+    addr: 0.0.0.1:80
+
+    # -------------------------
+    # Additional options
+    # -------------------------
+    # auth: "username:password"
+    # host_header: rewrite
+    # inspect: true
+    # bind_tls: true
+

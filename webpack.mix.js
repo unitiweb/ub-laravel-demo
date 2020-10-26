@@ -12,7 +12,14 @@ const tailwindcss = require('tailwindcss')
  |
  */
 
+/**
+ * Mix in the JavaScript
+ */
 mix.js('resources/js/app.js', 'public/js').sourceMaps()
+
+/**
+ * Mix in the StyleSheets
+ */
 mix.sass('resources/sass/app.scss', 'public/css')
     .options({
         processCssUrls: false,

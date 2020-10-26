@@ -10,7 +10,7 @@ import VueRouterPrefetch from 'vue-router-prefetch'
  */
 import BaseLayout from '../components/layouts/BaseLayout';
 import AuthLayout from "../components/layouts/AuthLayout";
-import DashboardLayout from "../components/layouts/DashboardLayout";
+import DashboardLayout from "../components/layouts/dashboard/DashboardLayout";
 
 /**
  * Load the view components

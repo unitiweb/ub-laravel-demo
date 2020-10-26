@@ -16,8 +16,7 @@ services:
     ports:
       - '${DB_EXTERNAL_PORT:-8041}:3306'
     volumes:
-      - './.docker-storage/db/${DB_DATABASE}:/var/lib/mysql'
-      - './datadump:/root/datadump'
+      - './.services/mysql/${DB_DATABASE}:/var/lib/mysql'
     command: '--default-authentication-plugin=mysql_native_password'
     environment:
       MYSQL_ROOT_PASSWORD: '${DB_PASSWORD:-password01}'

@@ -6,17 +6,42 @@ stack:
     down:
       description: Spin down the stack
       commands: docker-compose down
+    dev:
+      description: Build for development environment
+      commands: |
+        export COMPOSE_INTERACTIVE_NO_CLI=1
+        docker-compose exec app npm run dev
+    prod:
+      description: Build for development environment
+      commands: |
+        export COMPOSE_INTERACTIVE_NO_CLI=1
+        docker-compose exec app npm run prod
     watch:
       description: Start the npm watcher inside the container
       commands: |
         export COMPOSE_INTERACTIVE_NO_CLI=1
-        docker-compose exec app npm run watch-poll
+        docker-compose exec app npm run watch
     npm:
       install:
         description: Run npm install inside the container
         commands: |
           export COMPOSE_INTERACTIVE_NO_CLI=1
           docker-compose exec app npm install
+    db:
+      open:
+        description: Open phpmyadmin in your browser (works on mac)
+        commands: open http://127.0.0.1:8040
+      migrate:
+        default:
+          description: Migrate the database through the app container
+          commands: |
+            export COMPOSE_INTERACTIVE_NO_CLI=1
+            docker-compose exec app php artisan migrate
+          rollback:
+            description: Roll back the database
+            commands: |
+              export COMPOSE_INTERACTIVE_NO_CLI=1
+              docker-compose exec app php artisan migrate:rollback
     docker:
       stop:
         description: Stop all docker containers on this system
