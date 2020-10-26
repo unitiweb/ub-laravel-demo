@@ -1,0 +1,55 @@
+version: "3.5"
+
+services:
+
+  app:
+    image: davetorres/base-lumen:latest
+    ports:
+      - "${API_PORT:-8040}:80"
+    volumes:
+      - .:/var/www/html
+    networks:
+      - overlay
+
+  mysql:
+    image: 'mysql:8'
+    ports:
+      - '${DB_EXTERNAL_PORT:-8041}:3306'
+    volumes:
+      - './.docker-storage/db/${DB_DATABASE}:/var/lib/mysql'
+      - './datadump:/root/datadump'
+    command: '--default-authentication-plugin=mysql_native_password'
+    environment:
+      MYSQL_ROOT_PASSWORD: '${DB_PASSWORD:-password01}'
+      MYSQL_USER: '${DB_USERNAME:-root}'
+      MYSQL_DATABASE: "${DB_DATABASE:-testdb}"
+      MYSQL_PASSWORD: '${DB_PASSWORD:-password01}'
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
+      interval: 1s
+      timeout: 3s
+      retries: 60
+    networks:
+      - overlay
+
+  phpmyadmin:
+    image: 'phpmyadmin/phpmyadmin:4.7'
+    ports:
+      - '${PHPMYADMIN_EXTERNAL_PORT:-8042}:80'
+    environment:
+      PMA_ARBITRARY: 1
+      PMA_HOSTS: '${DB_HOST:-mysql}'
+      PMA_USER: '${DB_USERNAME:-root}'
+      PMA_PASSWORD: '${DB_PASSWORD:-password01}'
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://phpmyadmin"]
+      interval: 1s
+      timeout: 3s
+      retries: 60
+    depends_on:
+      - mysql
+    networks:
+      - overlay
+
+networks:
+  overlay:

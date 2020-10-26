@@ -1,0 +1,29 @@
+stack:
+  commands:
+    up:
+      description: Spin up the stack
+      commands: docker-compose up -d
+    down:
+      description: Spin down the stack
+      commands: docker-compose down
+    watch:
+      description: Start the npm watcher inside the container
+      commands: |
+        export COMPOSE_INTERACTIVE_NO_CLI=1
+        docker-compose exec app npm run watch-poll
+    npm:
+      install:
+        description: Run npm install inside the container
+        commands: |
+          export COMPOSE_INTERACTIVE_NO_CLI=1
+          docker-compose exec app npm install
+    docker:
+      stop:
+        description: Stop all docker containers on this system
+        commands: docker stop $(docker ps -aq)
+      rm:
+        description: Remove all containers on this system
+        commands: docker rm $(docker ps -aq)
+      rmi:
+        description: Remove all images on this system
+        commands: docker rmi $(docker images -aq)
