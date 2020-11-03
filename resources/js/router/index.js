@@ -34,26 +34,28 @@ const routes = [
         path: '/',
         name: 'Home',
         component: BaseLayout,
+        redirect: { name: 'login' },
         children: [
             {
                 path: '/auth',
-                name: 'Auth',
+                name: 'auth',
                 component: AuthLayout,
                 children: [
                     {
                         path: 'login',
-                        name: 'Login',
+                        name: 'login',
                         component: Login
                     }
                 ]
             }, {
                 path: 'dashboard',
-                name: 'Dashboard',
+                name: 'dashboard',
                 component: DashboardLayout,
+                redirect: { name: 'budget' },
                 children: [
                     {
                         path: 'budget',
-                        name: 'Budget',
+                        name: 'budget',
                         component: Budget
                     }
                 ]

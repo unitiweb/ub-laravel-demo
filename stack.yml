@@ -30,7 +30,7 @@ stack:
     db:
       open:
         description: Open phpmyadmin in your browser (works on mac)
-        commands: open http://127.0.0.1:8040
+        commands: open http://127.0.0.1:8043
       migrate:
         default:
           description: Migrate the database through the app container

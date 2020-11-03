@@ -1,5 +1,6 @@
 const mix = require('laravel-mix');
 const tailwindcss = require('tailwindcss')
+const config = require('./webpack.config')
 
 /*
  |--------------------------------------------------------------------------
@@ -25,3 +26,4 @@ mix.sass('resources/sass/app.scss', 'public/css')
         processCssUrls: false,
         postCss: [ tailwindcss('./tailwind.config.js') ],
     })
+    .webpackConfig(config)
