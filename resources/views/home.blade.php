@@ -8,11 +8,10 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.5">
 
     <link href="{{ mix('css/app.css') }}" rel="stylesheet">
+    <script src="/js/env.js"></script>
 </head>
 <body>
-<div class="wrapper" id="app">
-    My app
-</div>
+<div id="app"></div>
 
 <!-- build files will be auto injected -->
 <script src="{{ mix('js/app.js') }}"></script>

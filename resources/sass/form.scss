@@ -1,0 +1,9 @@
+@layer components {
+    .form-input {
+        //@apply flex-1 form-input block w-full min-w-0 rounded-none rounded-r-md transition duration-150 ease-in-out sm:text-sm sm:leading-5;
+        @apply mt-1 block text-gray-700 text-base w-full border-2 border-gray-400 rounded-md shadow-md py-2 px-4 transition duration-150 ease-in-out;
+        &:focus {
+            @apply outline-none border-blue-400;
+        }
+    }
+}

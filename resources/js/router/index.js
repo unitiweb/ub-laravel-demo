@@ -4,19 +4,28 @@
 import Vue from 'vue'
 import VueRouter from 'vue-router'
 import VueRouterPrefetch from 'vue-router-prefetch'
+import store from '@/store'
 
 /**
  * Load the layout components
  */
-import BaseLayout from '../components/layouts/BaseLayout';
-import AuthLayout from "../components/layouts/AuthLayout";
-import DashboardLayout from "../components/layouts/dashboard/DashboardLayout";
+import BaseLayout from '@/components/layouts/BaseLayout';
+import AuthLayout from "@/components/layouts/AuthLayout";
+import SecureLayout from "@/components/layouts/SecureLayout";
 
 /**
  * Load the view components
  */
-import Budget from '../views/dashboard/budget/Budget'
-import Login from "../views/auth/Login";
+import Budget from '@/views/dashboard/budget/Budget'
+import Login from '@/views/auth/Login'
+import Lock from '@/views/auth/Lock'
+import Logout from '@/views/auth/Logout'
+
+/**
+ * Middleware
+ */
+
+import Authentication from '@/router/middleware/authentication'
 
 /**
  * Add the plugins to the Vue instance
@@ -45,12 +54,21 @@ const routes = [
                         path: 'login',
                         name: 'login',
                         component: Login
+                    }, {
+                        path: 'lock',
+                        name: 'lock',
+                        component: Lock
+                    }, {
+                        path: 'logout',
+                        name: 'logout',
+                        component: Logout
                     }
                 ]
             }, {
                 path: 'dashboard',
                 name: 'dashboard',
-                component: DashboardLayout,
+                component: SecureLayout,
+                meta: { privateAccess: true },
                 redirect: { name: 'budget' },
                 children: [
                     {
@@ -82,6 +100,8 @@ const router = new VueRouter({
         }
     }
 })
+
+router.beforeEach(Authentication)
 
 /**
  * Export the vue router

@@ -8,6 +8,8 @@ services:
       - "${DOCKER_APP_PORT}:80"
     volumes:
       - .:/var/www/html
+#      - .services/app:/var/www/services
+#    entrypoint: /var/www/services/entrypoint.sh
     networks:
       - overlay
 
