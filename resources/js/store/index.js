@@ -1,8 +1,6 @@
 import Vuex from 'vuex'
 import Vue from 'vue'
-
 import config from '@/config'
-import router from '@/router'
 
 // Add Vuex to the Vue instance
 Vue.use(Vuex)
@@ -55,8 +53,10 @@ export default new Vuex.Store({
         isLoggedIn: state => {
             return state.auth.isLoggedIn
         },
-        isLocked: (state) => {
-            return state.auth.isLocked
+        isLocked: state => {
+            const email = localStorage.getItem(config.AUTH_USER_LOCKED)
+            state.auth.isLocked = email
+            return email
         },
         refreshToken: state => {
             const token = localStorage.getItem(config.LOCAL_REFRESH_TOKEN_KEY)
@@ -65,6 +65,9 @@ export default new Vuex.Store({
         },
         tokensConfig: state => {
             return state.auth.tokens.config
+        },
+        user: state => {
+            return state.user
         },
         page: state => {
             return state.page
@@ -80,9 +83,10 @@ export default new Vuex.Store({
         loggedIn (state, loggedIn) {
             state.auth.isLoggedIn = loggedIn
         },
-        locked (state, isLocked) {
-            state.auth.isLocked = isLocked
-            if (isLocked !== true) {
+        locked (state, email) {
+            if (email) {
+                localStorage.setItem(config.AUTH_USER_LOCKED, email)
+            } else {
                 localStorage.removeItem(config.AUTH_USER_LOCKED)
             }
         },
@@ -119,16 +123,21 @@ export default new Vuex.Store({
             commit('user', payload.user)
             commit('tokens', payload.tokens)
             commit('appLoaded', true)
+            commit('locked', null)
         },
-        lock ({ commit }, redirect) {
-            commit('locked', true)
-            if (redirect === true) {
-                router.push({ name: 'lock' }).catch(() => {})
-            }
+        lock ({ commit, dispatch, getters }) {
+            const email = getters.user.email
+            commit('locked', email)
+            commit('loggedIn', false)
+            commit('appLoaded', false)
+            commit('site', {})
+            commit('settings', {})
+            commit('user', {})
+            commit('tokens', null)
         },
         logout ({ commit }) {
+            commit('locked', null)
             commit('loggedIn', false)
-            commit('locked', false)
             commit('appLoaded', false)
             commit('site', {})
             commit('settings', {})

@@ -16,11 +16,17 @@ export default async (to, from, next) => {
             try {
                 const token = store.getters.refreshToken
                 const { data, site, settings, tokens } = await $http.refresh(token)
-                store.dispatch('login', { user: data, site, settings, tokens })
+                await store.dispatch('login', { user: data, site, settings, tokens })
             } catch (error) {
-                store.dispatch('logout')
+                await store.dispatch('logout')
                 next({ name: 'logout' })
             }
+        }
+
+        console.log('store.getters.isLocked', store.getters.isLocked)
+
+        if (store.getters.isLocked) {
+            return next({ name: 'lock' })
         }
 
         // If the user is not logged in then logout which will

@@ -6,8 +6,13 @@ import App from '@/App.vue'
 import store from '@/store'
 import router from '@/router'
 
-// import VIcon from 'vue-tailwind-icons';
-// window.Vue.use(VIcon, { set: 'outline' })
+// Tailwind Settings
+import VueTailwind from 'vue-tailwind'
+import VueTailwindTheme from '@/theme'
+window.Vue.use(VueTailwind, VueTailwindTheme)
+
+import UiComponents from "@/components/ui";
+window.Vue.use(UiComponents)
 
 import Http from '@/scripts/http'
 window.Vue.use(Http)

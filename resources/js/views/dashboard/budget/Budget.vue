@@ -11,13 +11,21 @@
             <div class="clearfix"></div>
         </template>
         <div>
-            <h1>My Budget</h1>
-            <div class="border" style="height: 700px;">
-                <modal v-if="show" title="Are you sure?" type="danger" cancel-label="No" confirm-label="Sure, Go ahead" @cancel="cancel" @confirm="confirm">
-                    Are you sure you want to deactivate your account? All of your data will be permanently removed. This action cannot be undone.
-                </modal>
+            <div class="border p-6" style="height: 700px;">
 
-                <form-button @click="open">Open</form-button>
+
+
+                <f-button @click="prev">Prev</f-button>
+                <f-button @click="next">Next</f-button>
+                <f-button @click="refresh">Refresh</f-button>
+
+                <div class="my-3">
+
+                    <entry v-for="(entry, index) in budget.entries" :key="`${entry}-${index}`" :entry="entry"></entry>
+
+                </div>
+
+
             </div>
         </div>
 
@@ -27,43 +35,78 @@
 
 <script>
     import Layout from "@/components/layouts/Layout";
-    import PageHeader from "@/components/layouts/PageHeader";
-    import Modal from '@/components/ui/modal/Modal'
-    import FormButton from "@/components/ui/form/FormButton";
-    import Spinner from "@/components/ui/Spinner";
+    import moment from 'moment'
+    import Entry from '@/components/entry/Entry'
 
     export default {
 
         components: {
-            Layout,
-            PageHeader,
-            FormButton,
-            Modal,
-            Spinner
+            Entry,
+            Layout
         },
 
         data () {
             return {
-                show: false
+                budget: {}
+            }
+        },
+
+        computed: {
+            budgetDate () {
+                const year = this.$route.params.year
+                const month = this.$route.params.month
+                return moment(`${year}-${month}-01`, 'YYYY-MM-DD').format('YYYY-MM-DD')
+            }
+        },
+
+        watch: {
+            $route () {
+                this.loadBudget()
             }
         },
 
         methods: {
-            open () {
-                this.show = !this.show
-                // this.$store.commit('loading', true)
-                console.log('show', this.show)
+            next () {
+                this.$router.push({ name: 'budget', params: { year: '2020', month: '11' }})
             },
-            cancel () {
-                this.show = false
-                this.$store.commit('loading', false)
-                console.log('cancel')
+            prev () {
+                this.$router.push({ name: 'budget', params: { year: '2020', month: '10' }})
             },
-            confirm () {
-                this.show = false
-                this.$store.commit('loading', false)
-                console.log('success')
+            refresh () {
+                this.loadBudget()
+            },
+            loadBudget () {
+                this.redirectIfNoDate()
+                this.budget = {}
+                this.$store.commit('loading', true)
+                this.$http.getBudget(this.budgetDate, 'incomes,groups,entries')
+                    .then(({ data }) => {
+                        this.budget = data
+                        console.log('data', data)
+                        this.$store.commit('loading', false)
+                    }).catch(({ error }) => {
+                        this.$store.commit('loading', false)
+                        if (error.code === 404) {
+                            this.view = 'addBudget'
+                        } else {
+                            this.error = error
+                            this.view = 'error'
+                        }
+                    })
+            },
+            redirectIfNoDate () {
+                let year = this.$route.params.year
+                let month = this.$route.params.month
+                if (!year || !month) {
+                    let year = moment().format('YYYY')
+                    let month = moment().format('MM')
+                    this.$router.push({ name: 'budget', params: { year, month }})
+                }
             }
+        },
+
+        mounted () {
+            this.loadBudget()
         }
 
     }

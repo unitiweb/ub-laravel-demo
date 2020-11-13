@@ -18,6 +18,7 @@ import SecureLayout from "@/components/layouts/SecureLayout";
  */
 import Budget from '@/views/dashboard/budget/Budget'
 import Login from '@/views/auth/Login'
+import Locked from '@/views/auth/Locked'
 import Lock from '@/views/auth/Lock'
 import Logout from '@/views/auth/Logout'
 
@@ -26,6 +27,7 @@ import Logout from '@/views/auth/Logout'
  */
 
 import Authentication from '@/router/middleware/authentication'
+import ClearLoading from '@/router/middleware/clearLoading'
 
 /**
  * Add the plugins to the Vue instance
@@ -55,6 +57,10 @@ const routes = [
                         name: 'login',
                         component: Login
                     }, {
+                        path: 'locked',
+                        name: 'locked',
+                        component: Locked
+                    }, {
                         path: 'lock',
                         name: 'lock',
                         component: Lock
@@ -72,7 +78,7 @@ const routes = [
                 redirect: { name: 'budget' },
                 children: [
                     {
-                        path: 'budget',
+                        path: 'budget/:year?/:month?',
                         name: 'budget',
                         component: Budget
                     }
@@ -102,6 +108,7 @@ const router = new VueRouter({
 })
 
 router.beforeEach(Authentication)
+router.beforeEach(ClearLoading)
 
 /**
  * Export the vue router

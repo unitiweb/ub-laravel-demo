@@ -16,13 +16,3 @@ use Illuminate\Support\Facades\Route;
 Route::get('/{any}', function () {
     return view('home');
 })->where('any', '.*');
-
-
-//Route::get('/', function () {
-//    return view('home');
-//});
-
-// The default laravel view | Remove later
-Route::get('/welcome', function () {
-    return view('welcome');
-});

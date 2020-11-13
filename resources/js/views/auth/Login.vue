@@ -1,79 +1,53 @@
 <template>
     <div>
-        <div>
+        <div class="mb-4">
             <logo size="lg" class="mx-auto"></logo>
-            <h2 class="my-6 text-center text-3xl leading-9 font-extrabold text-gray-900">
-                Sign in to your account
-            </h2>
-            <p class="mt-2 text-center text-sm leading-5 text-gray-600">
-<!--                    Or-->
-<!--                    <a href="#" class="font-medium text-indigo-600 hover:text-indigo-500 focus:outline-none focus:underline transition ease-in-out duration-150">-->
-<!--                        start your 14-day free trial-->
-<!--                    </a>-->
-            </p>
         </div>
-        <div>
-            <input type="hidden" name="remember" value="true">
-            <div class="rounded-md shadow-sm">
-                <div>
-                    <input v-model="credentials.email"
-                           aria-label="Email address"
-                           name="email"
-                           type="email"
-                           required
-                           class="appearance-none rounded-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-t-md focus:outline-none focus:shadow-outline-blue focus:border-blue-300 focus:z-10 sm:text-sm sm:leading-5"
-                           placeholder="Email address"/>
-                </div>
-                <div class="-mt-px">
-                    <input v-model="credentials.password"
-                           aria-label="Password"
-                           name="password"
-                           type="password"
-                           required
-                           class="appearance-none rounded-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-b-md focus:outline-none focus:shadow-outline-blue focus:border-blue-300 focus:z-10 sm:text-sm sm:leading-5"
-                           placeholder="Password"/>
-                </div>
-            </div>
-
-            <div class="mt-6 flex items-center justify-between">
-                <div class="flex items-center">
-<!--                        <input id="remember_me" type="checkbox" class="form-checkbox h-4 w-4 text-indigo-600 transition duration-150 ease-in-out">-->
-<!--                        <label for="remember_me" class="ml-2 block text-sm leading-5 text-gray-900">-->
-<!--                            Remember me-->
-<!--                        </label>-->
-                </div>
-
-                <div class="text-sm leading-5">
+        <card>
+            <template v-slot:header>
+                <h2 class="text-center text-3xl leading-9 font-extrabold text-gray-900">
+                    Sign in to your account
+                </h2>
+                <p class="mt-2 text-center text-sm leading-5 text-gray-600">
+                    Or
                     <a href="#" class="font-medium text-indigo-600 hover:text-indigo-500 focus:outline-none focus:underline transition ease-in-out duration-150">
-                        Forgot your password?
-                    </a>
-                </div>
+                        start your 14-day free trial
+                </a>
+                </p>
+            </template>
+
+            <div class="px-4 py-2">
+                <f-input label="Email" placeholder="email" v-model="credentials.email"/>
+            </div>
+            <div class="px-4 py-2">
+                <f-input type="password" label="Password" placeholder="password" v-model="credentials.password"/>
             </div>
 
-            <div class="mt-6">
-                <form-button @click="login" icon="login" size="xl" block>Login</form-button>
-<!--                <button @click="login" type="submit" class="group relative w-full flex justify-center py-2 px-4 border border-transparent text-sm leading-5 font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-500 focus:outline-none focus:border-indigo-700 focus:shadow-outline-indigo active:bg-indigo-700 transition duration-150 ease-in-out">-->
-<!--                    <span class="absolute left-0 inset-y-0 flex items-center pl-3">-->
-<!--                        <svg class="h-5 w-5 text-indigo-500 group-hover:text-indigo-400 transition ease-in-out duration-150" fill="currentColor" viewBox="0 0 20 20">-->
-<!--                            <path fill-rule="evenodd" d="M5 9V7a5 5 0 0110 0v2a2 2 0 012 2v5a2 2 0 01-2 2H5a2 2 0 01-2-2v-5a2 2 0 012-2zm8-2v2H7V7a3 3 0 016 0z" clip-rule="evenodd" />-->
-<!--                        </svg>-->
-<!--                    </span>-->
-<!--                    Sign in-->
-<!--                </button>-->
-            </div>
+            <alert variant="danger" :show="!!error">{{ error }}</alert>
+
+            <template v-slot:footer>
+                <f-button @click="login" icon="lock" block>Login</f-button>
+            </template>
+        </card>
+
+        <div class="text-center text-sm leading-5">
+            <a href="#" class="font-medium text-indigo-600 hover:text-indigo-500 focus:outline-none focus:underline transition ease-in-out duration-150">
+                Forgot your password?
+            </a>
         </div>
+
     </div>
 </template>
 
 <script>
     import Logo from '@/components/ui/logo/Logo'
-    import FormButton from '@/components/ui/form/FormButton'
+    import FButton from '@/components/ui/form/FButton'
 
     export default {
 
         components: {
             Logo,
-            FormButton
+            FButton
         },
 
         data () {
@@ -88,27 +62,23 @@
 
         methods: {
             login () {
+                this.error = null;
                 this.$store.commit('loading', true)
-                this.$http.login(
-                    this.credentials.email,
-                    this.credentials.password
-                ).then(({ data, settings, tokens, site }) => {
-                    setTimeout(() => {
-                        this.$store.dispatch('login', { user: data, settings, tokens, site })
-                        this.$router.push({ name: 'dashboard' })
+                this.$http.login(this.credentials.email, this.credentials.password)
+                    .then(({ data, settings, tokens, site }) => {
+                        setTimeout(() => {
+                            this.$store.dispatch('login', { user: data, settings, tokens, site })
+                            location.href = this.getUrl('dashboard')
+                        }, 500);
+                    }).catch(({ error }) => {
+                        this.error = error.message;
+                        this.credentials.password = ''
                         this.$store.commit('loading', false)
-                    }, 1000);
-                }).catch(({ error }) => {
-                    console.log('error', error);
-                    this.$store.commit('loading', false)
-                    // if (error.status === 'EmailNotVerified') {
-                    //     this.$router.push({ name: 'verify-email' })
-                    // } else {
-                    //     this.credentials.password = ''
-                    //     this.error = error.message
-                    //     this.loading = false;
-                    // }
-                })
+                    })
+            },
+            getUrl (name) {
+                let props = this.$router.resolve({ name })
+                return props.href
             }
         }
 
