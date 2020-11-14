@@ -11,21 +11,14 @@
             <div class="clearfix"></div>
         </template>
         <div>
-            <div class="border p-6" style="height: 700px;">
-
-
-
-                <f-button @click="prev">Prev</f-button>
-                <f-button @click="next">Next</f-button>
-                <f-button @click="refresh">Refresh</f-button>
-
-                <div class="my-3">
-
-                    <entry v-for="(entry, index) in budget.entries" :key="`${entry}-${index}`" :entry="entry"></entry>
-
-                </div>
-
-
+            <div>
+                <income v-for="(income, index) in incomes" :key="`income-${index}`" :income="income">
+                    <draggable v-model="income.entries" v-bind="dragOptions" group="entries" @start="startDrag" @end="endDrag">
+                        <transition-group type="transition" :name="!drag ? 'flip-list' : null">
+                            <entry v-for="(entry, index) in income.entries" :key="`${entry}-${index}`" :month="budget.month" :entry="entry"></entry>
+                        </transition-group>
+                    </draggable>
+                </income>
             </div>
         </div>
 
@@ -36,18 +29,23 @@
 <script>
     import Layout from "@/components/layouts/Layout";
     import moment from 'moment'
-    import Entry from '@/components/entry/Entry'
+    import Entry from '@/components/budget/Entry'
+    import Draggable from 'vuedraggable'
+    import Income from '@/components/budget/Income'
 
     export default {
 
         components: {
+            Layout,
             Entry,
-            Layout
+            Draggable,
+            Income
         },
 
         data () {
             return {
-                budget: {}
+                budget: {},
+                drag: false
             }
         },
 
@@ -56,6 +54,17 @@
                 const year = this.$route.params.year
                 const month = this.$route.params.month
                 return moment(`${year}-${month}-01`, 'YYYY-MM-DD').format('YYYY-MM-DD')
+            },
+            incomes () {
+                return this.budget.incomes || []
+            },
+            dragOptions() {
+                return {
+                    animation: 200,
+                    group: "description",
+                    disabled: false,
+                    ghostClass: "ghost"
+                };
             }
         },
 
@@ -66,6 +75,17 @@
         },
 
         methods: {
+            startDrag (value) {
+                this.drag = true
+            },
+            endDrag (value, value2) {
+                this.drag = false
+                console.log('value', value)
+                console.log('value2', value2)
+            },
+            sort() {
+                this.budget.entries = this.budget.entries.sort((a, b) => a.order - b.order);
+            },
             next () {
                 this.$router.push({ name: 'budget', params: { year: '2020', month: '11' }})
             },
@@ -79,7 +99,7 @@
                 this.redirectIfNoDate()
                 this.budget = {}
                 this.$store.commit('loading', true)
-                this.$http.getBudget(this.budgetDate, 'incomes,groups,entries')
+                this.$http.getBudget(this.budgetDate, 'incomes,incomes.entries,incomes.entries.group')
                     .then(({ data }) => {
                         this.budget = data
                         console.log('data', data)
@@ -111,3 +131,24 @@
 
     }
 </script>
+
+<style lang="scss" scoped>
+    .flip-list-move {
+        transition: transform 0.5s;
+    }
+    .no-move {
+        transition: transform 0s;
+    }
+    .ghost {
+        visibility: hidden;
+    }
+    .list-group {
+        min-height: 20px;
+    }
+    .list-group-item {
+        cursor: move;
+    }
+    .list-group-item i {
+        cursor: pointer;
+    }
+</style>

@@ -17,8 +17,8 @@
         default: ''
       },
       value: {
-        type: Number,
-        defualt: 0.00
+        type: [String, Number],
+        default: 0.00
       },
       labelClass: {
         type: String,

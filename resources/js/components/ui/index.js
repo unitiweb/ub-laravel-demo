@@ -3,6 +3,7 @@ import FInput from '@/components/ui/form/FInput'
 import Icon from '@/components/ui/Icon'
 import Card from '@/components/ui/Card'
 import Alert from '@/components/ui/Alert'
+import FCheckbox from '@/components/ui/form/FCheckbox'
 
 const UiComponents = {
     install(Vue) {
@@ -11,6 +12,7 @@ const UiComponents = {
         Vue.component('f-input', FInput)
         Vue.component('card', Card)
         Vue.component('alert', Alert)
+        Vue.component('f-checkbox', FCheckbox)
     }
 }
 
