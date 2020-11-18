@@ -1,11 +1,11 @@
 <template>
-    <t-button @click="click"
-              :variant="variant"
-              :class="classes"
-              type="button">
-            <icon v-if="icon" :name="icon" :variant="variant" :class="iconClasses"></icon>
-        <slot/>
-    </t-button>
+    <span :class="wrapperClasses">
+        <button type="button" :class="classes" @click="click">
+            <icon v-if="iconLeft" :name="iconLeft" class="-ml-1 mr-2 h-5 w-5"></icon>
+            <slot/>
+            <icon v-if="iconRight" :name="iconRight" class="mr-1 ml-2 h-5 w-5"></icon>
+        </button>
+    </span>
 </template>
 
 <script>
@@ -40,26 +40,61 @@
                     return ['xs', 'sm', 'md', 'lg', 'xl'].indexOf(value) !== -1
                 }
             },
-            icon: {
+            iconLeft: {
+                type: String,
+                default: null
+            },
+            iconRight: {
                 type: String,
                 default: null
             }
         },
 
-        computed: {
-            classes () {
-                const classes = []
-                classes.push(this.getSize())
-                if (this.block) {
-                    classes.push('w-full')
+        data () {
+            return {
+                wrapperBase: 'rounded-md shadow-md',
+                buttonBase: 'border-2 border-transparent leading-5 font-medium rounded-md focus:outline-none transition ease-in-out duration-150',
+                colorMap: {
+                    primary: 'blue',
+                    secondary: 'gray',
+                    success: 'green',
+                    info: 'teal',
+                    warning: 'ornage',
+                    danger: 'red'
                 }
+            }
+        },
+
+        computed: {
+            wrapperClasses () {
+                const classes = []
+
+                if (this.block) {
+                    classes.push('block w-full')
+                } else {
+                    classes.push('inline-flex')
+                }
+
+                // BAse style
+                classes.push(this.wrapperBase)
+
                 return classes
             },
-            iconClasses () {
-                if (this.variant === 'outline') {
-                    return 'text-sx text-gray-600 ml-1 mr-2 h-5 w-5'
+            classes () {
+                const classes = []
+
+                // Make full width if button is type block
+                if (this.block) {
+                    classes.push('w-full flex justify-center')
+                } else {
+                    classes.push('inline-flex items-center')
                 }
-                return 'text-white ml-1 mr-1 h-5 w-5'
+
+                classes.push(this.buttonBase)
+                classes.push(this.getSize())
+                classes.push(this.getColor())
+
+                return classes
             }
         },
 
@@ -67,18 +102,42 @@
             click () {
                 this.$emit('click')
             },
+            getColor () {
+                const color = this.colorMap[this.variant]
+
+                if (this.outline) {
+                    return `text-${color}-700
+                            bg-${color}-100
+                            border-2
+                            border-${color}-500
+                            hover:bg-${color}-200
+                            hover:border-${color}-600
+                            focus:border-${color}-600
+                            focus:bg-${color}-300
+                            focus:shadow-outline-${color}
+                            active:bg-${color}-300`
+                }
+                return `text-white
+                        bg-${color}-600
+                        border-${color}-700
+                        hover:bg-${color}-500
+                        focus:border-${color}-700
+                        focus:shadow-outline-${color}
+                        active:bg-${color}-700`
+            },
             getSize () {
                 let size = ''
+
                 if (this.size === 'xs') {
-                    size = 'px-2 py-0'
+                    size = 'text-xs px-2 py-0'
                 } else if (this.size === 'sm') {
-                    size = 'px-2 py-2'
+                    size = 'text-sm px-1 py-1'
                 } else if (this.size === 'md') {
-                    size = 'px-3 py-2'
+                    size = 'text-base px-3 py-2'
                 } else if (this.size === 'lg') {
-                    size = 'px-3 py-2'
+                    size = 'text-base px-3 py-3'
                 } else if (this.size === 'xl') {
-                    size = 'px-4 py-3'
+                    size = 'text-2xl px-4 py-4'
                 }
                 return `text-${this.size} ${size}`
             }

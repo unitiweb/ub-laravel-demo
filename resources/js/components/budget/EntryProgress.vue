@@ -1,13 +1,14 @@
 <template>
-    <div class="cursor-pointer shadow-md rounded-md m-1" @click="update">
+    <!-- Added @mousedown.prevent=" to this element to prevent the browser from selected text on page when clicking fast -->
+    <div class="cursor-pointer shadow-md rounded-md m-1" @click="update" @mousedown.prevent="">
         <div class="px-3 border-t border-l border-r border-b-0 rounded-t-md" :class="clearedClasses">
-            <icon name="dots-horizontal" class="text-gray-600 h-3 w-3"></icon>
+            <icon name="dotsHorizontal" class="text-gray-600 h-3 w-3"></icon>
         </div>
         <div class="px-3 border-l border-r border-t border-b-0" :class="paidClasses">
-            <icon name="dots-horizontal" class="text-gray-600 h-3 w-3"></icon>
+            <icon name="dotsHorizontal" class="text-gray-600 h-3 w-3"></icon>
         </div>
         <div class="px-3 border rounded-b-md" :class="goalClasses">
-            <icon name="dots-horizontal" class="text-gray-600 h-3 w-3"></icon>
+            <icon name="dotsHorizontal" class="text-gray-600 h-3 w-3"></icon>
         </div>
     </div>
 </template>

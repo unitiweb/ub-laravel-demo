@@ -1,5 +1,4 @@
 <template>
-
     <layout>
         <template v-slot:header>
             <div class="float-left">
@@ -10,34 +9,34 @@
             </div>
             <div class="clearfix"></div>
         </template>
-        <div>
-            <div>
-                <income v-for="(income, index) in incomes" :key="`income-${index}`" :income="income">
-                    <draggable v-model="income.entries" v-bind="dragOptions" group="entries" @start="startDrag" @end="endDrag">
-                        <transition-group type="transition" :name="!drag ? 'flip-list' : null">
-                            <entry v-for="(entry, index) in income.entries" :key="`${entry}-${index}`" :month="budget.month" :entry="entry"></entry>
-                        </transition-group>
-                    </draggable>
-                </income>
-            </div>
-        </div>
+
+        <income v-if="view.state === null" v-for="(income, index) in incomes" :key="`income-${index}`" :income="income">
+            <draggable v-model="income.entries" handle=".entry-handle" v-bind="dragOptions" group="entries" @start="startDrag" @end="endDrag">
+                <transition-group type="transition" :name="!drag ? 'flip-list' : null">
+                    <entry-row v-for="(entry, index) in income.entries" :key="`${entry}-${index}`" :month="budget.month" @dialog="entryDialog" :entry="entry"></entry-row>
+                </transition-group>
+            </draggable>
+        </income>
+
+        <entry-form v-if="view.state === 'entry-form'" :entry="view.data"></entry-form>
 
     </layout>
-
 </template>
 
 <script>
-    import Layout from "@/components/layouts/Layout";
-    import moment from 'moment'
-    import Entry from '@/components/budget/Entry'
+    import Layout from "@/components/layouts/Layout"
+    import EntryForm from '@/components/budget/EntryForm'
+    import EntryRow from '@/components/budget/EntryRow'
     import Draggable from 'vuedraggable'
     import Income from '@/components/budget/Income'
+    import moment from 'moment'
 
     export default {
 
         components: {
             Layout,
-            Entry,
+            EntryForm,
+            EntryRow,
             Draggable,
             Income
         },
@@ -45,7 +44,11 @@
         data () {
             return {
                 budget: {},
-                drag: false
+                drag: false,
+                view: {
+                    state: 'entry-form',
+                    data: {}
+                }
             }
         },
 
@@ -83,15 +86,6 @@
                 console.log('value', value)
                 console.log('value2', value2)
             },
-            sort() {
-                this.budget.entries = this.budget.entries.sort((a, b) => a.order - b.order);
-            },
-            next () {
-                this.$router.push({ name: 'budget', params: { year: '2020', month: '11' }})
-            },
-            prev () {
-                this.$router.push({ name: 'budget', params: { year: '2020', month: '10' }})
-            },
             refresh () {
                 this.loadBudget()
             },
@@ -121,6 +115,12 @@
                     let year = moment().format('YYYY')
                     let month = moment().format('MM')
                     this.$router.push({ name: 'budget', params: { year, month }})
+                }
+            },
+            entryDialog (entry) {
+                this.view = {
+                    state: 'entry-form',
+                    data: entry
                 }
             }
         },

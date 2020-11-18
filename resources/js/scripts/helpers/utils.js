@@ -27,3 +27,37 @@ export const cleanNumber = (value) => {
             .replace('x','.')
     }
 }
+
+/**
+ * Take in a value and clean it to match currency without the symbol
+ *
+ * @param value
+ *
+ * @returns string
+ */
+export const cleanCurrency = (value) => {
+    return Number.isInteger(value) ? value.toFixed(2) : value
+}
+
+/**
+ * Format a currency string
+ *
+ * @param value
+ * @param includeSymbol
+ *
+ * @returns string
+ */
+export const currency = (value, includeSymbol = true) => {
+    const options = {
+        currency: 'USD',
+        minimumFractionDigits: 2
+    }
+
+    if (includeSymbol) {
+        options.style = 'currency'
+    }
+
+    const formatter = new Intl.NumberFormat('en-US', options)
+
+    return formatter.format(value)
+}
