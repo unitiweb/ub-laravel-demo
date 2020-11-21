@@ -18,7 +18,6 @@
 
         computed: {
             isLoading () {
-                console.log('this.$store.getters.loading', this.$store.getters.loading)
                 return this.$store.getters.loading
             },
             onCancel () {

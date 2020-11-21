@@ -6,6 +6,11 @@ import { request } from '@/scripts/http/utils';
 
 export default {
     // Create a new budget income
+    getIncomes: (month, relations) => {
+        return request('get', ['budgets', month, 'incomes'], null, relations)
+    },
+
+    // Create a new budget income
     addIncome: (month, income, relations) => {
         return request('post', ['budgets', month, 'incomes'], income, relations)
     },

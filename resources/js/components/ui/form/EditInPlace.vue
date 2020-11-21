@@ -85,7 +85,6 @@
                     const element = this.$refs.editInPlaceInput
                     element.focus()
                     if (this.selectOnEdit) {
-                        console.log('select')
                         element.select()
                     }
                 });
@@ -99,7 +98,6 @@
                 this.edit = false
             },
             cancel () {
-                console.log('cancel')
                 this.$emit('input', this.original)
                 this.edit = false
             }

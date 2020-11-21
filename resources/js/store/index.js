@@ -18,7 +18,7 @@ export default new Vuex.Store({
                     // Once countdown is started it will be 1
                     timeout: 5,
                     // The ttl value where the countdown will start
-                    notice: 25,
+                    notice: 60,
                 },
                 // The access jwt token details
                 access: {
@@ -123,6 +123,7 @@ export default new Vuex.Store({
             commit('user', payload.user)
             commit('tokens', payload.tokens)
             commit('appLoaded', true)
+            commit('loggedIn', true)
             commit('locked', null)
         },
         lock ({ commit, dispatch, getters }) {

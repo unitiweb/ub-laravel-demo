@@ -23,18 +23,9 @@ export default async (to, from, next) => {
             }
         }
 
-        console.log('store.getters.isLocked', store.getters.isLocked)
-
         if (store.getters.isLocked) {
             return next({ name: 'lock' })
         }
-
-        // If the user is not logged in then logout which will
-        // also redirect to the login page
-        // if (store.getters.isLoggedIn !== true) {
-        //     await store.dispatch('logout', true)
-        //     next({ name: 'login' })
-        // }
     }
     next()
 }

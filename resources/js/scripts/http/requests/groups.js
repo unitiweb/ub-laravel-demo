@@ -5,6 +5,11 @@ import { request } from '@/scripts/http/utils';
  */
 
 export default {
+    // get groups
+    getGroups: (relations) => {
+        return request('get', ['groups'], {}, relations)
+    },
+
     // get a group
     getGroup: (groupId, relations) => {
         return request('get', ['groups', groupId], {}, relations)

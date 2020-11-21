@@ -64,7 +64,6 @@
         methods: {
             toggleMobileMenu () {
                 this.showMobileMenu = !this.showMobileMenu
-                console.log('showMobileMenu', this.showMobileMenu)
             }
         }
 

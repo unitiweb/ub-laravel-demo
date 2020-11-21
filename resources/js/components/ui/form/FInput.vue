@@ -6,15 +6,20 @@
             <span v-if="hint" class="text-sm leading-5 text-gray-500 pr-2" id="email-optional">{{ hint }}</span>
         </div>
         <div :class="wrapperClasses">
+            <div v-if="hasLeftAddOn" class="absolute inset-y-0 left-0 flex items-center">
+                <slot name="left-add-on"></slot>
+            </div>
             <div v-if="showLeftIcon" class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
                 <icon :name="leftIcon" fill class="h-5 w-5 text-gray-400"/>
             </div>
             <span v-if="showLeftAddOn" class="inline-flex items-center px-3 text-gray-600 bg-gray-200 border-2 border-gray-400 rounded-l-md left-0 px-3 flex items-center pointer-events-none">
-                http://
+                {{ leftAddOn }}
             </span>
-            <input :type="type" :class="inputClasses" :value="value" :placeholder="placeholder">
+            <slot>
+                <input :type="type" :class="inputClasses" :value="value" @input="input" :placeholder="placeholder">
+            </slot>
             <span v-if="showRightAddOn" class="inline-flex items-center px-3 text-gray-600 bg-gray-200 border-2 border-gray-400 rounded-r-md left-0 px-3 flex items-center pointer-events-none">
-                http://
+                {{ rightAddOn }}
             </span>
             <div v-if="showRightIcon" class="absolute inset-y-0 right-0 pr-3 flex items-center pointer-events-none">
                 <span class="text-gray-500 sm:text-sm sm:leading-5" id="price-currency">
@@ -26,6 +31,9 @@
             </div>
             <div v-if="showSuccess" class="absolute inset-y-0 right-0 pr-3 flex items-center pointer-events-none">
                 <icon name="thumbUp" stroke class="h-5 w-5 text-green-600"/>
+            </div>
+            <div v-if="hasRightAddOn" class="absolute inset-y-0 mr-2 right-0 flex items-center">
+                <slot name="right-add-on"></slot>
             </div>
         </div>
         <p v-if="showError" class="mt-1 pl-2 text-sm text-red-600">{{ feedback }}</p>
@@ -132,6 +140,12 @@
             showDescription () {
                 return this.description && !this.error && !this.success
             },
+            hasLeftAddOn () {
+                return !!this.$slots['left-add-on'] && !this.leftIcon && !this.leftAddOn
+            },
+            hasRightAddOn () {
+                return !!this.$slots['right-add-on'] && !this.rightIcon && !this.error && !this.success
+            },
             wrapperClasses () {
                 const classes = []
 
@@ -177,17 +191,6 @@
 
                 return classes
             },
-            // iconWrapperClasses () {
-            //     const classes = []
-            //
-            //     if (this.leftAddOn) {
-            //         classes.push('absolute')
-            //     } else {
-            //         classes.push('absolute')
-            //     }
-            //
-            //     return classes
-            // },
             labelClasses () {
                 const classes = []
 
@@ -195,31 +198,11 @@
 
                 return classes
             }
-            // variant () {
-            //     return {
-            //         success: this.success,
-            //         error: this.error
-            //     }
-            // },
-            // hasFeedback () {
-            //     if (this.success || this.error) {
-            //         return this.feedback
-            //     }
-            // },
-            // getInputClasses () {
-            //     const classes = [this.inputClasses]
-            //
-            //     if (this.right) {
-            //         classes.push('text-right')
-            //     }
-            //
-            //     return classes
-            // }
         },
 
         methods: {
-            input (value) {
-                this.$emit('input', value)
+            input (e) {
+                this.$emit('input', e.target.value)
             }
         }
 

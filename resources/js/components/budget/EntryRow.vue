@@ -1,21 +1,8 @@
 <template>
     <div class="flex bg-white border-b rounded-md">
         <div class="flex-none border-r px-1 py-1">
-<!--            <icon name="arrows-expand" color="#999" class="entry-handle cursor-move text-gray-700 h-5 h-5"></icon>-->
-
             <icon name="arrowsExpand" class="entry-handle cursor-move text-gray-500 hover:text-blue-700 h-5 h-5"></icon>
-            <icon @click="dialog" name="pencilAlt" class="cursor-pointer text-gray-500 hover:text-blue-700 mt-1 h-5 h-5"></icon>
-
-<!--            <svg class="entry-handle text-gray-500 hover:text-gray-700 cursor-move" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">-->
-<!--                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 8V4m0 0h4M4 4l5 5m11-1V4m0 0h-4m4 0l-5 5M4 16v4m0 0h4m-4 0l5-5m11 5l-5-5m5 5v-4m0 4h-4" />-->
-<!--            </svg>-->
-
-<!--            <svg class="entry-handle text-gray-400 cursor-move h-5 h-5" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">-->
-<!--                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 8V4m0 0h4M4 4l5 5m11-1V4m0 0h-4m4 0l-5 5M4 16v4m0 0h4m-4 0l5-5m11 5l-5-5m5 5v-4m0 4h-4" />-->
-<!--            </svg>-->
-
-
-<!--            <icon name="pencil-alt" color="#999" class="cursor-pointer mt-1 h-5 h-5" @click="dialog"></icon>-->
+            <icon @click="modify" name="pencilAlt" class="cursor-pointer text-gray-500 hover:text-blue-700 mt-1 h-5 h-5"></icon>
         </div>
         <div class="flex-1 px-2">
             <edit-in-place classes="py-1 px-1 hover:bg-gray-200" v-model="entry.name" :width="200" @updated="updateName"/>
@@ -119,8 +106,8 @@
                 this.entry.dueDay = date.format('D')
                 this.saveEntry({ dueDay: this.entry.dueDay })
             },
-            dialog () {
-                this.$emit('dialog', this.entry)
+            modify () {
+                this.$emit('modify', this.entry)
             }
         }
 

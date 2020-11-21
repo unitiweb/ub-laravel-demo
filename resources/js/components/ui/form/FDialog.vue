@@ -13,7 +13,7 @@
 
                 <!-- This element is to trick the browser into centering the modal contents. -->
                 <span class="hidden sm:inline-block sm:align-middle sm:h-screen"></span>&#8203;
-                <div class="inline-block align-bottom bg-white rounded-lg text-left overflow-hidden shadow-xl transform transition-all my-8 sm:align-middle sm:max-w-3xl w-full" role="dialog" aria-modal="true" aria-labelledby="modal-headline">
+                <div class="inline-block align-bottom bg-white rounded-lg text-left overflow-hidden shadow-xl transform transition-all my-8 sm:align-middle sm:max-w-2xl w-full" role="dialog" aria-modal="true" aria-labelledby="modal-headline">
 
                     <div class="px-4 py-5 p-6">
                         <h3 v-if="title" class="text-lg leading-6 font-medium text-gray-900">

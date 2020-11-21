@@ -1,4 +1,5 @@
 import { request, sha256 } from '@/scripts/http/utils';
+import store from "@/store";
 
 /**
  * Auth related requests
@@ -17,9 +18,13 @@ export default {
         return request('post', ['auth', 'register'], register)
     },
 
-    // Refresh the access token. Send it the refresh token and a new refresh and access token will be retured
-    refresh: (refreshToken) => {
+    // Refresh the access token. Send it the refresh token and a new refresh and access token will be returned
+    refresh: async (refreshToken) => {
         return request('post', ['auth', 'refresh'], { refreshToken })
+    },
+
+    tryRefresh: (method, url, params, relations) => {
+
     },
 
     // Check to see if the email is available

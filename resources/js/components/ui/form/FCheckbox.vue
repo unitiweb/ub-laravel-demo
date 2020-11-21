@@ -36,7 +36,6 @@
 
         methods: {
             input (value) {
-                console.log('checkbox value', value)
                 this.$emit('input', value)
             }
         }

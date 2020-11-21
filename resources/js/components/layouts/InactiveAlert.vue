@@ -87,16 +87,18 @@ export default {
                 // If the notice has been reached we open the dialog and start the countdown
                 if (this.ttl <= this.notice) {
                     if (this.firstRun === true) {
-                        this.opened = true
-                        this.timeout = 1
-                        this.firstRun = false
-                        clearInterval(this.timer)
-                        this.countdown()
+                        // Instead of a dialog to count down, just try to refresh the access token
+                        this.refreshTokens()
+                        // this.opened = true
+                        // this.timeout = 1
+                        // this.firstRun = false
+                        // clearInterval(this.timer)
+                        // this.countdown()
                     }
 
                     // log out the last 10 seconds of the countdown
                     if (this.ttl <= 10) {
-                        console.log('countdown ttl (last 10 seconds):', this.ttl)
+                        // console.log('countdown ttl (last 10 seconds):', this.ttl)
                     }
 
                     // Format and update the expired string to be shown in the modal
@@ -109,14 +111,17 @@ export default {
             this.countdown()
         }
     },
-    mounted() {
+
+    watch: {
         // Watch the "isLoggedIn" store variable so that if the user logs out the timer is stopped.
-        this.$store.watch(state => state.auth.isLoggedIn, (value) => {
-                if (value !== true) {
-                    this.reset()
-                }
+        '$store.state.auth.isLoggedIn': (value) => {
+            if (value !== true) {
+                this.reset()
             }
-        )
+        }
+    },
+
+    mounted() {
         this.startTimer()
     }
 }

@@ -10,16 +10,15 @@
             <div class="clearfix"></div>
         </template>
 
-        <income v-if="view.state === null" v-for="(income, index) in incomes" :key="`income-${index}`" :income="income">
-            <draggable v-model="income.entries" handle=".entry-handle" v-bind="dragOptions" group="entries" @start="startDrag" @end="endDrag">
+        <income v-if="view.state === 'list'" v-for="(income, index) in incomes" :key="`income-${index}`" :income="income">
+            <draggable handle=".entry-handle" v-model="income.entries" v-bind="dragOptions" group="entries" @move="onMoveCallback" @start="startDrag" @end="endDrag">
                 <transition-group type="transition" :name="!drag ? 'flip-list' : null">
-                    <entry-row v-for="(entry, index) in income.entries" :key="`${entry}-${index}`" :month="budget.month" @dialog="entryDialog" :entry="entry"></entry-row>
+                    <entry-row v-for="(entry, index) in income.entries" :key="`${entry}-${index}`" :month="budget.month" @modify="modifyEntry" :entry="entry"></entry-row>
                 </transition-group>
             </draggable>
         </income>
 
-        <entry-form v-if="view.state === 'entry-form'" :entry="view.data"></entry-form>
-
+        <entry-form v-if="view.state === 'entry-form'" :budget="budget" :entry="view.data" @cancel="cancelEntryForm" @updated="closeEntryForm"></entry-form>
     </layout>
 </template>
 
@@ -46,7 +45,7 @@
                 budget: {},
                 drag: false,
                 view: {
-                    state: 'entry-form',
+                    state: 'list',
                     data: {}
                 }
             }
@@ -81,10 +80,12 @@
             startDrag (value) {
                 this.drag = true
             },
-            endDrag (value, value2) {
+            endDrag (value) {
                 this.drag = false
-                console.log('value', value)
-                console.log('value2', value2)
+            },
+            onMoveCallback (evt, originalEvent) {
+                // ...
+                // return false; — for cancel
             },
             refresh () {
                 this.loadBudget()
@@ -96,7 +97,6 @@
                 this.$http.getBudget(this.budgetDate, 'incomes,incomes.entries,incomes.entries.group')
                     .then(({ data }) => {
                         this.budget = data
-                        console.log('data', data)
                         this.$store.commit('loading', false)
                     }).catch(({ error }) => {
                         this.$store.commit('loading', false)
@@ -117,11 +117,21 @@
                     this.$router.push({ name: 'budget', params: { year, month }})
                 }
             },
-            entryDialog (entry) {
+            modifyEntry (entry) {
                 this.view = {
                     state: 'entry-form',
                     data: entry
                 }
+            },
+            cancelEntryForm () {
+                this.view = {
+                    state: 'list',
+                    data: {}
+                }
+            },
+            closeEntryForm () {
+                this.loadBudget()
+                this.cancelEntryForm()
             }
         },
 
