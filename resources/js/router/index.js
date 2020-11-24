@@ -7,20 +7,29 @@ import VueRouterPrefetch from 'vue-router-prefetch'
 import store from '@/store'
 
 /**
+ * Other needed imports
+ */
+import moment from 'moment'
+
+/**
  * Load the layout components
  */
 import BaseLayout from '@/components/layouts/BaseLayout';
 import AuthLayout from "@/components/layouts/AuthLayout";
-import SecureLayout from "@/components/layouts/SecureLayout";
+import DashboardLayout from "@/components/layouts/DashboardLayout";
 
 /**
- * Load the view components
+ * Load the auth components
  */
-import Budget from '@/views/dashboard/budget/Budget'
 import Login from '@/views/auth/Login'
 import Locked from '@/views/auth/Locked'
 import Lock from '@/views/auth/Lock'
 import Logout from '@/views/auth/Logout'
+
+/**
+ * Load the budget components
+ */
+import Budget from '@/views/dashboard/budget/Budget'
 
 /**
  * Middleware
@@ -73,14 +82,23 @@ const routes = [
             }, {
                 path: 'dashboard',
                 name: 'dashboard',
-                component: SecureLayout,
+                component: DashboardLayout,
                 meta: { privateAccess: true },
                 redirect: { name: 'budget' },
                 children: [
                     {
                         path: 'budget/:year?/:month?',
                         name: 'budget',
-                        component: Budget
+                        component: Budget,
+                        beforeEnter: (to, from , next) => {
+                            if (!to.params.year || !to.params.month) {
+                                const now = moment()
+                                const year = now.format('YYYY')
+                                const month = now.format('MM')
+                                next({ name: 'budget', params: { year, month }})
+                            }
+                            next()
+                        }
                     }
                 ]
             }

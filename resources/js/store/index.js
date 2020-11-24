@@ -1,6 +1,7 @@
 import Vuex from 'vuex'
 import Vue from 'vue'
 import config from '@/config'
+import moment from 'moment'
 
 // Add Vuex to the Vue instance
 Vue.use(Vuex)
@@ -35,6 +36,8 @@ export default new Vuex.Store({
         loading: false,
         site: {},
         settings: {},
+        budgetDate: null,
+        budgetView: 'incomes',
         user: {},
         page: {
             title: ''
@@ -68,6 +71,14 @@ export default new Vuex.Store({
         },
         user: state => {
             return state.user
+        },
+        budgetDate: state => {
+            if (state.budgetDate) return this.budgetDate
+            else return moment().format('YYYY-MM-01')
+        },
+        budgetView: state => {
+            if (state.budgetView === 'groups') return 'groups'
+            else return 'incomes'
         },
         page: state => {
             return state.page
@@ -112,6 +123,12 @@ export default new Vuex.Store({
                 localStorage.setItem(config.LOCAL_REFRESH_TOKEN_KEY, tokens.refresh.token)
             }
         },
+        budgetDate (state, date) {
+            state.budgetDate = date
+        },
+        budgetView (state, view) {
+            state.budgetView = view
+        },
         page (state, payload) {
             state.page.title = payload.title
         }
@@ -147,6 +164,12 @@ export default new Vuex.Store({
         },
         appLoaded ({ commit }, payload) {
             commit('appLoaded', payload)
+        },
+        budgetDate ({ commit }, date) {
+            commit('budgetDate', date)
+        },
+        budgetView ({ commit }, view) {
+            commit('budgetView', view)
         }
     }
 })

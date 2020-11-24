@@ -88,7 +88,7 @@ export default {
         updateState ({ goal, paid, cleared }) {
             this.$http.updateEntry(this.month, this.value.id, { goal, paid, cleared })
                 .then(({ data }) => {
-                    console.log('data', data)
+                    this.$emit('updated', data)
                 }).catch(({ error }) => {
                     console.log('error', error)
                 })

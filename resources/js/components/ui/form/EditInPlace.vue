@@ -94,7 +94,10 @@
                 this.$emit('input', value)
             },
             update () {
-                this.$emit('updated')
+                if (this.current !== this.original) {
+                    this.$emit('updated', this.current)
+                    this.original = this.current
+                }
                 this.edit = false
             },
             cancel () {

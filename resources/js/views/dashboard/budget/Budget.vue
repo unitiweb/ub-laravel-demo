@@ -1,164 +1,156 @@
 <template>
-    <layout>
-        <template v-slot:header>
-            <div class="float-left">
-                Budget
+    <section>
+        <budget-header class="mb-4"></budget-header>
+<!--        <budget-sidebar>-->
+            <div v-if="state.view === 'budget'">
+                <incomes v-if="budgetView === 'incomes'" :budget="budget" @modify-entry="modifyEntry"/>
+                <div class="text-red-500 text-right pr-4">
+                    <f-button @click="budgetDelete" outline variant="danger" size="sm" icon-left="minusCircle">delete budget</f-button>
+                </div>
             </div>
-            <div class="float-right">
-                <button>Testing</button>
+            <div v-else-if="state.view === 'modify-entry'">
+                <entry-form :entry="state.data" :budget="budget" @done="entryDone"/>
             </div>
-            <div class="clearfix"></div>
-        </template>
-
-        <income v-if="view.state === 'list'" v-for="(income, index) in incomes" :key="`income-${index}`" :income="income">
-            <draggable handle=".entry-handle" v-model="income.entries" v-bind="dragOptions" group="entries" @move="onMoveCallback" @start="startDrag" @end="endDrag">
-                <transition-group type="transition" :name="!drag ? 'flip-list' : null">
-                    <entry-row v-for="(entry, index) in income.entries" :key="`${entry}-${index}`" :month="budget.month" @modify="modifyEntry" :entry="entry"></entry-row>
-                </transition-group>
-            </draggable>
-        </income>
-
-        <entry-form v-if="view.state === 'entry-form'" :budget="budget" :entry="view.data" @cancel="cancelEntryForm" @updated="closeEntryForm"></entry-form>
-    </layout>
+            <div v-else-if="state.view === 'budget-create'">
+                <budget-create :month="budgetDate" @created="budgetCreated"></budget-create>
+            </div>
+            <modal v-if="state.view === 'budget-delete'"
+                   variant="danger"
+                   title="Are you sure?"
+                   confirm-label="Yes, Delete!"
+                   cancel-label="Oops! No"
+                   @confirm="budgetDeleteConfirm"
+                   @cancel="budgetDeleteCanceled">
+                Do you really want to delete this budget? It can't be undone.
+            </modal>
+<!--        </budget-sidebar>-->
+    </section>
 </template>
 
 <script>
-    import Layout from "@/components/layouts/Layout"
+    import BudgetHeader from '@/components/budget/BudgetHeader'
+    import BudgetSidebar from '@/components/budget/BudgetSidebar'
+    import Incomes from '@/views/dashboard/budget/Incomes'
     import EntryForm from '@/components/budget/EntryForm'
-    import EntryRow from '@/components/budget/EntryRow'
-    import Draggable from 'vuedraggable'
-    import Income from '@/components/budget/Income'
-    import moment from 'moment'
+    import BudgetCreate from '@/views/dashboard/budget/BudgetCreate'
+    import Modal from "@/components/ui/modal/Modal";
 
     export default {
 
         components: {
-            Layout,
+            BudgetHeader,
+            BudgetSidebar,
+            Incomes,
             EntryForm,
-            EntryRow,
-            Draggable,
-            Income
+            BudgetCreate,
+            Modal
+        },
+
+        computed: {
+
+            year () {
+                return this.$route.params.year
+            },
+
+            month () {
+                return this.$route.params.month
+            },
+
+            budgetView () {
+                return this.$store.getters.budgetView || 'incomes'
+            },
+
+            budgetDate () {
+                return `${this.year}-${this.month}-01`
+            }
+
         },
 
         data () {
             return {
-                budget: {},
-                drag: false,
-                view: {
-                    state: 'list',
-                    data: {}
+                budget: {
+                    id: null,
+                    month: null,
+                    incomes: [],
+                    groups: []
+                },
+                state: {
+                    view: 'budget',
+                    data: null
                 }
             }
         },
 
-        computed: {
-            budgetDate () {
-                const year = this.$route.params.year
-                const month = this.$route.params.month
-                return moment(`${year}-${month}-01`, 'YYYY-MM-DD').format('YYYY-MM-DD')
-            },
-            incomes () {
-                return this.budget.incomes || []
-            },
-            dragOptions() {
-                return {
-                    animation: 200,
-                    group: "description",
-                    disabled: false,
-                    ghostClass: "ghost"
-                };
-            }
-        },
-
         watch: {
-            $route () {
+            $route() {
+                // Reload the budget when the route changes
                 this.loadBudget()
             }
         },
 
         methods: {
-            startDrag (value) {
-                this.drag = true
-            },
-            endDrag (value) {
-                this.drag = false
-            },
-            onMoveCallback (evt, originalEvent) {
-                // ...
-                // return false; — for cancel
-            },
-            refresh () {
-                this.loadBudget()
-            },
-            loadBudget () {
-                this.redirectIfNoDate()
-                this.budget = {}
-                this.$store.commit('loading', true)
-                this.$http.getBudget(this.budgetDate, 'incomes,incomes.entries,incomes.entries.group')
-                    .then(({ data }) => {
-                        this.budget = data
-                        this.$store.commit('loading', false)
-                    }).catch(({ error }) => {
-                        this.$store.commit('loading', false)
-                        if (error.code === 404) {
-                            this.view = 'addBudget'
-                        } else {
-                            this.error = error
-                            this.view = 'error'
-                        }
-                    })
-            },
-            redirectIfNoDate () {
-                let year = this.$route.params.year
-                let month = this.$route.params.month
-                if (!year || !month) {
-                    let year = moment().format('YYYY')
-                    let month = moment().format('MM')
-                    this.$router.push({ name: 'budget', params: { year, month }})
+
+            async loadBudget () {
+                let relations = 'incomes,incomes.entries,incomes.entries.group'
+
+                // Reset the relations if view is groups
+                if (this.budgetView === 'groups') {
+                    relations = 'groups,groups.entries,groups.entries.income'
+                }
+
+                try {
+                    const { data } = await this.$http.getBudget(this.budgetDate, relations)
+                    this.budget = data
+                    this.setState('budget')
+                } catch ({ error }) {
+                    if (error.code === 404) {
+                        this.setState('budget-create')
+                    } else {
+                        console.log('error', error.code)
+                    }
                 }
             },
+
+            setState (view, data = null) {
+                this.state = { view, data }
+            },
+
             modifyEntry (entry) {
-                this.view = {
-                    state: 'entry-form',
-                    data: entry
-                }
+                this.setState('modify-entry', entry)
             },
-            cancelEntryForm () {
-                this.view = {
-                    state: 'list',
-                    data: {}
-                }
-            },
-            closeEntryForm () {
+
+            entryDone (saved) {
+                this.setState('budget');
                 this.loadBudget()
-                this.cancelEntryForm()
+            },
+
+            budgetCreated (budget) {
+                this.setState('budget')
+                this.loadBudget()
+            },
+
+            async budgetDelete () {
+                this.setState('budget-delete')
+            },
+
+            budgetDeleteCanceled () {
+                this.setState('budget')
+            },
+
+            async budgetDeleteConfirm () {
+                try {
+                    await this.$http.deleteBudget(this.budgetDate)
+                    await this.loadBudget()
+                } catch ({ error }) {
+                    console.log('error', error)
+                }
             }
+
         },
 
-        mounted () {
-            this.loadBudget()
+        async mounted () {
+            await this.loadBudget()
         }
 
     }
 </script>
-
-<style lang="scss" scoped>
-    .flip-list-move {
-        transition: transform 0.5s;
-    }
-    .no-move {
-        transition: transform 0s;
-    }
-    .ghost {
-        visibility: hidden;
-    }
-    .list-group {
-        min-height: 20px;
-    }
-    .list-group-item {
-        cursor: move;
-    }
-    .list-group-item i {
-        cursor: pointer;
-    }
-</style>

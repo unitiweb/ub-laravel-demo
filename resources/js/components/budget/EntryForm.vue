@@ -1,6 +1,6 @@
 <template>
 
-    <f-card title="Entry Details" sub-title="This is a test and only a test">
+    <f-card title="Entry Details" sub-title="This is a test and only a test" class="rounded-l-none shadow-md">
 
         <div class="grid grid-cols-2 gap-6">
             <div class="col-span-2">
@@ -38,9 +38,14 @@
             </div>
         </div>
 
+        <modal v-if="showDelete" variant="danger" title="Are you sure?" confirm-label="Yes, Delete!" cancel-label="Oops! No" @confirm="deleteEntryConfirmed" @cancel="deleteEntryCanceled">
+            Do you really want to delete this entry? It can't be undone.
+        </modal>
+
         <template v-slot:buttons>
+            <f-button @click="deleteEntry" outline variant="danger" class="float-left">delete</f-button>
             <f-button variant="secondary" @click="cancel" outline>Cancel</f-button>
-            <f-button @click="submit">Save</f-button>
+            <f-button @click="save">Save</f-button>
         </template>
     </f-card>
 
@@ -48,10 +53,11 @@
 
 <script>
     import moment from 'moment'
+    import Modal from "@/components/ui/modal/Modal";
 
     export default {
 
-        components: {},
+        components: {Modal},
 
         props: {
             budget: {
@@ -65,18 +71,10 @@
 
         data () {
             return {
-                // entry: {
-                //     name: '',
-                //     autoPay: false,
-                //     dueDay: null,
-                //     amount: 0.00,
-                //     incomeId: 'second',
-                //     groupId: null,
-                //     url: ''
-                // },
                 autoPayOn: false,
                 incomes: [],
-                groups: []
+                groups: [],
+                showDelete: false
             }
         },
 
@@ -121,16 +119,41 @@
                 this.autoPayOn = !this.autoPayOn
             },
             cancel () {
-                this.$emit('cancel')
+                this.$emit('done', false)
             },
-            submit () {
+            async save () {
                 this.$store.commit('loading', true)
-                this.$http.updateEntry(this.budget.month, this.entry.id, this.entry).then(({ data }) => {
-                    this.$store.commit('loading', false)
-                    this.$emit('updated', this.entry)
-                }).catch(({ error }) => {
+                try {
+                    if (!this.entry.incomeId) {
+                        delete this.entry.incomeId
+                    }
+                    if (!this.entry.groupId) {
+                        delete this.entry.groupId
+                    }
+
+                    if (this.entry.id) {
+                        const data = await this.$http.updateEntry(this.budget.month, this.entry.id, this.entry)
+                        this.$store.commit('loading', false)
+                        this.$emit('done', true)
+                    } else {
+                        const data = await this.$http.addEntry(this.budget.month, this.entry)
+                        this.$store.commit('loading', false)
+                        this.$emit('done', true)
+                    }
+                } catch ({ error }) {
                     console.log('error', error)
-                })
+                }
+            },
+            deleteEntry () {
+                this.showDelete = true
+            },
+            async deleteEntryConfirmed () {
+                const { data } = await this.$http.deleteEntry(this.budget.month, this.entry.id)
+                this.$emit('done', true)
+                this.showDelete = false
+            },
+            deleteEntryCanceled () {
+                this.showDelete = false
             }
         },
 

@@ -14,6 +14,9 @@ window.Vue.use(VueTailwind, VueTailwindTheme)
 import UiComponents from "@/components/ui";
 window.Vue.use(UiComponents)
 
+import Filters from "@/filters";
+window.Vue.use(Filters)
+
 import Http from '@/scripts/http'
 window.Vue.use(Http)
 

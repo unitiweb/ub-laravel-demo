@@ -1,11 +1,12 @@
 <template>
-    <span :class="wrapperClasses">
-        <button type="button" :class="classes" @click="click">
+<!--    <span :class="wrapperClasses">-->
+        <button type="button" class="btn" :class="classes" @click="click">
             <icon v-if="iconLeft" :name="iconLeft" class="-ml-1 mr-2 h-5 w-5"></icon>
-            <slot/>
+            <icon v-if="icon" :name="icon"  class="h-5 w-5"></icon>
+            <slot v-if="!icon"/>
             <icon v-if="iconRight" :name="iconRight" class="mr-1 ml-2 h-5 w-5"></icon>
         </button>
-    </span>
+<!--    </span>-->
 </template>
 
 <script>
@@ -40,6 +41,10 @@
                     return ['xs', 'sm', 'md', 'lg', 'xl'].indexOf(value) !== -1
                 }
             },
+            icon: {
+                type: String,
+                default: null
+            },
             iconLeft: {
                 type: String,
                 default: null
@@ -52,8 +57,8 @@
 
         data () {
             return {
-                wrapperBase: 'rounded-md shadow-md',
-                buttonBase: 'border-2 border-transparent leading-5 font-medium rounded-md focus:outline-none transition ease-in-out duration-150',
+                // wrapperBase: 'rounded-md shadow-md',
+                buttonBase: 'rounded-md shadow-md border border-transparent leading-5 font-medium rounded-md focus:outline-none transition ease-in-out duration-150 px-2',
                 colorMap: {
                     primary: 'blue',
                     secondary: 'gray',
@@ -66,20 +71,20 @@
         },
 
         computed: {
-            wrapperClasses () {
-                const classes = []
-
-                if (this.block) {
-                    classes.push('block w-full')
-                } else {
-                    classes.push('inline-flex')
-                }
-
-                // BAse style
-                classes.push(this.wrapperBase)
-
-                return classes
-            },
+            // wrapperClasses () {
+            //     const classes = []
+            //
+            //     if (this.block) {
+            //         classes.push('block w-full')
+            //     } else {
+            //         classes.push('inline-flex')
+            //     }
+            //
+            //     // BAse style
+            //     classes.push(this.wrapperBase)
+            //
+            //     return classes
+            // },
             classes () {
                 const classes = []
 
@@ -108,7 +113,7 @@
                 if (this.outline) {
                     return `text-${color}-700
                             bg-${color}-100
-                            border-2
+                            border
                             border-${color}-500
                             hover:bg-${color}-200
                             hover:border-${color}-600
@@ -129,15 +134,15 @@
                 let size = ''
 
                 if (this.size === 'xs') {
-                    size = 'text-xs px-2 py-0'
+                    size = 'text-xs h-6 px-2 py-0'
                 } else if (this.size === 'sm') {
-                    size = 'text-sm px-1 py-1'
+                    size = 'text-sm h-8 px-1 py-1'
                 } else if (this.size === 'md') {
-                    size = 'text-base px-3 py-2'
+                    size = 'text-base h-10 px-3 py-2'
                 } else if (this.size === 'lg') {
-                    size = 'text-base px-3 py-3'
+                    size = 'text-base h-12 px-3 py-3'
                 } else if (this.size === 'xl') {
-                    size = 'text-2xl px-4 py-4'
+                    size = 'text-2xl h-12 px-4 py-4'
                 }
                 return `text-${this.size} ${size}`
             }
