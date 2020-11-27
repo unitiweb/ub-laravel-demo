@@ -1,25 +1,18 @@
 <template>
-    <div class="flex bg-white border-b rounded-md">
-        <div class="flex-none border-r px-1 py-1">
-            <icon name="switchVertical" class="entry-handle cursor-move text-gray-500 hover:text-blue-700 h-5 h-5"></icon>
-            <icon @click="modify" name="pencilAlt" class="cursor-pointer text-gray-500 hover:text-blue-700 mt-1 h-5 h-5"></icon>
+    <div :class="rowClasses" class="flex border-b rounded-md cursor-pointer">
+        <div class="flex-none border-r px-1 pt-4">
+            <icon name="menu" fill class="entry-handle cursor-move text-gray-300 hover:text-gray-700 h-4 h-4"></icon>
         </div>
-        <div class="flex-1 px-2">
-            <edit-in-place classes="py-1 px-1 hover:bg-gray-200" v-model="entry.name" :width="200" @updated="updateName"/>
+        <div @click="modify" class="flex-1 px-2 pt-1">
+            {{ entry.name }}
             <div class="text-xs text-gray-600 pl-1">
-                Due:
-                <t-datepicker
-                    :value="dueDate"
-                    placeholder="Select a date"
-                    date-format="Y-m-d"
-                    user-format="J"
-                    :clearable="false"
-                    @input="updateDueDay"
-                />
+                Due Day: {{ dueDate }}
             </div>
         </div>
-        <div class="flex-none hover:bg-blue-100">
-            <edit-in-place classes="text-right text-lg amount-width px-3 py-3" v-model="entry.amount" :width="125" currency select-on-edit @updated="updateAmount"/>
+        <div @click="modify" class="flex-none">
+            <div class="text-right text-lg amount-width px-3 pt-3" v-model="entry.amount" :width="125">
+                {{ entry.amount | currency }}
+            </div>
         </div>
         <div class="flex-none rounded-md">
             <entry-progress v-model="entry" :month="this.month" @updated="updateStatus"></entry-progress>
@@ -50,6 +43,10 @@
             },
             entry: {
                 type: Object
+            },
+            active: {
+                type: Boolean,
+                default: false
             }
         },
 
@@ -78,8 +75,14 @@
             dueDate () {
                 const date = moment(new Date())
                 date.date(this.entry.dueDay)
-                return date.format('YYYY-MM-DD')
+                return date.format('Do')
                 // return moment().date(this.entry.dueDay).format('Y-m-d')
+            },
+            rowClasses () {
+                if (this.active) {
+                    return 'bg-yellow-100 border border-yellow-500'
+                }
+                return 'bg-white hover:bg-gray-100'
             }
         },
 

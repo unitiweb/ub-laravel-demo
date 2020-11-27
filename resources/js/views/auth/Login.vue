@@ -26,7 +26,7 @@
             <alert variant="danger" :show="!!error">{{ error }}</alert>
 
             <template v-slot:footer>
-                <f-button @click="login" icon="lock" block>Login</f-button>
+                <ub-button @click="login" icon="lock" block>Login</ub-button>
             </template>
         </card>
 
@@ -41,13 +41,11 @@
 
 <script>
     import Logo from '@/components/ui/logo/Logo'
-    import FButton from '@/components/ui/form/FButton'
 
     export default {
 
         components: {
-            Logo,
-            FButton
+            Logo
         },
 
         data () {

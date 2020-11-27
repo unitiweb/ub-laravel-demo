@@ -46,12 +46,12 @@
                     </div>
                     <div class="bg-gray-200 border border-top px-4 py-3 sm:px-6 sm:flex sm:flex-row-reverse">
                         <slot name="buttons">
-                          <f-button v-if="!hideConfirm" :variant="variant" @click="confirm" class="mx-2">
+                          <ub-button v-if="!hideConfirm" :variant="variant" @click="confirm" class="mx-2">
                             {{ confirmLabel }}
-                          </f-button>
-                          <f-button v-if="!hideCancel" variant="secondary" outline @click="cancel" class="mx-2">
+                          </ub-button>
+                          <ub-button v-if="!hideCancel" variant="secondary" outline @click="cancel" class="mx-2">
                             {{ cancelLabel }}
-                          </f-button>
+                          </ub-button>
                         </slot>
                     </div>
                 </div>

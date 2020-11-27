@@ -1,29 +1,66 @@
 <template>
     <section>
         <budget-header class="mb-4"></budget-header>
-<!--        <budget-sidebar>-->
-            <div v-if="state.view === 'budget'">
-                <incomes v-if="budgetView === 'incomes'" :budget="budget" @modify-entry="modifyEntry"/>
-                <div class="text-red-500 text-right pr-4">
-                    <f-button @click="budgetDelete" outline variant="danger" size="sm" icon-left="minusCircle">delete budget</f-button>
+
+        <div v-if="!budget">
+            <budget-create :month="budgetDate" @created="budgetCreated"></budget-create>
+        </div>
+
+        <budget-divided v-if="budget">
+            <template v-slot:left>
+                <div :class="leftVisibility">
+                    <incomes v-if="budgetView === 'incomes'" :active-income="activeIncome" :active-row="activeRow" :budget="budget" @modify-income="modifyIncome" @modify-entry="modifyEntry"/>
+                    <div>
+                        <ub-button @click="incomeCreate" class="float-left" outline variant="primary" size="sm" icon-left="plusCircle">Create Income</ub-button>
+                        <ub-button @click="budgetDelete" class="float-right" outline variant="danger" size="sm" icon-left="minusCircle">delete budget</ub-button>
+                    </div>
                 </div>
-            </div>
-            <div v-else-if="state.view === 'modify-entry'">
-                <entry-form :entry="state.data" :budget="budget" @done="entryDone"/>
-            </div>
-            <div v-else-if="state.view === 'budget-create'">
-                <budget-create :month="budgetDate" @created="budgetCreated"></budget-create>
-            </div>
-            <modal v-if="state.view === 'budget-delete'"
-                   variant="danger"
-                   title="Are you sure?"
-                   confirm-label="Yes, Delete!"
-                   cancel-label="Oops! No"
-                   @confirm="budgetDeleteConfirm"
-                   @cancel="budgetDeleteCanceled">
-                Do you really want to delete this budget? It can't be undone.
-            </modal>
-<!--        </budget-sidebar>-->
+            </template>
+            <template v-slot:right>
+
+                <transition enter-active-class="transition ease-out duration-100"
+                            enter-class="transform opacity-0 scale-95"
+                            enter-to-class="transform opacity-100 scale-100"
+                            leave-active-class="transition ease-in duration-75"
+                            leave-class="transform opacity-100 scale-100"
+                            leave-to-class="transform opacity-0 scale-95">
+                    <div :class="rightVisibility">
+                        <div class="flex bg-gray-200 border border-t-0 border-l-0 border-r-0 border-b border-gray-400 rounded-md">
+                            <div class="flex-1 text-xl text-center cursor-pointer hover:bg-gray-200 py-2">
+                                <ub-button v-if="state.view !== 'budget'"
+                                           @click="toggleRightPanel"
+                                           class="float-left ml-4"
+                                           size="sm"
+                                           outline
+                                           variant="secondary"
+                                           icon="chevronDoubleLeft">
+                                </ub-button>
+                                {{ state.title }}
+                            </div>
+                        </div>
+                        <div v-if="state.view === 'budget'" class="p-4 text-center">
+                            Stats will go here
+                        </div>
+                        <div v-if="state.view === 'modify-income'">
+                            <income-form :income="state.data" :budget="budget" @done="done"/>
+                        </div>
+                        <div v-if="state.view === 'modify-entry'">
+                            <entry-form :entry="state.data" :budget="budget" @done="done"/>
+                        </div>
+                    </div>
+                </transition>
+
+            </template>
+        </budget-divided>
+        <modal v-if="state.view === 'budget-delete'"
+               variant="danger"
+               title="Are you sure?"
+               confirm-label="Yes, Delete!"
+               cancel-label="Oops! No"
+               @confirm="budgetDeleteConfirm"
+               @cancel="budgetDeleteCanceled">
+            Do you really want to delete this budget? It can't be undone.
+        </modal>
     </section>
 </template>
 
@@ -31,22 +68,69 @@
     import BudgetHeader from '@/components/budget/BudgetHeader'
     import BudgetSidebar from '@/components/budget/BudgetSidebar'
     import Incomes from '@/views/dashboard/budget/Incomes'
-    import EntryForm from '@/components/budget/EntryForm'
+    import IncomeForm from '@/views/dashboard/budget/IncomeForm'
+    import EntryForm from '@/views/dashboard/budget/EntryForm'
     import BudgetCreate from '@/views/dashboard/budget/BudgetCreate'
     import Modal from "@/components/ui/modal/Modal";
+    import BudgetDivided from '@/components/budget/BudgetDivided'
 
     export default {
 
         components: {
             BudgetHeader,
             BudgetSidebar,
+            BudgetDivided,
             Incomes,
+            IncomeForm,
             EntryForm,
             BudgetCreate,
             Modal
         },
 
+        data () {
+            return {
+                budget: {
+                    id: null,
+                    month: null,
+                    incomes: [],
+                    groups: []
+                },
+                state: {
+                    view: 'budget',
+                    title: 'Budget Stats',
+                    data: null
+                },
+                activeIncome: null,
+                activeRow: null
+            }
+        },
+
         computed: {
+
+            leftVisibility () {
+                const classes = []
+
+                if (this.state.view !== 'budget') {
+                    classes.push('hidden md:inline')
+                } else {
+                    classes.push('')
+                }
+
+                return classes
+            },
+
+            rightVisibility () {
+                const classes = []
+                if (this.state.view === 'budget') {
+                    console.log('state', this.state)
+                    classes.push('hidden md:inline')
+                } else {
+                    // classes.push('hidden md:inline')
+                    classes.push('')
+                }
+
+                return classes
+            },
 
             year () {
                 return this.$route.params.year
@@ -66,21 +150,6 @@
 
         },
 
-        data () {
-            return {
-                budget: {
-                    id: null,
-                    month: null,
-                    incomes: [],
-                    groups: []
-                },
-                state: {
-                    view: 'budget',
-                    data: null
-                }
-            }
-        },
-
         watch: {
             $route() {
                 // Reload the budget when the route changes
@@ -91,7 +160,7 @@
         methods: {
 
             async loadBudget () {
-                let relations = 'incomes,incomes.entries,incomes.entries.group'
+                let relations = 'incomes,incomes.entries,incomes.entries.group,unassignedIncomeEntries'
 
                 // Reset the relations if view is groups
                 if (this.budgetView === 'groups') {
@@ -104,24 +173,66 @@
                     this.setState('budget')
                 } catch ({ error }) {
                     if (error.code === 404) {
-                        this.setState('budget-create')
+                        this.budget = null
+                        // this.setState('budget-create')
                     } else {
                         console.log('error', error.code)
                     }
                 }
             },
 
-            setState (view, data = null) {
-                this.state = { view, data }
+            toggleRightPanel () {
+                if (this.state.view !== 'budget') {
+                    this.activeIncome = null
+                    this.activeRow = null
+                    this.setState('budget')
+                }
+            },
+
+            setState (view, title = 'Budget Stats', data = null) {
+                this.state = { view, title, data }
+            },
+
+            modifyIncome (income) {
+                this.activeRow = null
+                if (this.activeIncome === income.id) {
+                    this.activeIncome = null
+                    this.setState('budget')
+                } else {
+                    console.log('income', income)
+                    this.activeIncome = income.id
+                    this.setState('modify-income', 'Modify Income', income)
+                }
             },
 
             modifyEntry (entry) {
-                this.setState('modify-entry', entry)
+                console.log('here', entry)
+                this.activeIncome = null
+
+                if (entry.id === null) {
+                    this.setState('modify-entry', 'Create Entry', entry)
+                } else if (entry.id === this.activeRow) {
+                    this.activeRow = null
+                    this.setState('budget')
+                } else {
+                    this.activeRow = entry.id
+                    this.setState('modify-entry', 'Modify Entry', entry)
+                }
             },
 
-            entryDone (saved) {
+            done () {
                 this.setState('budget');
                 this.loadBudget()
+                this.activeIncome = null
+                this.activeRow = null
+            },
+
+            incomeCreate () {
+                this.setState('modify-income', 'Create Income', {
+                    name: '',
+                    dueDay: '1',
+                    amount: '0.00'
+                })
             },
 
             budgetCreated (budget) {
@@ -130,7 +241,7 @@
             },
 
             async budgetDelete () {
-                this.setState('budget-delete')
+                this.setState('budget-delete', 'Delete Entry')
             },
 
             budgetDeleteCanceled () {

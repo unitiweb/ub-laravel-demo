@@ -39,7 +39,7 @@ export default {
         },
         paidClasses () {
             if (this.value.paid) {
-                return 'bg-orange-300 border-orange-400'
+                return 'bg-yellow-300 border-yellow-500'
             } else {
                 return this.defaultStatusClasses
             }

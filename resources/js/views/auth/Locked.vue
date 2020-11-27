@@ -20,10 +20,10 @@
             <div class="mt-6">
                 <div class="flex">
                     <div class="flex-auto p-2">
-                        <f-button @click="logout" variant="outline" icon="logout" block>Sign Out</f-button>
+                        <ub-button @click="logout" variant="outline" icon="logout" block>Sign Out</ub-button>
                     </div>
                     <div class="flex-auto p-2">
-                        <f-button @click="login" variant="primary" icon="login" block>Unlock</f-button>
+                        <ub-button @click="login" variant="primary" icon="login" block>Unlock</ub-button>
                     </div>
                 </div>
             </div>

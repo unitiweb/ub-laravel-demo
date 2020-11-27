@@ -6,32 +6,32 @@
                 <span class="text-sm text-gray-600">{{ year }}</span>
             </h2>
             <div class="hidden sm:inline mt-1 pt-2 flex flex-col sm:flex-row sm:flex-wrap sm:mt-0 sm:space-x-2">
-                <badge variant="success" outline small>
+                <ub-badge variant="success" outline small>
                     Income: {{ income | currency }}
-                </badge>
-                <badge variant="danger" outline small>
+                </ub-badge>
+                <ub-badge variant="danger" outline small>
                     Expenses: {{ expenses | currency }}
-                </badge>
-                <badge variant="success" outline small>
+                </ub-badge>
+                <ub-badge variant="success" outline small>
                     Left Over: {{ leftOver | currency }}
-                </badge>
+                </ub-badge>
             </div>
             <div class="inline sm:hidden mt-1 pt-2 flex flex-row flex-wrap text-center mt-0 space-x-2">
-                <badge variant="success" outline small class="flex-1 align-center">
+                <ub-badge variant="success" outline small class="flex-1 align-center">
                     Income: {{ income | currency }}
-                </badge>
-                <badge variant="danger" outline small class="flex-1">
+                </ub-badge>
+                <ub-badge variant="danger" outline small class="flex-1">
                     Expenses: {{ expenses | currency }}
-                </badge>
-                <badge variant="success" outline small class="flex-1">
+                </ub-badge>
+                <ub-badge variant="success" outline small class="flex-1">
                     Left Over: {{ leftOver | currency }}
-                </badge>
+                </ub-badge>
             </div>
         </div>
         <div class="mt-5 flex lg:mt-0 lg:ml-4">
-            <f-button @click="previous" outline block icon="chevronDoubleLeft" class="mr-1"></f-button>
-            <f-button @click="today" outline block icon="calendar"></f-button>
-            <f-button @click="next" outline block icon="chevronDoubleRight" class="ml-1"></f-button>
+            <ub-button @click="previous" outline block icon="chevronDoubleLeft" class="mr-1"></ub-button>
+            <ub-button @click="today" outline block icon="calendar"></ub-button>
+            <ub-button @click="next" outline block icon="chevronDoubleRight" class="ml-1"></ub-button>
         </div>
     </div>
 </template>

@@ -12,13 +12,14 @@
             <div v-if="showLeftIcon" class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
                 <icon :name="leftIcon" fill class="h-5 w-5 text-gray-400"/>
             </div>
-            <span v-if="showLeftAddOn" class="inline-flex items-center px-3 text-gray-600 bg-gray-200 border-2 border-gray-400 rounded-l-md left-0 px-3 flex items-center pointer-events-none">
+            <span v-if="showLeftAddOn" class="inline-flex items-center px-3 text-gray-600 bg-gray-200 border border-gray-400 rounded-l-md left-0 px-3 flex items-center pointer-events-none">
                 {{ leftAddOn }}
             </span>
-            <slot>
-                <input :type="type" :class="inputClasses" :value="value" @input="input" :placeholder="placeholder">
-            </slot>
-            <span v-if="showRightAddOn" class="inline-flex items-center px-3 text-gray-600 bg-gray-200 border-2 border-gray-400 rounded-r-md left-0 px-3 flex items-center pointer-events-none">
+            <div v-if="!!this.$slots.default" :class="inputClasses">
+                <slot/>
+            </div>
+            <input v-if="!!!this.$slots.default" :type="type" :class="inputClasses" :value="value" @input="input" :placeholder="placeholder">
+            <span v-if="showRightAddOn" class="inline-flex items-center px-3 text-gray-600 bg-gray-200 border border-gray-400 rounded-r-md left-0 px-3 flex items-center pointer-events-none">
                 {{ rightAddOn }}
             </span>
             <div v-if="showRightIcon" class="absolute inset-y-0 right-0 pr-3 flex items-center pointer-events-none">
@@ -91,6 +92,10 @@
                 description: 'The field placeholder',
                 type: String
             },
+            right: {
+                type: Boolean,
+                default: false
+            },
             leftIcon: {
                 type: String,
                 default: null
@@ -114,7 +119,7 @@
                 // wrapperBaseClasses: 'sm:grid sm:grid-cols-3 sm:gap-4 sm:items-start sm:border-t sm:border-gray-200 sm:pt-5',
                 wrapperBaseClasses: 'mt-1 rounded-md shadow-sm',
                 labelBaseClasses: 'block text-sm font-medium leading-5 text-gray-700 pl-2',
-                inputBaseClasses: 'bg-white border-2 border-gray-400 rounded-md py-2 px-4 block w-full leading-normal focus:outline-none focus:shadow-outline'
+                inputBaseClasses: 'bg-white border border-gray-400 rounded-md py-2 px-4 block w-full leading-normal focus:outline-none focus:shadow-outline'
             }
         },
 
@@ -187,6 +192,10 @@
                     if (this.rightAddOn) {
                         classes.push('rounded-r-none border-r-0')
                     }
+                }
+
+                if (this.right) {
+                    classes.push('text-right')
                 }
 
                 return classes

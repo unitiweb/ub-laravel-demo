@@ -1,5 +1,5 @@
 <template>
-    <img src="/assets/favicons/favicon-32x32.png" :class="classes" alt=""/>
+    <img src="/assets/favicons/favicon-32x32.png" :class="classes" alt=""></template>
 </template>
 
 <script>

@@ -1,4 +1,4 @@
-import FButton from '@/components/ui/form/FButton'
+import UbButton from '@/components/ui/form/UbButton'
 import FInput from '@/components/ui/form/FInput'
 import FCard from '@/components/ui/form/FCard'
 import Icon from '@/components/ui/Icon'
@@ -9,12 +9,12 @@ import FSelect from '@/components/ui/form/FSelect'
 import FDatepicker from '@/components/ui/form/FDatepicker'
 import FOption from '@/components/ui/form/FOption'
 import FTransition from '@/components/ui/form/FTransition'
-import Badge from '@/components/ui/Badge'
+import UbBadge from '@/components/ui/UbBadge'
 
 const UiComponents = {
     install(Vue) {
         Vue.component('icon', Icon)
-        Vue.component('f-button', FButton)
+        Vue.component('ub-button', UbButton)
         Vue.component('f-input', FInput)
         Vue.component('f-card', FCard)
         Vue.component('card', Card)
@@ -24,7 +24,7 @@ const UiComponents = {
         Vue.component('f-option', FOption)
         Vue.component('f-datepicker', FDatepicker)
         Vue.component('f-transition', FTransition)
-        Vue.component('badge', Badge)
+        Vue.component('ub-badge', UbBadge)
     }
 }
 

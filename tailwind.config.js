@@ -4,6 +4,7 @@ module.exports = {
         // purgeLayersByDefault: true,
     },
     purge: [],
+    darkMode: false,
     theme: {
         extend: {
             colors: {

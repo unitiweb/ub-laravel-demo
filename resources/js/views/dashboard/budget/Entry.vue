@@ -38,8 +38,8 @@
         </div>
 
         <template v-slot:buttons>
-            <f-button variant="secondary" @click="cancel" outline>Cancel</f-button>
-            <f-button @click="save">Save</f-button>
+            <ub-button variant="secondary" @click="cancel" outline>Cancel</ub-button>
+            <ub-button @click="save">Save</ub-button>
         </template>
     </f-card>
 </template>

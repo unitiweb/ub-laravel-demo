@@ -29,7 +29,7 @@
         </ul>
 
         <template v-slot:footer>
-            <f-button block size="xl" @click="start">Start {{ monthName }}'s Budget</f-button>
+            <ub-button block size="xl" @click="start">Start {{ monthName }}'s Budget</ub-button>
         </template>
     </card>
 </template>

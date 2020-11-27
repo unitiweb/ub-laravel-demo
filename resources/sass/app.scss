@@ -4,54 +4,6 @@
 @import '~tailwindcss/utilities';
 
 // Custom Components
+@import './form.scss';
 @import './button.scss';
-//@import './form';
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-//@layer base {
-//    .btn {
-//        @apply relative flex justify-center border border-transparent leading-5 font-medium rounded-md shadow-md outline-none transition duration-150 ease-in-out;
-//    }
-//}
-
-//@layer utilities {
-//    .btn-primary:hover {
-//        @apply bg-indigo-500;
-//    }
-//    .btn-primary:focus {
-//        @apply border-indigo-800 shadow-outline-indigo;
-//    }
-//    .btn-primary:active {
-//        @apply bg-indigo-700;
-//    }
-//    .btn-xs {
-//        @apply text-xs px-2 py-1;
-//    }
-//    .btn-sm {
-//        @apply text-sm px-3 py-2;
-//    }
-//    .btn-md {
-//        @apply text-sm px-4 py-2;
-//    }
-//    .btn-lg {
-//        @apply text-base px-4 py-2;
-//    }
-//    .btn-xl {
-//        @apply text-base px-6 py-3;
-//    }
-//}
+@import './badge.scss';

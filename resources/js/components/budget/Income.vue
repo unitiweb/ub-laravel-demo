@@ -1,29 +1,29 @@
 <template>
-    <div class="border border-gray-400 rounded-md rounded-l-none shadow-md mb-3">
+    <div class="border border-gray-400 rounded-md shadow-md mb-3">
         <div>
-            <div class="flex bg-gray-200 border border-t-0 border-l-0 border-r-0 border-b border-gray-400 rounded-t-md">
-                <div class="flex-none text-lg text-right cursor-pointer px-3 py-2">
-                    <f-button @click="collapsed = !collapsed"
+            <div :class="incomeClasses" class="flex border border-t-0 border-l-0 border-r-0 border-b border-gray-400 rounded-md">
+                <div class="flex-none text-lg text-right px-3 py-2">
+                    <ub-button @click="collapsed = !collapsed"
                               size="sm" variant="secondary"
                               :icon="collapsed ? 'chevronDoubleRight' : 'chevronDoubleDown'"
                               outline>
-                    </f-button>
+                    </ub-button>
                 </div>
-                <div class="flex-1 text-xl cursor-pointer hover:bg-gray-200 py-2">
+                <div @click="modifyIncome" :class="{'cursor-pointer': !this.income.unassigned}" class="flex-1 text-xl pb-2 pt-3">
                     {{ income.name }}
-                    <span class="text-xs text-gray-600">Due: <due-day :value="income.dueDay"></due-day></span>
+                    <span v-if="!this.income.unassigned" class="text-xs text-gray-600">Due: <due-day :value="income.dueDay"></due-day></span>
                 </div>
-                <div class="flex-none text-xl text-right cursor-pointer px-3 py-2 hover:bg-blue-200 hover:border-2 hover:border-blue-700" style="width: 125px;">
-                    <edit-in-place classes="" v-model="income.amount" :width="125" currency select-on-edit @updated="value => updateIncomeAmount(value, income)"/>
+                <div v-if="!this.income.unassigned" @click="modifyIncome" :class="{'cursor-pointer': !this.income.unassigned}" class="flex-none text-xl text-right px-3 pb-2 pt-3" style="width: 125px;">
+                    {{ income.amount | currency }}
                 </div>
-                <div class="flex-none text-lg text-right cursor-pointer px-3 py-2">
-                    <f-button @click="entryCreate(income)" size="sm" variant="secondary" icon="plus" outline></f-button>
+                <div v-if="!this.income.unassigned" class="flex-none text-lg text-right px-3 py-2">
+                    <ub-button @click="entryCreate(income)" size="sm" variant="secondary" icon="plus" outline></ub-button>
                 </div>
             </div>
-            <div v-if="collapsed === false">
+            <div v-if="collapsed === false && income.entries.length > 0">
                 <draggable handle=".entry-handle" v-model="income.entries" v-bind="dragOptions" group="entries" @move="onMoveCallback" @start="startDrag" @end="endDrag">
                     <transition-group type="transition" :name="!drag ? 'flip-list' : null">
-                        <entry-row v-for="(entry, index) in income.entries" :key="`${entry}-${index}`" :month="budgetDate" @calculate="calculate" @modify="modifyEntry" :entry="entry"></entry-row>
+                        <entry-row v-for="(entry, index) in income.entries" :key="`${entry}-${index}`" :active="isActive(entry)" :month="budgetDate" @calculate="calculate" @modify="modifyEntry" :entry="entry"></entry-row>
                     </transition-group>
                 </draggable>
             </div>
@@ -31,16 +31,15 @@
                 <icon name="dotsHorizontal" class="h-5 w-5"></icon>
             </div>
         </div>
-        <div class="text-center bg-gray-200 border-t rounded-b-md pb-1 pt-1">
-            <badge variant="danger" rounded outline>Expenses: {{ balances.expenses | currency }}</badge>
-            <badge :variant="outstandingVariant(income)" rounded outline>Out Standing: {{ balances.outstanding | currency }}</badge>
-            <badge :variant="leftOverVariant(income)" rounded outline>Left Over: {{ balances.leftOver | currency }}</badge>
+        <div v-if="!this.income.unassigned" class="text-center bg-gray-200 border border-t border-l-0 border-r-0 border-b-0 border-gray-400 rounded-md pb-1 pt-1">
+            <ub-badge variant="danger" rounded outline>Expenses: {{ balances.expenses | currency }}</ub-badge>
+            <ub-badge :variant="outstandingVariant(income)" rounded outline>Out Standing: {{ balances.outstanding | currency }}</ub-badge>
+            <ub-badge :variant="leftOverVariant(income)" rounded outline>Left Over: {{ balances.leftOver | currency }}</ub-badge>
         </div>
     </div>
 </template>
 
 <script>
-    import {currency} from "@/scripts/helpers/utils";
     import DueDay from '@/components/ui/DueDay'
     import EditInPlace from '@/components/ui/form/EditInPlace'
     import Draggable from 'vuedraggable'
@@ -58,6 +57,14 @@
         props: {
             income: {
                 type: Object
+            },
+            active: {
+                type: Boolean,
+                default: false
+            },
+            activeRow: {
+                type: [String, Number],
+                default: null
             }
         },
 
@@ -65,11 +72,17 @@
             return {
                 drag: false,
                 collapsed: false,
-                balances: [],
+                balances: []
             }
         },
 
         computed: {
+            incomeClasses () {
+                if (this.active && !this.income.unassigned) {
+                    return 'bg-yellow-100'
+                }
+                return ' bg-gray-200 hover:bg-gray-100'
+            },
             budgetDate () {
                 return `${this.$route.params.year}-${this.$route.params.month}-01`
             },
@@ -85,16 +98,23 @@
 
         methods: {
             startDrag (value) {
+                console.log('startDrag', value)
                 this.drag = true
             },
 
             endDrag (value) {
+                console.log('endDrag', value)
                 this.drag = false
             },
 
             onMoveCallback (evt, originalEvent) {
+                console.log('onMoveCallback', evt, originalEvent)
                 // ...
                 // return false; — for cancel
+            },
+
+            isActive (entry) {
+                return entry.id === this.activeRow
             },
 
             outstandingVariant (income) {
@@ -142,7 +162,7 @@
                         break
                     }
                 }
-                this.collapsed = completed
+                this.collapsed = this.income.entries.length === 0 ? false : completed
             },
 
             updateIncomeAmount () {
@@ -161,9 +181,16 @@
                 })
             },
 
+            modifyIncome () {
+                if (!this.income.unassigned) {
+                    this.$emit('modify-income', this.income)
+                }
+            },
+
             modifyEntry (entry) {
                 this.$emit('modify-entry', entry)
             }
+
         },
 
         async mounted () {

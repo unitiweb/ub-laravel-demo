@@ -1,12 +1,24 @@
 <template>
-    <vuejs-datepicker :value="value"
-                      :inline="inline"
-                      :format="format"
-                      :wrapper-class="wrapper"
-                      :calendar-class="calendar"
-                      :disabled-dates="state.disabledDates"
-                      @input="input">
-    </vuejs-datepicker>
+    <t-datepicker
+        :value="value"
+        :inline="inline"
+        :placeholder="placeholder"
+        :date-format="format"
+        :user-format="format"
+        @input="input"
+    />
+
+
+
+<!--    <vuejs-datepicker :value="value"-->
+<!--                      :inline="false"-->
+<!--                      :format="format"-->
+<!--                      wrapper-class="border-0 focus:border-0 active:border-0"-->
+<!--                      input-class="border-0 focus:border-0 active:border-0"-->
+<!--                      :calendar-class="calendar"-->
+<!--                      :disabled-dates="state.disabledDates"-->
+<!--                      @input="input">-->
+<!--    </vuejs-datepicker>-->
 </template>
 
 <script>
@@ -37,6 +49,10 @@
             },
             maxDate: {
                 type: [String, Date]
+            },
+            placeholder: {
+                type: String,
+                default: ''
             }
         },
 
@@ -44,14 +60,14 @@
             wrapper () {
                 const classes = []
 
-                classes.push('mt-1 rounded-md shadow-md')
+                // classes.push('mt-1 rounded-md shadow-md')
 
                 return classes
             },
             calendar () {
                 const classes = []
 
-                classes.push('border-2 border-400 rounded-md')
+                // classes.push('border-2 border-400 rounded-md')
 
                 return classes
             },
