@@ -28,6 +28,10 @@
             </li>
         </ul>
 
+        <modal v-if="showDialog" variant="info" :title="`Create Budget for ${monthName}`" confirm-label="Yes, Create!" cancel-label="No, Never Mind" @confirm="deleteConfirmed" @cancel="deleteCanceled">
+            Confirm you want to create a new budget.
+        </modal>
+
         <template v-slot:footer>
             <ub-button block size="xl" @click="start">Start {{ monthName }}'s Budget</ub-button>
         </template>
@@ -36,12 +40,23 @@
 
 <script>
     import moment from 'moment'
+    import Modal from "@/components/ui/modal/Modal";
 
     export default {
+
+        components: {
+            Modal
+        },
 
         props: {
             month: {
                 type: String
+            }
+        },
+
+        data () {
+            return {
+                showDialog: false
             }
         },
 
@@ -52,16 +67,20 @@
         },
 
         methods: {
-
             async start () {
+                this.showDialog = true
+            },
+            async deleteConfirmed () {
                 try {
                     const { data } = await this.$http.addBudget(this.month)
                     this.$emit('created', data)
                 } catch ({ error }) {
                     console.log('error', error)
                 }
+            },
+            deleteCanceled () {
+                this.showDialog = false
             }
-
         }
 
     }

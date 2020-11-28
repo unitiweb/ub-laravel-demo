@@ -17,39 +17,32 @@
                 </div>
             </template>
             <template v-slot:right>
-
-                <transition enter-active-class="transition ease-out duration-100"
-                            enter-class="transform opacity-0 scale-95"
-                            enter-to-class="transform opacity-100 scale-100"
-                            leave-active-class="transition ease-in duration-75"
-                            leave-class="transform opacity-100 scale-100"
-                            leave-to-class="transform opacity-0 scale-95">
-                    <div :class="rightVisibility">
-                        <div class="flex bg-gray-200 border border-t-0 border-l-0 border-r-0 border-b border-gray-400 rounded-md">
-                            <div class="flex-1 text-xl text-center cursor-pointer hover:bg-gray-200 py-2">
-                                <ub-button v-if="state.view !== 'budget'"
-                                           @click="toggleRightPanel"
-                                           class="float-left ml-4"
-                                           size="sm"
-                                           outline
-                                           variant="secondary"
-                                           icon="chevronDoubleLeft">
-                                </ub-button>
-                                {{ state.title }}
-                            </div>
-                        </div>
-                        <div v-if="state.view === 'budget'" class="p-4 text-center">
-                            Stats will go here
-                        </div>
-                        <div v-if="state.view === 'modify-income'">
-                            <income-form :income="state.data" :budget="budget" @done="done"/>
-                        </div>
-                        <div v-if="state.view === 'modify-entry'">
-                            <entry-form :entry="state.data" :budget="budget" @done="done"/>
+                <div :class="rightVisibility" class="overflow-hidden">
+                    <div class="flex bg-gray-200 border border-t-0 border-l-0 border-r-0 border-b border-gray-400 rounded-md">
+                        <div class="flex-1 text-xl text-center cursor-pointer hover:bg-gray-200 py-2">
+                            <ub-button v-if="state.view !== 'budget'"
+                                       @click="toggleRightPanel"
+                                       class="float-left ml-4"
+                                       size="sm"
+                                       outline
+                                       variant="secondary"
+                                       icon="chevronDoubleLeft">
+                            </ub-button>
+                            {{ state.title }}
                         </div>
                     </div>
-                </transition>
-
+                    <transition-slide :out="state.view !== 'budget'">
+                        <div v-show="state.view === 'budget'" class="object-top p-4 text-center">
+                            Stats will go here
+                        </div>
+                    </transition-slide>
+                    <transition-slide :out="state.view !== 'modify-income'">
+                        <income-form v-show="state.view === 'modify-income'" class="object-top" :income="state.data" :budget="budget" @done="done"/>
+                    </transition-slide>
+                    <transition-slide :out="state.view !== 'modify-entry'">
+                        <entry-form v-show="state.view === 'modify-entry'" class="object-top" :entry="state.data" :budget="budget" @done="done"/>
+                    </transition-slide>
+                </div>
             </template>
         </budget-divided>
         <modal v-if="state.view === 'budget-delete'"
@@ -73,6 +66,7 @@
     import BudgetCreate from '@/views/dashboard/budget/BudgetCreate'
     import Modal from "@/components/ui/modal/Modal";
     import BudgetDivided from '@/components/budget/BudgetDivided'
+    import TransitionSlide from '@/components/transitions/TransitionSlide'
 
     export default {
 
@@ -84,7 +78,8 @@
             IncomeForm,
             EntryForm,
             BudgetCreate,
-            Modal
+            Modal,
+            TransitionSlide
         },
 
         data () {
@@ -252,8 +247,10 @@
                 try {
                     await this.$http.deleteBudget(this.budgetDate)
                     await this.loadBudget()
+                    this.setState('budget')
                 } catch ({ error }) {
                     console.log('error', error)
+                    this.setState('budget')
                 }
             }
 

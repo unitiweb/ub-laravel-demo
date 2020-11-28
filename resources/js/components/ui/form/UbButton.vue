@@ -1,7 +1,7 @@
 <template>
     <button type="button" class="btn" :class="classes" @click="click">
         <icon v-if="iconLeft" :name="iconLeft" class="btn-icon-left"></icon>
-        <icon v-if="icon" :name="icon"  class="h-5 w-5"></icon>
+        <icon v-if="icon" :name="icon" class="h-5 w-5"></icon>
         <slot v-if="!icon"/>
         <icon v-if="iconRight" :name="iconRight" class="btn-icon-right"></icon>
     </button>
@@ -66,7 +66,7 @@
                     secondary: 'gray',
                     success: 'green',
                     info: 'teal',
-                    warning: 'ornage',
+                    warning: 'yellow',
                     danger: 'red'
                 }
             }

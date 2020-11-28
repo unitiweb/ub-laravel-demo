@@ -12,7 +12,7 @@
 </template>
 
 <script>
-    import Income from '@/components/budget/Income'
+    import Income from '@/views/dashboard/budget/Income'
 
     export default {
 

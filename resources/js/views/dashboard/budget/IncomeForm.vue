@@ -1,6 +1,6 @@
 <template>
     <div class="p-2">
-        <div class="grid grid-cols-2 gap-6">
+        <div v-if="income" class="grid grid-cols-2 gap-6">
             <div class="col-span-2">
                 <f-input label="Income Name"
                          placeholder="entry name"
@@ -38,11 +38,9 @@
         },
 
         props: {
-            budget: {
-                type: Object
-            },
             income: {
-                type: Object
+                type: Object,
+                default: null
             }
         },
 
@@ -59,6 +57,9 @@
             month () {
                 return this.$route.params.month
             },
+            budgetMonth () {
+                return `${this.year}-${this.month}-01`
+            },
             date () {
                 let dueDay = this.income.dueDay ? this.income.dueDay : '1'
                 return moment(`${this.year}-${this.month}-${dueDay}`, "YYYY-M-DD")
@@ -74,13 +75,13 @@
                 this.$store.commit('loading', true)
                 try {
                     if (this.income.id) {
-                        const { data } = await this.$http.updateIncome(this.budget.month, this.income.id, {
+                        const { data } = await this.$http.updateIncome(this.budgetMonth, this.income.id, {
                             name: this.income.name,
                             dueDay: parseInt(this.income.dueDay),
                             amount: parseFloat(this.income.amount)
                         })
                     } else {
-                        const { data } = await this.$http.addIncome(this.budget.month, {
+                        const { data } = await this.$http.addIncome(this.budgetMonth, {
                             name: this.income.name,
                             dueDay: parseInt(this.income.dueDay),
                             amount: parseFloat(this.income.amount)
@@ -102,7 +103,7 @@
             },
             async deleteConfirmed () {
                 try {
-                    await this.$http.deleteIncome(this.budget.month, this.income.id)
+                    await this.$http.deleteIncome(this.budgetMonth, this.income.id)
                     this.$emit('done', true)
                     this.showDelete = false
                 } catch ({ error }) {
@@ -114,6 +115,10 @@
                 this.showDelete = false
             }
 
+        },
+
+        mounted () {
+            console.log('income', this.income)
         }
     }
 

@@ -1,6 +1,6 @@
 <template>
     <div class="p-2">
-        <div class="grid grid-cols-2 gap-6">
+        <div v-if="entry" class="grid grid-cols-2 gap-6">
             <div v-if="errors.length >= 1" class="col-span-2">
                 {{ errors[0] }}
             </div>
@@ -56,9 +56,6 @@
         },
 
         props: {
-            budget: {
-                type: Object
-            },
             entry: {
                 type: Object
             }
@@ -85,6 +82,9 @@
                 let dueDay = this.entry.dueDay ? this.entry.dueDay : '01'
                 return moment(`${this.year}-${this.month}-${dueDay}`, "YYYY-M-DD")
             },
+            budgetMonth () {
+                return this.date.format('YYYY-MM-DD')
+            },
             dueDate () {
                 if (!this.entry.dueDay) {
                     this.entry.dueDay = 1
@@ -106,7 +106,7 @@
         methods: {
             async loadData () {
                 try {
-                    const { data: incomes } = await this.$http.getIncomes(this.budget.month)
+                    const { data: incomes } = await this.$http.getIncomes(this.budgetMonth)
                     const { data: groups } = await this.$http.getGroups()
 
                     this.incomes = []
@@ -132,11 +132,11 @@
                 this.$store.commit('loading', true)
                 try {
                     if (this.entry.id) {
-                        await this.$http.updateEntry(this.budget.month, this.entry.id, this.entry)
+                        await this.$http.updateEntry(this.budgetMonth, this.entry.id, this.entry)
                         this.$store.commit('loading', false)
                         this.$emit('done', true)
                     } else {
-                        const data = await this.$http.addEntry(this.budget.month, this.entry)
+                        const data = await this.$http.addEntry(this.budgetMonth, this.entry)
                         this.$store.commit('loading', false)
                         this.$emit('done', true)
                     }
@@ -152,7 +152,7 @@
                 this.showDelete = true
             },
             async deleteEntryConfirmed () {
-                const { data } = await this.$http.deleteEntry(this.budget.month, this.entry.id)
+                const { data } = await this.$http.deleteEntry(this.budgetMonth, this.entry.id)
                 this.$emit('done', true)
                 this.showDelete = false
             },
