@@ -34,26 +34,12 @@
             }
         },
 
-        data () {
-            return {
-                drag: false,
-                balances: [],
-                collapsed: {}
-            }
-        },
-
         computed: {
 
-            year () {
-                return this.$route.params.year
-            },
-
-            month () {
-                return this.$route.params.month
-            },
-
             budgetDate () {
-                return `${this.year}-${this.month}-01`
+                const year = this.$route.params.year
+                const month = this.$route.params.month
+                return `${year}-${month}-01`
             },
 
             incomes () {

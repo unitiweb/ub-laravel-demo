@@ -2,49 +2,43 @@
     <section>
         <budget-header class="mb-4"></budget-header>
 
-        <div v-if="!budget">
-            <budget-create :month="budgetDate" @created="budgetCreated"></budget-create>
-        </div>
+        <div class="px-4 pb-4">
+            <div v-if="!budget">
+                <budget-create :month="budgetDate" @created="budgetCreated"></budget-create>
+            </div>
 
-        <budget-divided v-if="budget">
-            <template v-slot:left>
-                <div :class="leftVisibility">
-                    <incomes v-if="budgetView === 'incomes'" :active-income="activeIncome" :active-row="activeRow" :budget="budget" @modify-income="modifyIncome" @modify-entry="modifyEntry"/>
-                    <div>
-                        <ub-button @click="incomeCreate" class="float-left" outline variant="primary" size="sm" icon-left="plusCircle">Create Income</ub-button>
-                        <ub-button @click="budgetDelete" class="float-right" outline variant="danger" size="sm" icon-left="minusCircle">delete budget</ub-button>
-                    </div>
-                </div>
-            </template>
-            <template v-slot:right>
-                <div :class="rightVisibility" class="overflow-hidden">
-                    <div class="flex bg-gray-200 border border-t-0 border-l-0 border-r-0 border-b border-gray-400 rounded-md">
-                        <div class="flex-1 text-xl text-center cursor-pointer hover:bg-gray-200 py-2">
-                            <ub-button v-if="state.view !== 'budget'"
-                                       @click="toggleRightPanel"
-                                       class="float-left ml-4"
-                                       size="sm"
-                                       outline
-                                       variant="secondary"
-                                       icon="chevronDoubleLeft">
-                            </ub-button>
-                            {{ state.title }}
+            <budget-divided v-if="budget">
+                <template v-slot:left>
+                    <div :class="leftVisibility">
+                        <incomes v-if="budgetView === 'incomes'" :active-income="activeIncome" :active-row="activeRow" :budget="budget" @modify-income="modifyIncome" @modify-entry="modifyEntry"/>
+                        <groups v-if="budgetView === 'groups'" :active-income="activeGroup" :active-row="activeRow" :budget="budget" @modify-group="modifyGroup" @modify-entry="modifyEntry"/>
+                        <div>
+                            <ub-button @click="incomeCreate" class="float-left" outline variant="primary" size="sm" icon-left="plusCircle">Create Income</ub-button>
+                            <ub-button @click="budgetDelete" class="float-right" outline variant="danger" size="sm" icon-left="minusCircle">delete budget</ub-button>
                         </div>
                     </div>
-                    <transition-slide :out="state.view !== 'budget'">
+                </template>
+                <template v-slot:right>
+                    <div :class="rightVisibility">
+                        <!--                    <transition-slide :out="state.view !== 'budget'">-->
                         <div v-show="state.view === 'budget'" class="object-top p-4 text-center">
                             Stats will go here
                         </div>
-                    </transition-slide>
-                    <transition-slide :out="state.view !== 'modify-income'">
+                        <!-- </transition-slide>-->
+                        <!-- <transition-slide :out="state.view !== 'modify-income'">-->
                         <income-form v-show="state.view === 'modify-income'" class="object-top" :income="state.data" :budget="budget" @done="done"/>
-                    </transition-slide>
-                    <transition-slide :out="state.view !== 'modify-entry'">
-                        <entry-form v-show="state.view === 'modify-entry'" class="object-top" :entry="state.data" :budget="budget" @done="done"/>
-                    </transition-slide>
-                </div>
-            </template>
-        </budget-divided>
+                        <!-- </transition-slide>-->
+                        <!-- <transition-slide :out="state.view !== 'modify-income'">-->
+                        <group-form v-show="state.view === 'modify-group'" class="object-top" :group="state.data" :budget="budget" @done="done"/>
+                        <!-- </transition-slide>-->
+                        <!-- <transition-slide :out="state.view !== 'modify-entry'">-->
+                        <entry-form v-show="state.view === 'modify-entry'" class="object-top" :entry="state.data" :incomes="incomes" :groups="groups" @done="done"/>
+                        <!-- </transition-slide>-->
+                    </div>
+                </template>
+            </budget-divided>
+        </div>
+
         <modal v-if="state.view === 'budget-delete'"
                variant="danger"
                title="Are you sure?"
@@ -62,6 +56,8 @@
     import BudgetSidebar from '@/components/budget/BudgetSidebar'
     import Incomes from '@/views/dashboard/budget/Incomes'
     import IncomeForm from '@/views/dashboard/budget/IncomeForm'
+    import Groups from '@/views/dashboard/budget/Groups'
+    import GroupForm from '@/views/dashboard/budget/GroupForm'
     import EntryForm from '@/views/dashboard/budget/EntryForm'
     import BudgetCreate from '@/views/dashboard/budget/BudgetCreate'
     import Modal from "@/components/ui/modal/Modal";
@@ -76,6 +72,8 @@
             BudgetDivided,
             Incomes,
             IncomeForm,
+            Groups,
+            GroupForm,
             EntryForm,
             BudgetCreate,
             Modal,
@@ -90,12 +88,15 @@
                     incomes: [],
                     groups: []
                 },
+                incomes: [],
+                groups: [],
                 state: {
                     view: 'budget',
                     title: 'Budget Stats',
                     data: null
                 },
                 activeIncome: null,
+                activeGroup: null,
                 activeRow: null
             }
         },
@@ -136,7 +137,7 @@
             },
 
             budgetView () {
-                return this.$store.getters.budgetView || 'incomes'
+                return this.$store.getters.lastView || 'incomes'
             },
 
             budgetDate () {
@@ -159,7 +160,7 @@
 
                 // Reset the relations if view is groups
                 if (this.budgetView === 'groups') {
-                    relations = 'groups,groups.entries,groups.entries.income'
+                    relations = 'groups,groups.entries,groups.entries.group,groups.entries.income,unassignedGroupEntries'
                 }
 
                 try {
@@ -173,6 +174,27 @@
                     } else {
                         console.log('error', error.code)
                     }
+                }
+            },
+            async loadData () {
+                try {
+                    const { data: incomes } = await this.$http.getIncomes(this.budget.month)
+                    const { data: groups } = await this.$http.getGroups()
+
+                    this.incomes = []
+                    for (let i = 0; i < incomes.length; i++) {
+                        this.incomes.push({ id: incomes[i].id, label: incomes[i].name })
+                    }
+                    this.incomes.push({ id: null, label: 'none' })
+
+                    this.groups = []
+                    for (let i = 0; i < groups.length; i++) {
+                        this.groups.push({ id: groups[i].id, label: groups[i].name })
+                    }
+                    this.groups.push({ id: null, label: 'none' })
+
+                } catch (error) {
+                    console.log(error)
                 }
             },
 
@@ -198,6 +220,19 @@
                     this.activeIncome = income.id
                     this.setState('modify-income', 'Modify Income', income)
                 }
+            },
+
+            modifyGroup (group) {
+                this.setState('modify-group', 'Modify Group', group)
+                // this.activeRow = null
+                // if (this.activeIncome === income.id) {
+                //     this.activeIncome = null
+                //     this.setState('budget')
+                // } else {
+                //     console.log('income', income)
+                //     this.activeIncome = income.id
+                //     this.setState('modify-income', 'Modify Income', income)
+                // }
             },
 
             modifyEntry (entry) {
@@ -254,10 +289,12 @@
                 }
             }
 
+
         },
 
         async mounted () {
             await this.loadBudget()
+            await this.loadData()
         }
 
     }

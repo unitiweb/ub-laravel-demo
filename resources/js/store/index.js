@@ -37,7 +37,6 @@ export default new Vuex.Store({
         site: {},
         settings: {},
         budgetDate: null,
-        budgetView: 'incomes',
         user: {},
         page: {
             title: ''
@@ -76,8 +75,8 @@ export default new Vuex.Store({
             if (state.budgetDate) return this.budgetDate
             else return moment().format('YYYY-MM-01')
         },
-        budgetView: state => {
-            if (state.budgetView === 'groups') return 'groups'
+        lastView: state => {
+            if (state.settings.lastView === 'groups') return 'groups'
             else return 'incomes'
         },
         page: state => {
@@ -126,8 +125,8 @@ export default new Vuex.Store({
         budgetDate (state, date) {
             state.budgetDate = date
         },
-        budgetView (state, view) {
-            state.budgetView = view
+        lastView (state, view) {
+            state.settings.lastView = view
         },
         page (state, payload) {
             state.page.title = payload.title
@@ -168,8 +167,8 @@ export default new Vuex.Store({
         budgetDate ({ commit }, date) {
             commit('budgetDate', date)
         },
-        budgetView ({ commit }, view) {
-            commit('budgetView', view)
+        lastView ({ commit }, view) {
+            commit('lastView', view)
         }
     }
 })

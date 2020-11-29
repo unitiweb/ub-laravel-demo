@@ -10,6 +10,7 @@ import FDatepicker from '@/components/ui/form/FDatepicker'
 import FOption from '@/components/ui/form/FOption'
 import FTransition from '@/components/ui/form/FTransition'
 import UbBadge from '@/components/ui/UbBadge'
+import UbDropdown from '@/components/ui/UbDropdown'
 
 const UiComponents = {
     install(Vue) {
@@ -25,6 +26,7 @@ const UiComponents = {
         Vue.component('f-datepicker', FDatepicker)
         Vue.component('f-transition', FTransition)
         Vue.component('ub-badge', UbBadge)
+        Vue.component('ub-dropdown', UbDropdown)
     }
 }
 

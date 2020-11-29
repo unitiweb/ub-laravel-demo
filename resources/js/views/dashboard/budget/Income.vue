@@ -41,14 +41,12 @@
 
 <script>
     import DueDay from '@/components/ui/DueDay'
-    import EditInPlace from '@/components/ui/form/EditInPlace'
     import Draggable from 'vuedraggable'
     import EntryRow from '@/components/budget/EntryRow'
 
     export default {
 
         components: {
-            EditInPlace,
             Draggable,
             EntryRow,
             DueDay

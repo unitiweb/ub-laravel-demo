@@ -1,6 +1,13 @@
 <template>
     <div class="p-2">
         <div v-if="income" class="grid grid-cols-2 gap-6">
+            <div class="col-span-1">
+                <ub-button v-if="income.id" @click="deleteIncome" outline variant="danger" class="float-left">delete</ub-button>
+            </div>
+            <div class="col-span-1 text-right">
+                <ub-button variant="secondary" @click="cancel" outline>Cancel</ub-button>
+                <ub-button @click="save">Save</ub-button>
+            </div>
             <div class="col-span-2">
                 <f-input label="Income Name"
                          placeholder="entry name"
@@ -13,16 +20,9 @@
             <div class="col-span-1">
                 <f-input label="Amount" placeholder="0.00" right v-model="income.amount" left-add-on="$"></f-input>
             </div>
-            <div class="col-span-1">
-                <ub-button v-if="income.id" @click="deleteIncome" outline variant="danger" class="float-left">delete</ub-button>
-            </div>
-            <div class="col-span-1 text-right">
-                <ub-button variant="secondary" @click="cancel" outline>Cancel</ub-button>
-                <ub-button @click="save">Save</ub-button>
-            </div>
         </div>
         <modal v-if="showDelete" variant="danger" title="Are you sure?" confirm-label="Yes, Delete!" cancel-label="Oops! No" @confirm="deleteConfirmed" @cancel="deleteCanceled">
-            Do you really want to delete this entry? It can't be undone.
+            Do you really want to delete this income? It can't be undone.
         </modal>
     </div>
 </template>
@@ -115,11 +115,8 @@
                 this.showDelete = false
             }
 
-        },
-
-        mounted () {
-            console.log('income', this.income)
         }
+
     }
 
 </script>

@@ -1,6 +1,13 @@
 <template>
     <div class="p-2">
         <div v-if="entry" class="grid grid-cols-2 gap-6">
+            <div class="col-span-1">
+                <ub-button v-if="entry.id" @click="deleteEntry" outline variant="danger" class="float-left">delete</ub-button>
+            </div>
+            <div class="col-span-1 text-right">
+                <ub-button variant="secondary" @click="cancel" outline>Cancel</ub-button>
+                <ub-button @click="save">Save</ub-button>
+            </div>
             <div v-if="errors.length >= 1" class="col-span-2">
                 {{ errors[0] }}
             </div>
@@ -31,13 +38,6 @@
             <div class="col-span-2">
                 <f-input label="Url" placeholder="http://" v-model="entry.url"></f-input>
             </div>
-            <div class="col-span-1">
-                <ub-button v-if="entry.id" @click="deleteEntry" outline variant="danger" class="float-left">delete</ub-button>
-            </div>
-            <div class="col-span-1 text-right">
-                <ub-button variant="secondary" @click="cancel" outline>Cancel</ub-button>
-                <ub-button @click="save">Save</ub-button>
-            </div>
         </div>
         <modal v-if="showDelete" variant="danger" title="Are you sure?" confirm-label="Yes, Delete!" cancel-label="Oops! No" @confirm="deleteEntryConfirmed" @cancel="deleteEntryCanceled">
             Do you really want to delete this entry? It can't be undone.
@@ -58,14 +58,24 @@
         props: {
             entry: {
                 type: Object
+            },
+            incomes: {
+                type: Array,
+                default: () => {
+                    return []
+                }
+            },
+            groups: {
+                type: Array,
+                default: () => {
+                    return []
+                }
             }
         },
 
         data () {
             return {
                 autoPayOn: false,
-                incomes: [],
-                groups: [],
                 showDelete: false,
                 errors: []
             }
@@ -104,27 +114,6 @@
         },
 
         methods: {
-            async loadData () {
-                try {
-                    const { data: incomes } = await this.$http.getIncomes(this.budgetMonth)
-                    const { data: groups } = await this.$http.getGroups()
-
-                    this.incomes = []
-                    for (let i = 0; i < incomes.length; i++) {
-                        this.incomes.push({ id: incomes[i].id, label: incomes[i].name })
-                    }
-                    this.incomes.push({ id: null, label: 'none' })
-
-                    this.groups = []
-                    for (let i = 0; i < groups.length; i++) {
-                        this.groups.push({ id: groups[i].id, label: groups[i].name })
-                    }
-                    this.groups.push({ id: null, label: 'none' })
-
-                } catch (error) {
-                    console.log(error)
-                }
-            },
             cancel () {
                 this.$emit('done', false)
             },
@@ -159,10 +148,6 @@
             deleteEntryCanceled () {
                 this.showDelete = false
             }
-        },
-
-        mounted () {
-            this.loadData()
         }
 
     }

@@ -20,7 +20,7 @@
                         leave-active-class="transition ease-in duration-100"
                         leave-class="opacity-100"
                         leave-to-class="opacity-0">
-                <div v-show="opened" class="absolute mt-1 w-full z-40 rounded-md bg-white border border-gray-400 shadow-lg">
+                <div v-show="opened" class="absolute mt-1 w-full z-50 rounded-md bg-white border border-gray-400 shadow-lg">
                     <ul tabindex="-1" role="listbox" class="max-h-60 rounded-md py-1 text-base leading-6 shadow-xs overflow-auto focus:outline-none sm:text-sm sm:leading-5">
                         <li v-for="option in options" @click="select(option)" role="option" class="text-gray-700 cursor-pointer select-none relative hover:bg-gray-100 hover:border-gray-200 py-2 pl-8 pr-4">
                             <span :class="{ 'font-semibold': selected(option), 'font-normal': !selected(option) }" class="font-normal block truncate">
