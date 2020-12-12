@@ -5,9 +5,10 @@ import Icon from '@/components/ui/Icon'
 import Card from '@/components/ui/Card'
 import Alert from '@/components/ui/Alert'
 import FCheckbox from '@/components/ui/form/FCheckbox'
-import FSelect from '@/components/ui/form/FSelect'
+import UbSelect from '@/components/ui/form/UbSelect'
+import UbSelectOption from '@/components/ui/form/UbSelectOption'
+import UbSelectDivider from '@/components/ui/form/UbSelectDivider'
 import FDatepicker from '@/components/ui/form/FDatepicker'
-import FOption from '@/components/ui/form/FOption'
 import FTransition from '@/components/ui/form/FTransition'
 import UbBadge from '@/components/ui/UbBadge'
 import UbDropdown from '@/components/ui/UbDropdown'
@@ -21,8 +22,9 @@ const UiComponents = {
         Vue.component('card', Card)
         Vue.component('alert', Alert)
         Vue.component('f-checkbox', FCheckbox)
-        Vue.component('f-select', FSelect)
-        Vue.component('f-option', FOption)
+        Vue.component('ub-select', UbSelect)
+        Vue.component('ub-select-option', UbSelectOption)
+        Vue.component('ub-select-divider', UbSelectDivider)
         Vue.component('f-datepicker', FDatepicker)
         Vue.component('f-transition', FTransition)
         Vue.component('ub-badge', UbBadge)

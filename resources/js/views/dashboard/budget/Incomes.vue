@@ -18,6 +18,7 @@
 
         components: {
             Income
+            // Draggable
         },
 
         props: {
@@ -54,6 +55,15 @@
                 }
 
                 return this.budget.incomes
+            },
+
+            dragOptions() {
+                return {
+                    animation: 200,
+                    group: "description",
+                    disabled: false,
+                    ghostClass: "ghost"
+                }
             }
 
         },

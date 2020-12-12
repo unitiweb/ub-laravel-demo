@@ -23,11 +23,6 @@
                                  role="menuitem">
                         Your Profile
                     </router-link>
-                    <router-link :to="{ name: 'dashboard' }"
-                                 class="block py-2 px-4 text-sm leading-5 text-gray-700 hover:bg-gray-100 focus:outline-none focus:bg-gray-100 hover:bg-gray-200 transition duration-150 ease-in-out"
-                                 role="menuitem">
-                        Settings
-                    </router-link>
                     <router-link :to="{ name: 'lock' }"
                                  class="block py-2 px-4 text-sm leading-5 text-gray-700 hover:bg-gray-100 focus:outline-none focus:bg-gray-100 hover:bg-gray-200 transition duration-150 ease-in-out"
                                  role="menuitem">

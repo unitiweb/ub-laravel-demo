@@ -5,7 +5,7 @@
                 Right
             </slot>
         </div>
-        <div class="col-span-5 md:col-span-2 ml-1 bg-gray-100 border border-gray-400 rounded-md shadow-md">
+        <div class="col-span-5 md:col-span-2 bg-gray-100 border border-gray-400 rounded-md shadow-md my-1">
             <slot name="right"/>
         </div>
     </div>

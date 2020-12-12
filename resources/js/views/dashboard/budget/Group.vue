@@ -1,5 +1,5 @@
 <template>
-    <div class="border border-gray-400 rounded-md shadow-md mb-3">
+    <div class="border border-gray-400 rounded-md shadow-md m-1">
         <div>
             <div :class="groupClasses" class="flex border border-t-0 border-l-0 border-r-0 border-b border-gray-400 rounded-md">
                 <div class="flex-none text-lg text-right px-3 py-2">
@@ -12,21 +12,17 @@
                 <div @click="modifyGroup" :class="{'cursor-pointer': !this.group.unassigned}" class="flex-1 text-xl pb-2 pt-3">
                     {{ group.name }}
                 </div>
-                <div v-if="!this.group.unassigned" @click="modifyGroup" :class="{'cursor-pointer': !this.group.unassigned}" class="flex-none text-xl text-right px-3 pb-2 pt-3" style="width: 125px;">
-                    {{ group.amount | currency }}
-                </div>
                 <div v-if="!this.group.unassigned" class="flex-none text-lg text-right px-3 py-2">
                     <ub-button @click="entryCreate(group)" size="sm" variant="secondary" icon="plus" outline></ub-button>
                 </div>
             </div>
-            <div v-if="collapsed === false && group.entries.length > 0">
-                <draggable handle=".entry-handle" v-model="group.entries" v-bind="dragOptions" group="entries" @move="onMoveCallback" @start="startDrag" @end="endDrag">
-                    <transition-group type="transition" :name="!drag ? 'flip-list' : null">
-                        <entry-row v-for="(entry, index) in group.entries" :key="`${entry}-${index}`" :active="isActive(entry)" :month="budgetDate" @calculate="calculate" @modify="modifyEntry" :entry="entry"></entry-row>
-                    </transition-group>
-                </draggable>
+            <draggable handle=".entry-handle" :list="group.entries" v-bind="dragOptions" group="entries" @change="dragChanged">
+                <entry-row v-if="collapsed === false" v-for="(entry, index) in group.entries" :key="`${entry}-${index}`" :active="isActive(entry)" :month="budgetDate" @calculate="calculate" @modify="modifyEntry" :entry="entry"></entry-row>
+            </draggable>
+            <div v-if="this.group.entries.length === 0" class="text-gray-400 px-4 py-1">
+                no entries
             </div>
-            <div v-else class="text-gray-600 px-4 py-1">
+            <div v-else-if="collapsed === true" class="text-gray-400 px-4 py-1">
                 <icon name="dotsHorizontal" class="h-5 w-5"></icon>
             </div>
         </div>
@@ -69,7 +65,8 @@
             return {
                 drag: false,
                 collapsed: false,
-                balances: []
+                balances: [],
+                draggableObject: []
             }
         },
 
@@ -89,27 +86,11 @@
                     group: "description",
                     disabled: false,
                     ghostClass: "ghost"
-                };
+                }
             }
         },
 
         methods: {
-
-            startDrag (value) {
-                console.log('startDrag', value)
-                this.drag = true
-            },
-
-            endDrag (value) {
-                console.log('endDrag', value)
-                this.drag = false
-            },
-
-            onMoveCallback (evt, originalEvent) {
-                console.log('onMoveCallback', evt, originalEvent)
-                // ...
-                // return false; — for cancel
-            },
 
             isActive (entry) {
                 return entry.id === this.activeRow
@@ -184,6 +165,49 @@
 
             modifyEntry (entry) {
                 this.$emit('modify-entry', entry)
+            },
+
+            /**
+             * Drag and Drop functions start here
+             */
+
+            /**
+             * When a drag changes this function will be executed
+             */
+            dragChanged (evt) {
+                console.log('evt', evt)
+                if (evt.added) {
+                    this.addedTo(evt.added.newIndex, evt.added.element)
+                    console.log(`${evt.added.element.name} was added to the group`)
+                } else if (evt.moved) {
+                    this.moveTo(evt.moved.oldIndex, evt.moved.newIndex, evt.moved.element)
+                }
+            },
+
+            /**
+             * Execute when entry is moved to another group
+             */
+            async addedTo (newIndex, entry) {
+                try {
+                    await this.$http.updateEntry(this.budgetDate, entry.id, { groupId: this.group.id, order: newIndex })
+                } catch ({ error }) {
+                    console.log('error', error)
+                }
+            },
+
+            /**
+             * Executed when an entry is moved within its current group
+             */
+            async moveTo(oldIndex, newIndex, entry) {
+                const ids = this.group.entries.map(e => e.id)
+                try {
+                    await this.$http.orderBudgetGroupEntries(this.budgetDate, this.group.id, { order: ids })
+                    entry.groupId = this.group.id
+                    // If entry as been added then un-collapse so results can be seen
+                    this.collapsed = false
+                } catch ({ error }) {
+                    console.log('error', error)
+                }
             }
 
         },
@@ -196,3 +220,24 @@
     }
 
 </script>
+
+<style lang="scss" scoped>
+    .flip-list-move {
+        transition: transform 0.5s;
+    }
+    .no-move {
+        transition: transform 0s;
+    }
+    .ghost {
+        visibility: hidden;
+    }
+    .list-group {
+        min-height: 20px;
+    }
+    .list-group-item {
+        cursor: move;
+    }
+    .list-group-item i {
+        cursor: pointer;
+    }
+</style>

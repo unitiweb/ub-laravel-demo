@@ -2,11 +2,11 @@
     <div class="p-2">
         <div v-if="entry" class="grid grid-cols-2 gap-6">
             <div class="col-span-1">
-                <ub-button v-if="entry.id" @click="deleteEntry" outline variant="danger" class="float-left">delete</ub-button>
+                <ub-button v-if="entry.id" @click="showDelete = true" outline variant="danger" size="sm" icon="trash" class="float-left"></ub-button>
             </div>
             <div class="col-span-1 text-right">
-                <ub-button variant="secondary" @click="cancel" outline>Cancel</ub-button>
-                <ub-button @click="save">Save</ub-button>
+                <ub-button variant="secondary" @click="cancel" size="sm" outline>Cancel</ub-button>
+                <ub-button @click="save" size="sm">Save</ub-button>
             </div>
             <div v-if="errors.length >= 1" class="col-span-2">
                 {{ errors[0] }}
@@ -30,10 +30,34 @@
                 <f-input label="Amount" placeholder="0.00" v-model="entry.amount" left-add-on="$"></f-input>
             </div>
             <div class="col-span-2">
-                <f-select label="Income" v-model="entry.incomeId" :options="incomes" placeholder="select income"/>
+                <ub-select label="Income" v-model="entry.incomeId" :options="incomes" id-key="id" label-key="name" placeholder="select income">
+                    <ub-select-divider></ub-select-divider>
+                    <ub-select-option @click="noIncome" :value="null" label="none"/>
+                </ub-select>
             </div>
             <div class="col-span-2">
-                <f-select label="Group" v-model="entry.groupId" :options="groups" placeholder="select group"/>
+                <ub-select label="Group" v-model="entry.groupId" placeholder="select group">
+                    <template v-slot:selected-label>
+                        {{ groupSelectedName }}
+                    </template>
+                    <ub-select-option v-for="(option, index) in groups"
+                                      :key="`group-option-${index}`"
+                                      @click="groupSelect('group', option)"
+                                      :selected="isGroupSelected('other', option)"
+                                      :value="option.id"
+                                      :label="option.name">
+                    </ub-select-option>
+                    <ub-select-divider>Other</ub-select-divider>
+                    <ub-select-option v-for="(option, index) in otherGroups"
+                                      :key="`group-other-option-${index}`"
+                                      @click="groupSelect('other', option)"
+                                      :selected="isGroupSelected('other', option)"
+                                      :value="option.id"
+                                      :label="option.name">
+                    </ub-select-option>
+                    <ub-select-divider></ub-select-divider>
+                    <ub-select-option @click="noGroup" :value="null" label="none"/>
+                </ub-select>
             </div>
             <div class="col-span-2">
                 <f-input label="Url" placeholder="http://" v-model="entry.url"></f-input>
@@ -70,86 +94,174 @@
                 default: () => {
                     return []
                 }
+            },
+            otherGroups: {
+                type: Array,
+                default: () => {
+                    return []
+                }
             }
         },
 
         data () {
             return {
-                autoPayOn: false,
                 showDelete: false,
-                errors: []
+                errors: [],
+                groupSelectedObject: null
+            }
+        },
+
+        watch: {
+            entry (value) {
+                this.resetGroup(value)
             }
         },
 
         computed: {
-            year () {
-                return this.$route.params.year
-            },
-            month () {
-                return this.$route.params.month
-            },
-            date () {
-                let dueDay = this.entry.dueDay ? this.entry.dueDay : '01'
-                return moment(`${this.year}-${this.month}-${dueDay}`, "YYYY-M-DD")
-            },
-            budgetMonth () {
-                return this.date.format('YYYY-MM-DD')
-            },
-            dueDate () {
-                if (!this.entry.dueDay) {
-                    this.entry.dueDay = 1
+
+            groupSelected () {
+                console.log(this.entry.groupId + ' === ' + this.groups.budgetGroupId)
+                if (this.entry.groupId === this.groups.budgetGroupId) {
+                    return this.entry.groupId
                 }
-                return this.date.date(this.entry.dueDay).toDate()
+                return null
             },
-            minDate () {
-                return this.date.startOf('month').toDate()
+
+            selectedGroup () {
+                if (this.groupSelectedObject === null) {
+                    const selected = this.groups.find(g => g.id === this.entry.groupId)
+                    this.groupSelectedObject = {
+                        type: 'group',
+                        name: selected.name || 'select group',
+                        id: this.entry.groupId
+                    }
+                }
+
+                return this.groupSelectedObject
             },
-            maxDate () {
-                return this.date.endOf('month').toDate()
+
+            groupSelectedName () {
+                if (this.groupSelectedObject) {
+                    return this.groupSelectedObject.name
+                }
+                return 'select group'
             },
+
+            date () {
+                const year = this.$route.params.year
+                const month = this.$route.params.month
+
+                let dueDay = this.entry.dueDay ? this.entry.dueDay : '01'
+                return moment(`${year}-${month}-${dueDay}`, "YYYY-M-DD")
+            },
+
+            budgetMonth () {
+                return this.date.format('YYYY-MM') + '-01'
+            },
+
             dueDaySuffix () {
                 const day = this.date.format('Do')
                 return day.slice(-2)
             }
+
         },
 
         methods: {
+
+            resetGroup (entry) {
+                let id = null
+                let name = 'select group'
+                if (entry && entry.groupId) {
+                    const group = this.groups.find(g => g.id === entry.groupId)
+                    if (group) {
+                        id = group.id
+                        name = group.name
+                    }
+                }
+                this.groupSelectedObject = { type: 'group', name, id}
+            },
+
+            noIncome () {
+                this.entry.incomeId = null
+            },
+
+            noGroup () {
+                this.groupSelectedObject = {
+                    type: 'group',
+                    name: 'select group',
+                    id: null
+                }
+            },
+
+            groupSelect (type, option) {
+                this.groupSelectedObject = {
+                    type: type,
+                    name: option.name,
+                    id: option.id
+                }
+            },
+
+            isGroupSelected (type, option) {
+                if (type === 'group') {
+                    return option.id === this.selectedGroup.id
+                }
+                if (type === 'other') {
+                    return option.id === this.selectedGroup.id
+                }
+            },
+
             cancel () {
                 this.$emit('done', false)
             },
+
             async save () {
-                this.$store.commit('loading', true)
                 try {
+                    const saveEntry = {
+                        name: this.entry.name,
+                        autoPay: this.entry.autoPay,
+                        dueDay: this.entry.dueDay,
+                        amount: this.entry.amount,
+                        incomeId: this.entry.incomeId,
+                        groupId: this.entry.groupId,
+                        url: this.entry.url
+                    }
+
+                    this.setGroupId(saveEntry)
                     if (this.entry.id) {
-                        await this.$http.updateEntry(this.budgetMonth, this.entry.id, this.entry)
-                        this.$store.commit('loading', false)
+                        await this.$http.updateEntry(this.budgetMonth, this.entry.id, saveEntry)
                         this.$emit('done', true)
                     } else {
-                        const data = await this.$http.addEntry(this.budgetMonth, this.entry)
-                        this.$store.commit('loading', false)
+                        await this.$http.addEntry(this.budgetMonth, saveEntry)
                         this.$emit('done', true)
                     }
                 } catch ({ error }) {
-                    this.$store.commit('loading', false)
                     if (error.code === 422) {
-
                         console.log('error', error)
                     }
                 }
             },
-            deleteEntry () {
-                this.showDelete = true
+
+            setGroupId (entry) {
+                if (this.groupSelectedObject) {
+                    if (this.groupSelectedObject.type === 'other') {
+                        entry.otherGroupId = this.groupSelectedObject.id
+                    } else {
+                        entry.groupId = this.groupSelectedObject.id
+                    }
+                }
             },
+
             async deleteEntryConfirmed () {
-                const { data } = await this.$http.deleteEntry(this.budgetMonth, this.entry.id)
+                await this.$http.deleteEntry(this.budgetMonth, this.entry.id)
                 this.$emit('done', true)
                 this.showDelete = false
             },
+
             deleteEntryCanceled () {
                 this.showDelete = false
             }
-        }
 
+        }
     }
 
 </script>

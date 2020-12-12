@@ -18,11 +18,13 @@
 
 <script>
     import Layout from '@/components/layouts/Layout'
+    import Logo from '@/components/ui/logo/Logo'
 
     export default {
 
         components: {
-            Layout
+            Layout,
+            Logo
         },
 
         methods: {

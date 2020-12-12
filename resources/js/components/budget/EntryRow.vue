@@ -1,5 +1,5 @@
 <template>
-    <div :class="rowClasses" class="flex border-b rounded-md cursor-pointer">
+    <div :class="rowClasses" class="flex border-b rounded-md cursor-pointer m-1 pb-1">
         <div class="flex-none border-r px-1 pt-4">
             <icon name="menu" fill class="entry-handle cursor-move text-gray-300 hover:text-gray-700 h-4 h-4"></icon>
         </div>

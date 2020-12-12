@@ -27,10 +27,10 @@
                 <f-input label="Amount" placeholder="0.00" right v-model="entry.amount" left-add-on="$"></f-input>
             </div>
             <div class="col-span-2 sm:col-span-1">
-                <f-select label="Income" v-model="entry.incomeId" :options="incomes" placeholder="select income"/>
+                <ub-select label="Income" v-model="entry.incomeId" :options="incomes" placeholder="select income"/>
             </div>
             <div class="col-span-2 sm:col-span-1">
-                <f-select label="Group" v-model="entry.groupId" :options="groups" placeholder="select group"/>
+                <ub-select label="Group" v-model="entry.groupId" :options="groups" placeholder="select group"/>
             </div>
             <div class="col-span-2">
                 <f-input label="Url" placeholder="http://" right v-model="entry.url"></f-input>

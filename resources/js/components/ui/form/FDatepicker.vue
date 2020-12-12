@@ -1,24 +1,21 @@
 <template>
-    <t-datepicker
-        :value="value"
-        :inline="inline"
-        :placeholder="placeholder"
-        :date-format="format"
-        :user-format="format"
-        @input="input"
-    />
+<!--    <t-datepicker :value="value"-->
+<!--                  :inline="inline"-->
+<!--                  :placeholder="placeholder"-->
+<!--                  :date-format="format"-->
+<!--                  :user-format="format"-->
+<!--                  @input="input"-->
+<!--    />-->
 
-
-
-<!--    <vuejs-datepicker :value="value"-->
-<!--                      :inline="false"-->
-<!--                      :format="format"-->
-<!--                      wrapper-class="border-0 focus:border-0 active:border-0"-->
-<!--                      input-class="border-0 focus:border-0 active:border-0"-->
-<!--                      :calendar-class="calendar"-->
-<!--                      :disabled-dates="state.disabledDates"-->
-<!--                      @input="input">-->
-<!--    </vuejs-datepicker>-->
+    <vuejs-datepicker :value="value"
+                      :inline="inline"
+                      :format="format"
+                      wrapper-class="border-0 focus:border-0 active:border-0"
+                      input-class="border-0 focus:border-0 active:border-0"
+                      :calendar-class="calendar"
+                      :disabled-dates="state.disabledDates"
+                      @selected="input">
+    </vuejs-datepicker>
 </template>
 
 <script>

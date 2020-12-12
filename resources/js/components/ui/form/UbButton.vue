@@ -1,5 +1,5 @@
 <template>
-    <button type="button" class="btn" :class="classes" @click="click">
+    <button type="button" class="btn" :class="classes" @click="click" @blur="blur">
         <icon v-if="iconLeft" :name="iconLeft" class="btn-icon-left"></icon>
         <icon v-if="icon" :name="icon" class="h-5 w-5"></icon>
         <slot v-if="!icon"/>
@@ -97,6 +97,9 @@
         methods: {
             click () {
                 this.$emit('click')
+            },
+            blur () {
+                this.$emit('blur')
             }
         }
 

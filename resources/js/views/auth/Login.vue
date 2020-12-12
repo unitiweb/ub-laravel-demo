@@ -16,17 +16,19 @@
                 </p>
             </template>
 
-            <div class="px-4 py-2">
-                <f-input label="Email" placeholder="email" v-model="credentials.email"/>
-            </div>
-            <div class="px-4 py-2">
-                <f-input type="password" label="Password" placeholder="password" v-model="credentials.password"/>
-            </div>
+            <div class="p-4">
+                <div class="px-4 py-2">
+                    <f-input label="Email" placeholder="email" v-model="credentials.email"/>
+                </div>
+                <div class="px-4 py-2">
+                    <f-input type="password" label="Password" placeholder="password" v-model="credentials.password"/>
+                </div>
 
-            <alert variant="danger" :show="!!error">{{ error }}</alert>
+                <alert variant="danger" :show="!!error">{{ error }}</alert>
+            </div>
 
             <template v-slot:footer>
-                <ub-button @click="login" icon="lock" block>Login</ub-button>
+                <ub-button @click="login" icon-left="login" block>Login</ub-button>
             </template>
         </card>
 

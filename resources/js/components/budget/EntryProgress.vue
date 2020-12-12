@@ -62,31 +62,29 @@ export default {
                 entry.goal = false
                 entry.paid = false
                 entry.cleared = false
+                this.updateState({ goal: false })
             } else if (entry.paid) {
                 // Advance to cleared
                 entry.goal = true
                 entry.paid = true
                 entry.cleared = true
+                this.updateState({ cleared: true })
             } else if (entry.goal) {
                 // Advance to paid
                 entry.goal = true
                 entry.paid = true
                 entry.cleared = false
+                this.updateState({ paid: true })
             } else {
                 // Advance to goal
                 entry.goal = true
                 entry.paid = false
                 entry.cleared = false
+                this.updateState({ goal: true })
             }
-
-            this.updateState({
-                goal: entry.goal,
-                paid: entry.paid,
-                cleared: entry.cleared
-            })
         },
-        updateState ({ goal, paid, cleared }) {
-            this.$http.updateEntry(this.month, this.value.id, { goal, paid, cleared })
+        updateState (data) {
+            this.$http.updateEntry(this.month, this.value.id, data)
                 .then(({ data }) => {
                     this.$emit('updated', data)
                 }).catch(({ error }) => {

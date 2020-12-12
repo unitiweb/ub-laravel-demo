@@ -1,12 +1,12 @@
 <template>
     <div>
         <group v-for="(group, index) in groups"
-                :key="`group-${index}`"
-                :group="group"
-                :active="isActive(group)"
-                :active-row="activeRow"
-                @modify-group="modifyGroup"
-                @modify-entry="modifyEntry">
+               :key="`group-${index}`"
+               :group="group"
+               :active="isActive(group)"
+               :active-row="activeRow"
+               @modify-group="modifyGroup"
+               @modify-entry="modifyEntry">
         </group>
     </div>
 </template>
@@ -43,15 +43,15 @@
             },
 
             groups () {
-                // if (this.budget.unassignedIncomeEntries && this.budget.unassignedIncomeEntries.length >= 1) {
-                //     this.budget.incomes.push({
-                //         id: null,
-                //         unassigned: true,
-                //         name: 'Unassigned',
-                //         dueDay: null,
-                //         entries: this.budget.unassignedIncomeEntries
-                //     })
-                // }
+                if (this.budget.unassignedGroupEntries && this.budget.unassignedGroupEntries.length >= 1) {
+                    this.budget.groups.push({
+                        id: null,
+                        unassigned: true,
+                        name: 'Unassigned',
+                        order: 10000,
+                        entries: this.budget.unassignedGroupEntries
+                    })
+                }
 
                 return this.budget.groups
             }

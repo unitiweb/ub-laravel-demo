@@ -2,11 +2,11 @@
     <div class="p-2">
         <div v-if="income" class="grid grid-cols-2 gap-6">
             <div class="col-span-1">
-                <ub-button v-if="income.id" @click="deleteIncome" outline variant="danger" class="float-left">delete</ub-button>
+                <ub-button v-if="income.id" @click="deleteIncome" outline variant="danger" icon="trash" class="float-left" size="sm"></ub-button>
             </div>
             <div class="col-span-1 text-right">
-                <ub-button variant="secondary" @click="cancel" outline>Cancel</ub-button>
-                <ub-button @click="save">Save</ub-button>
+                <ub-button variant="secondary" @click="cancel" outline size="sm">Cancel</ub-button>
+                <ub-button @click="save" size="sm">Save</ub-button>
             </div>
             <div class="col-span-2">
                 <f-input label="Income Name"

@@ -89,16 +89,7 @@ const routes = [
                     {
                         path: 'budget/:year?/:month?',
                         name: 'budget',
-                        component: Budget,
-                        beforeEnter: (to, from , next) => {
-                            if (!to.params.year || !to.params.month) {
-                                const now = moment()
-                                const year = now.format('YYYY')
-                                const month = now.format('MM')
-                                next({ name: 'budget', params: { year, month }})
-                            }
-                            next()
-                        }
+                        component: Budget
                     }
                 ]
             }
