@@ -12,7 +12,7 @@
                         </slot>
                     </span>
                     <span class="absolute inset-y-0 right-0 flex items-center pr-2 pointer-events-none">
-                        <icon name="selector" class="h-5 w-5 text-gray-700"></icon>
+                        <icon name="selector" class="text-gray-700"></icon>
                     </span>
                 </button>
             </span>

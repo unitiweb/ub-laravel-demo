@@ -1,8 +1,8 @@
 import { currency } from "@/scripts/helpers/utils";
 
-const Currency = function (value) {
+const Currency = function (value, includeSymbol = true) {
     if (!value) value = 0
-    return currency(value)
+    return currency(value, includeSymbol)
 }
 
 const Filters = {

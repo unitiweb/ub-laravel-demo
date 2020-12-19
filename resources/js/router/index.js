@@ -32,6 +32,11 @@ import Logout from '@/views/auth/Logout'
 import Budget from '@/views/dashboard/budget/Budget'
 
 /**
+ * Load the profile components
+ */
+import Profile from '@/views/dashboard/profile/Profile'
+
+/**
  * Middleware
  */
 
@@ -90,6 +95,10 @@ const routes = [
                         path: 'budget/:year?/:month?',
                         name: 'budget',
                         component: Budget
+                    }, {
+                        path: 'profile',
+                        name: 'profile',
+                        component: Profile
                     }
                 ]
             }

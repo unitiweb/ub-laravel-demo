@@ -1,7 +1,7 @@
 <template>
-    <button type="button" class="btn" :class="classes" @click="click" @blur="blur">
+    <button type="button" class="btn" :class="classes" @click="click" @blur="blur" :disabled="disabled">
         <icon v-if="iconLeft" :name="iconLeft" class="btn-icon-left"></icon>
-        <icon v-if="icon" :name="icon" class="h-5 w-5"></icon>
+        <icon v-if="icon" :name="icon"></icon>
         <slot v-if="!icon"/>
         <icon v-if="iconRight" :name="iconRight" class="btn-icon-right"></icon>
     </button>
@@ -33,7 +33,7 @@
                 type: String,
                 default: 'primary',
                 validator: value => {
-                    return ['primary', 'secondary', 'success', 'info', 'warning', 'danger', 'outline'].indexOf(value) !== -1
+                    return ['primary', 'secondary', 'success', 'info', 'warning', 'danger', 'link'].indexOf(value) !== -1
                 }
             },
             size: {
@@ -54,6 +54,10 @@
             iconRight: {
                 type: String,
                 default: null
+            },
+            disabled: {
+                type: Boolean,
+                default: false
             }
         },
 
@@ -95,7 +99,7 @@
         },
 
         methods: {
-            click () {
+            click (event) {
                 this.$emit('click')
             },
             blur () {

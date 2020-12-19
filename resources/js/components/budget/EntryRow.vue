@@ -1,7 +1,7 @@
 <template>
     <div :class="rowClasses" class="flex border-b rounded-md cursor-pointer m-1 pb-1">
         <div class="flex-none border-r px-1 pt-4">
-            <icon name="menu" fill class="entry-handle cursor-move text-gray-300 hover:text-gray-700 h-4 h-4"></icon>
+            <icon name="menu" fill size="4" class="entry-handle cursor-move text-gray-300 hover:text-gray-700"></icon>
         </div>
         <div @click="modify" class="flex-1 px-2 pt-1">
             {{ entry.name }}
@@ -14,7 +14,7 @@
                 {{ entry.amount | currency }}
             </div>
         </div>
-        <div class="flex-none rounded-md">
+        <div v-if="!hideProgress" class="flex-none rounded-md">
             <entry-progress v-model="entry" :month="this.month" @updated="updateStatus"></entry-progress>
         </div>
     </div>
@@ -45,6 +45,10 @@
                 type: Object
             },
             active: {
+                type: Boolean,
+                default: false
+            },
+            hideProgress: {
                 type: Boolean,
                 default: false
             }

@@ -7,10 +7,10 @@
                 </div>
                 <div class="hidden lg:block lg:ml-6 lg:space-x-4">
                     <div class="flex">
-                        <navbar-link :to="{ name: 'dashboard' }">Dashboard</navbar-link>
-<!--                        <navbar-link :to="{ name: 'login' }">Jobs</navbar-link>-->
-<!--                        <navbar-link :to="{ name: 'login' }">Applications</navbar-link>-->
-<!--                        <navbar-link :to="{ name: 'login' }">Company</navbar-link>-->
+                        <navbar-link :to="{ name: 'budget' }">Budget</navbar-link>
+                        <navbar-link :to="{ name: 'profile' }">My Profile</navbar-link>
+                        <navbar-link :to="{ name: 'lock' }">Lock</navbar-link>
+                        <navbar-link :to="{ name: 'logout' }">Logout</navbar-link>
                     </div>
                 </div>
             </div>

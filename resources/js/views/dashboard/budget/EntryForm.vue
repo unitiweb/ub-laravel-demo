@@ -24,10 +24,10 @@
                 </f-input>
             </div>
             <div class="col-span-1">
-                <f-input label="Due Day" placeholder="1" right v-model="entry.dueDay" :right-add-on="dueDaySuffix"></f-input>
+                <due-day-picker v-model="entry.dueDay" :date="budgetMonth"></due-day-picker>
             </div>
             <div class="col-span-1">
-                <f-input label="Amount" placeholder="0.00" v-model="entry.amount" left-add-on="$"></f-input>
+                <f-input label="Amount" placeholder="0.00" v-model="entry.amount" :filter="currencyFilter" left-add-on="$"></f-input>
             </div>
             <div class="col-span-2">
                 <ub-select label="Income" v-model="entry.incomeId" :options="incomes" id-key="id" label-key="name" placeholder="select income">
@@ -72,11 +72,13 @@
 <script>
     import moment from "moment";
     import Modal from "@/components/ui/modal/Modal";
+    import DueDayPicker from '@/views/dashboard/budget/DueDayPicker'
 
     export default {
 
         components: {
-            Modal
+            Modal,
+            DueDayPicker
         },
 
         props: {
@@ -167,6 +169,17 @@
         },
 
         methods: {
+
+            currencyFilter (value) {
+                return this.$options.filters.currency(value, false)
+            },
+
+            dueDayFilter (value) {
+                const year = this.$route.params.year
+                const month = this.$route.params.month
+                const max = moment(`${year}-${month}-01`, "YYYY-M-DD").endOf('month').date()
+                return Math.min(Math.max(parseInt(value), 1), max)
+            },
 
             resetGroup (entry) {
                 let id = null

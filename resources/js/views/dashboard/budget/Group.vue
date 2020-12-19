@@ -23,7 +23,7 @@
                 no entries
             </div>
             <div v-else-if="collapsed === true" class="text-gray-400 px-4 py-1">
-                <icon name="dotsHorizontal" class="h-5 w-5"></icon>
+                <icon name="dotsHorizontal"></icon>
             </div>
         </div>
         <div v-if="!this.group.unassigned" class="text-center bg-gray-200 border border-t border-l-0 border-r-0 border-b-0 border-gray-400 rounded-md pb-1 pt-1">
@@ -75,7 +75,7 @@
                 if (this.active && !this.group.unassigned) {
                     return 'bg-yellow-100'
                 }
-                return ' bg-gray-200 hover:bg-gray-100'
+                return ' bg-green-100 hover:bg-green-200'
             },
             budgetDate () {
                 return `${this.$route.params.year}-${this.$route.params.month}-01`
@@ -117,7 +117,6 @@
             },
 
             async calculate () {
-                console.log('calculate')
                 this.balances = {
                     expenses: 0,
                     outstanding: 0,

@@ -7,7 +7,7 @@
                     id="user-menu"
                     aria-haspopup="true">
                 <span class="sr-only">Open profile menu</span>
-                <img class="rounded-full h-8 w-8" src="https://images.unsplash.com/photo-1517365830460-955ce3ccd263?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=facearea&facepad=4&w=256&h=256&q=80" alt="">
+                <img class="rounded-full h-8 w-8" :src="avatar" alt="fullName">
             </button>
         </div>
         <transition enter-active-class="transition ease-out duration-100"
@@ -46,6 +46,16 @@
         data () {
             return {
                 show: false
+            }
+        },
+
+        computed: {
+            avatar () {
+                return this.$store.getters.avatar
+            },
+            fullName () {
+                const user = this.$store.getters.user
+                return `${user.firstName} ${user.lastName}`
             }
         },
 

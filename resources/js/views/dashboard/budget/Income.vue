@@ -1,7 +1,7 @@
 <template>
     <div class="border border-gray-400 rounded-md shadow-md m-1">
         <div>
-            <div :class="incomeClasses" class="flex border border-t-0 border-l-0 border-r-0 border-b border-gray-400 rounded-md">
+            <div :class="incomeClasses" class="flex border border-t-0 border-l-0 border-r-0 border-b border-blue-400 rounded-md">
                 <div class="flex-none text-lg text-right px-3 py-2">
                     <ub-button @click="collapsed = !collapsed"
                               size="sm" variant="secondary"
@@ -27,10 +27,10 @@
                 no entries
             </div>
             <div v-else-if="collapsed === true" class="text-gray-400 px-4 py-1">
-                <icon name="dotsHorizontal" class="h-5 w-5"></icon>
+                <icon name="dotsHorizontal"></icon>
             </div>
         </div>
-        <div v-if="!this.income.unassigned" class="text-center bg-gray-200 border border-t border-l-0 border-r-0 border-b-0 border-gray-400 rounded-md pb-1 pt-1">
+        <div v-if="!this.income.unassigned" class="text-center bg-gray-100 border border-t border-l-0 border-r-0 border-b-0 border-gray-400 rounded-md pb-1 pt-1">
             <ub-badge variant="danger" rounded outline>Expenses: {{ balances.expenses | currency }}</ub-badge>
             <ub-badge :variant="outstandingVariant(income)" rounded outline>Out Standing: {{ balances.outstanding | currency }}</ub-badge>
             <ub-badge :variant="leftOverVariant(income)" rounded outline>Left Over: {{ balances.leftOver | currency }}</ub-badge>
@@ -42,13 +42,27 @@
                cancel-label="Oops! No"
                @confirm="entryMoveConfirm"
                @cancel="entryMoveCanceled">
-            <f-datepicker :value="pickerDueDate"
-                          inline
-                          format="dd"
-                          :min-date="pickerMinDate"
-                          :max-date="pickerMaxDate"
-                          @input="pickerUpdateDueDay">
-            </f-datepicker>
+
+            <entry-row :month="budgetDate" :entry="changeDueDay" hide-progress></entry-row>
+
+            <div class="flex">
+                <div class="flex-1">
+                    <!-- This item will grow or shrink as needed -->
+                </div>
+                <div class="flex-shrink-0 p-6">
+                    <f-datepicker :value="pickerDueDate"
+                                  inline
+                                  format="dd"
+                                  class="mx-auto"
+                                  :min-date="pickerMinDate"
+                                  :max-date="pickerMaxDate"
+                                  @input="pickerUpdateDueDay">
+                    </f-datepicker>
+                </div>
+                <div class="flex-1">
+                    <!-- This item will grow or shrink as needed -->
+                </div>
+            </div>
         </modal>
     </div>
 </template>
@@ -57,6 +71,7 @@
     import DueDay from '@/components/ui/DueDay'
     import Draggable from 'vuedraggable'
     import EntryRow from '@/components/budget/EntryRow'
+    import DueDayPicker from '@/views/dashboard/budget/DueDayPicker'
     import Modal from "@/components/ui/modal/Modal";
     import moment from "moment";
 
@@ -65,6 +80,7 @@
         components: {
             Draggable,
             EntryRow,
+            DueDayPicker,
             Modal,
             DueDay
         },
@@ -114,7 +130,7 @@
                 if (this.active && !this.income.unassigned) {
                     return 'bg-yellow-100'
                 }
-                return ' bg-gray-200 hover:bg-gray-100'
+                return ' bg-blue-100 hover:bg-blue-200'
             },
             budgetDate () {
                 return `${this.$route.params.year}-${this.$route.params.month}-01`
@@ -156,7 +172,6 @@
             },
 
             async calculate () {
-                console.log('calculate')
                 this.balances = {
                     expenses: 0,
                     outstanding: 0,
@@ -205,7 +220,6 @@
             modifyEntry (entry) {
                 this.$emit('modify-entry', entry)
             },
-
 
             /**
              * Due Day change and modal methods below

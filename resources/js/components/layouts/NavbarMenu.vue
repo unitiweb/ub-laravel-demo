@@ -8,6 +8,8 @@
         <div class="bg-light-blue-900 lg:hidden">
             <div class="pt-2 pb-3 px-2 space-y-1">
                 <navbar-menu-link :to="{ name: 'budget' }">Dashboard</navbar-menu-link>
+                <navbar-menu-link :to="{ name: 'lock' }">Lock</navbar-menu-link>
+                <navbar-menu-link :to="{ name: 'logout' }">Logout</navbar-menu-link>
             </div>
             <div class="pt-4 pb-3 border-t border-light-blue-800">
                 <div class="flex items-center px-4">

@@ -20,17 +20,16 @@
                         <div class="relative inline-block text-left">
                             <div>
                                 <ub-button @click="showViewMenu = !showViewMenu" @blur="showViewMenu = false" variant="secondary" outline size="sm">
-                                    <icon name="cog" class="-l-mr-1 ml-2 h-5 w-5"></icon>
+                                    <icon name="cog" size="5" class="-l-mr-1 ml-2"></icon>
                                     <span class="hidden sm:inline ml-2">Options</span>
-                                    <icon name="chevronDown" class="-l-mr-1 ml-2 h-5 w-5"></icon>
-<!--                                    <icon name="viewBoard" class="inline sm:hidden h-5 w-5"></icon>-->
+                                    <icon name="chevronDown" class="-l-mr-1 ml-2"></icon>
                                 </ub-button>
                             </div>
                             <transition-fade>
                                 <div v-show="showViewMenu" class="origin-top-right absolute right-0 mt-2 w-56 z-50 rounded-md shadow-lg bg-white ring-1 ring-black ring-opacity-5 divide-y divide-gray-200" role="menu" aria-orientation="vertical" aria-labelledby="options-menu">
                                     <div>
                                         <a href="#" @click="today" class="group px-2 py-1 flex items-center py-2 text-sm text-gray-700 hover:bg-gray-100 hover:text-gray-900" role="menuitem">
-                                            <icon name="calendar" class="h-5 w-5 mr-2 text-gray-500"></icon>
+                                            <icon name="calendar" class="mr-2 text-gray-500"></icon>
                                             Current Month
                                         </a>
                                     </div>
@@ -39,12 +38,12 @@
                                             View
                                         </p>
                                         <a href="#" @click="changeView('incomes')" :class="{ 'font-bold': viewActive('incomes') }" class="group px-2 py-1 flex items-center py-2 text-sm text-gray-700 hover:bg-gray-100 hover:text-gray-900" role="menuitem">
-                                            <icon v-if="viewActive('incomes')" name="check" class="float-left text-green-700 mr-2 h-5 w-5"></icon>
-                                            <span :class="{'ml-7': !viewActive('incomes')}">Incomes View</span>
+                                            <icon v-if="viewActive('incomes')" name="check" class="float-left text-green-700 mr-2"></icon>
+                                            <span :class="{'ml-7': !viewActive('incomes')}">View by Income</span>
                                         </a>
                                         <a href="#" @click="changeView('groups')" :class="{ 'font-bold': viewActive('groups') }" class="group px-2 py-1 flex items-center py-2 text-sm text-gray-700 hover:bg-gray-100 hover:text-gray-900" role="menuitem">
-                                            <icon v-if="viewActive('groups')" name="check" class="float-left text-green-700 mr-2 h-5 w-5"></icon>
-                                            <span :class="{'ml-7': !viewActive('groups')}">Groups View</span>
+                                            <icon v-if="viewActive('groups')" name="check" class="float-left text-green-700 mr-2"></icon>
+                                            <span :class="{'ml-7': !viewActive('groups')}">View by Group</span>
                                         </a>
                                     </div>
                                     <div>
@@ -52,17 +51,17 @@
                                             Manage
                                         </p>
                                         <a href="#" @click="changeView('create-income')" :class="{ 'font-bold': viewActive('create-income') }" class="group px-2 py-1 flex items-center py-2 text-sm text-gray-700 hover:bg-gray-100 hover:text-gray-900" role="menuitem">
-                                            <icon name="plus" class="float-left text-green-700 mr-2 h-5 w-5"></icon>
+                                            <icon name="plus" class="float-left text-green-700 mr-2"></icon>
                                             <span>Create Income</span>
                                         </a>
                                         <a href="#" @click="changeView('create-group')" :class="{ 'font-bold': viewActive('manage-groups') }" class="group px-2 py-1 flex items-center py-2 text-sm text-gray-700 hover:bg-gray-100 hover:text-gray-900" role="menuitem">
-                                            <icon name="plus" class="float-left text-green-700 mr-2 h-5 w-5"></icon>
+                                            <icon name="plus" class="float-left text-green-700 mr-2"></icon>
                                             <span>Create Group</span>
                                         </a>
                                     </div>
                                     <div>
                                         <a href="#" @click="changeView('delete-budget')" :class="{ 'font-bold': viewActive('delete-budget') }" class="group px-2 py-1 flex items-center py-2 text-sm text-gray-700 hover:bg-gray-100 hover:text-gray-900" role="menuitem">
-                                            <icon name="trash" class="float-left text-green-700 mr-2 h-5 w-5"></icon>
+                                            <icon name="trash" class="float-left text-green-700 mr-2"></icon>
                                             <span>Delete Budget</span>
                                         </a>
                                     </div>

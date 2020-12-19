@@ -9,10 +9,10 @@
                @keypress.enter="save"
         />
         <button class="border text-white bg-blue-400 border border-blue-500 h-10 px-2 my-1" @click="save">
-            <icon name="save" class="h-5 w-5"></icon>
+            <icon name="save"></icon>
         </button>
         <button class="border text-white bg-red-400 border border-red-500 rounded-r-md h-10 px-2 my-1" @click="cancel">
-            <icon name="x" class="h-5 w-5"></icon>
+            <icon name="x"></icon>
         </button>
     </div>
 </template>

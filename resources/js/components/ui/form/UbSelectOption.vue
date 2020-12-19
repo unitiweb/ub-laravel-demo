@@ -6,7 +6,7 @@
             </slot>
         </span>
         <span :class="{ 'text-white': !selected, 'text-indigo-600': selected }" class="absolute inset-y-0 left-0 flex items-center pl-2">
-            <icon name="check" class="h-5 w-5"></icon>
+            <icon name="check"></icon>
         </span>
     </li>
 </template>

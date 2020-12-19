@@ -12,7 +12,7 @@
                     Or
                     <a href="#" class="font-medium text-indigo-600 hover:text-indigo-500 focus:outline-none focus:underline transition ease-in-out duration-150">
                         start your 14-day free trial
-                </a>
+                    </a>
                 </p>
             </template>
 
@@ -23,7 +23,6 @@
                 <div class="px-4 py-2">
                     <f-input type="password" label="Password" placeholder="password" v-model="credentials.password"/>
                 </div>
-
                 <alert variant="danger" :show="!!error">{{ error }}</alert>
             </div>
 

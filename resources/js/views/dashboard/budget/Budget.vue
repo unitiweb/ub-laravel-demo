@@ -9,6 +9,16 @@
                 <template v-slot:left>
                     <div :class="leftVisibility">
                         <div v-if="['incomes', 'groups'].includes(currentState.left)">
+                            <div class="flex align-middle p-1 m-1">
+                                <div class="flex-initial">
+                                    <ub-button @click="viewIncomes" size="sm" icon="currencyDollar" :variant="currentState.left === 'incomes' ? 'primary' : 'secondary'" outline></ub-button>
+                                    <ub-button @click="viewGroups" size="sm" icon="viewBoard" :variant="currentState.left === 'groups' ? 'success' : 'secondary'" outline></ub-button>
+                                </div>
+                                <div class="flex-initial ml-2 pt-1 font-bold">
+                                    <span  v-if="currentState.left === 'incomes'">View by Income</span>
+                                    <span  v-if="currentState.left === 'groups'">View by Group</span>
+                                </div>
+                            </div>
                             <incomes v-if="currentState.left === 'incomes'" :active-income="activeIncome" :active-row="activeRow" :budget="budget" @modify-income="modifyIncome" @modify-entry="modifyEntry"/>
                             <groups v-if="currentState.left === 'groups'" :active-group="activeGroup" :active-row="activeRow" :budget="budget" @modify-group="modifyGroup" @modify-entry="modifyEntry"/>
                         </div>
@@ -16,18 +26,10 @@
                 </template>
                 <template v-slot:right>
                     <div :class="rightVisibility">
-                        <!-- <transition-slide :out="state.view !== 'budget'"> -->
                         <budget-stats v-show="!currentState.right" :budget="budget"/>
-                        <!-- </transition-slide> -->
-                        <!-- <transition-slide :out="state.view !== 'modify-income'"> -->
                         <income-form v-show="currentState.right === 'modify-income'" class="object-top" :income="currentState.data" :budget="budget" @done="done"/>
-                        <!-- </transition-slide> -->
-                        <!-- <transition-slide :out="state.view !== 'modify-income'"> -->
                         <group-form v-show="currentState.right === 'modify-group'" class="object-top" :group="currentState.data" :budget="budget" @done="done"/>
-                        <!-- </transition-slide> -->
-                        <!-- <transition-slide :out="state.view !== 'modify-entry'"> -->
                         <entry-form v-show="currentState.right === 'modify-entry'" class="object-top" :entry="currentState.data" :incomes="incomes" :groups="groups" :other-groups="otherGroups" @done="done"/>
-                        <!-- </transition-slide> -->
                     </div>
                 </template>
             </budget-divided>
@@ -170,6 +172,18 @@
                 } else {
                     this.setState(view)
                 }
+            },
+
+            async viewIncomes () {
+                await this.$http.updateSettings({ lastView: 'incomes' })
+                await this.$store.dispatch('lastView', 'incomes');
+                await this.loadBudget()
+            },
+
+            async viewGroups () {
+                await this.$http.updateSettings({ lastView: 'groups' })
+                await this.$store.dispatch('lastView', 'groups');
+                await this.loadBudget()
             },
 
             async redirectIfNoDate () {

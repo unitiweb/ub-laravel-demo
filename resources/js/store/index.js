@@ -71,6 +71,17 @@ export default new Vuex.Store({
         user: state => {
             return state.user
         },
+        avatar: (state) => {
+            const avatar = state.user.avatar
+            if (avatar && avatar.length > 0) {
+                return `${config.AVATAR_BASE_PATH}/${avatar}`
+            }
+            // default if since an avatar is not set
+            return '/static/img/mike.jpg'
+        },
+        site: state => {
+            return state.site
+        },
         budgetDate: state => {
             if (state.budgetDate) return this.budgetDate
             else return moment().format('YYYY-MM-01')
@@ -105,6 +116,9 @@ export default new Vuex.Store({
         },
         site (state, site) {
             state.site = site
+        },
+        avatar (state, avatar) {
+            state.user.avatar = avatar
         },
         settings (state, settings) {
             state.settings = settings
@@ -160,6 +174,22 @@ export default new Vuex.Store({
             commit('settings', {})
             commit('user', {})
             commit('tokens', null)
+        },
+        user ({ commit, getters }, payload) {
+            const user = getters.user
+            // Update only the given values
+            for (const [key, value] of Object.entries(payload)) {
+                user[key] = value
+            }
+            commit('user', user)
+        },
+        site ({ commit, getters }, payload) {
+            const site = getters.site
+            // Update only the given values
+            for (const [key, value] of Object.entries(payload)) {
+                site[key] = value
+            }
+            commit('site', site)
         },
         appLoaded ({ commit }, payload) {
             commit('appLoaded', payload)

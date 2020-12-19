@@ -1,8 +1,8 @@
 <template>
     <div class="flex border border-gray-400 bg-gray-100 rounded-md shadow mx-1 my-2">
         <div class="flex-none border-r border-gray-400 hover:bg-blue-200 py-1">
-            <icon name="order-bar" class="cursor-move text-gray-700 h-6 w-4"></icon>
-            <icon name="link" class="cursor-pointer float-left ml-1 mt-1 h-3 w-3"></icon>
+            <icon size="6" name="order-bar" class="cursor-move text-gray-700"></icon>
+            <icon name="link" size="3" class="cursor-pointer float-left ml-1 mt-1"></icon>
         </div>
         <div class="flex-1 cursor-pointer hover:bg-gray-200 px-3 py-1" style="width: 50%;">
             {{ entry.name }}

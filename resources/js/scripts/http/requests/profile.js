@@ -23,6 +23,9 @@ export default {
     // Update user specific settings
     updateSettings: (settings) => request('patch', ['profile', 'settings'], settings),
 
+    // Update user specific site
+    updateSite: (site) => request('patch', ['profile', 'site'], site),
+
     // Upload an image in a base64 format
     uploadAvatar: (image) => request('post', ['profile', 'avatar'], { image })
 }

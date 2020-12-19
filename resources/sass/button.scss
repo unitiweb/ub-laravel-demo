@@ -20,7 +20,7 @@
 .btn-secondary:hover { @apply bg-gray-500; }
 .btn-secondary:focus { @apply border-gray-700; }
 .btn-secondary:active { @apply bg-gray-700; }
-.btn-secondary-outline { @apply text-gray-700 bg-gray-100 border border-gray-500; }
+.btn-secondary-outline { @apply text-gray-700 bg-gray-100 border border-gray-400; }
 .btn-secondary-outline:hover { @apply bg-gray-200 border-gray-600; }
 .btn-secondary-outline:focus { @apply border-gray-600 bg-gray-300; }
 .btn-secondary-outline:active { @apply bg-gray-300; }
@@ -60,6 +60,13 @@
 .btn-danger-outline:hover { @apply bg-red-200 border-red-600; }
 .btn-danger-outline:focus { @apply border-red-600 bg-red-300; }
 .btn-danger-outline:active { @apply bg-red-300; }
+/* button link */
+.btn-link { @apply text-gray-600 shadow-none border-0; }
+.btn-link:hover { @apply text-gray-500; }
+.btn-link-outline { @apply text-gray-700; }
+.btn-link-outline:hover { @apply text-gray-200; }
+.btn-link-outline:focus { @apply text-gray-300; }
+.btn-link-outline:active { @apply text-gray-300; }
 /* button sizes */
 .btn-xs { @apply text-xs h-6 px-2 py-0; }
 .btn-sm { @apply text-sm h-8 px-2 py-1; }
