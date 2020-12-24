@@ -1,7 +1,7 @@
 <template>
-    <div class="border border-gray-400 rounded-md shadow-md m-1">
+    <div class="border border-gray-300 rounded-md shadow-md m-1">
         <div>
-            <div :class="groupClasses" class="flex border border-t-0 border-l-0 border-r-0 border-b border-gray-400 rounded-md">
+            <div :class="groupClasses" class="flex border border-t-0 border-l-0 border-r-0 border-b border-gray-300 rounded-md rounded-b-none">
                 <div class="flex-none text-lg text-right px-3 py-2">
                     <ub-button @click="collapsed = !collapsed"
                                size="sm" variant="secondary"
@@ -26,7 +26,7 @@
                 <icon name="dotsHorizontal"></icon>
             </div>
         </div>
-        <div v-if="!this.group.unassigned" class="text-center bg-gray-200 border border-t border-l-0 border-r-0 border-b-0 border-gray-400 rounded-md pb-1 pt-1">
+        <div v-if="!this.group.unassigned" class="text-center bg-gray-200 border border-t border-l-0 border-r-0 border-b-0 border-gray-300 rounded-md rounded-t-none pb-1 pt-1">
             <ub-badge variant="danger" rounded outline>Expenses: {{ balances.expenses | currency }}</ub-badge>
             <ub-badge :variant="outstandingVariant(group)" rounded outline>Out Standing: {{ balances.outstanding | currency }}</ub-badge>
             <ub-badge :variant="leftOverVariant(group)" rounded outline>Left Over: {{ balances.leftOver | currency }}</ub-badge>
@@ -75,7 +75,7 @@
                 if (this.active && !this.group.unassigned) {
                     return 'bg-yellow-100'
                 }
-                return ' bg-green-100 hover:bg-green-200'
+                return ' bg-gray-100 hover:bg-gray-200'
             },
             budgetDate () {
                 return `${this.$route.params.year}-${this.$route.params.month}-01`

@@ -44,7 +44,7 @@
         computed: {
 
             wrapperClasses () {
-                const classes = ['bg-white rounded-lg shadow-xl m-2 border-2 mx-auto']
+                const classes = ['bg-white rounded-lg shadow-xl m-2 border mx-auto']
 
                 if (this.color === 'white') {
                     classes.push(`border-gray-${this.border}`)
@@ -56,12 +56,12 @@
             },
 
             headerClasses () {
-                const classes = ['text-lg font-weight-bold p-4 border-b rounded-t']
+                const classes = ['text-lg font-weight-bold p-4 border-b rounded-t-lg rounded-b-none']
 
                 if (this.color === 'white') {
                     classes.push(`bg-${this.color} border-gray-${this.border}`)
                 } else {
-                    classes.push(`bg-${this.color}-200 border-${this.color}-${this.border}`)
+                    classes.push(`bg-${this.color}-100 border-${this.color}-${this.border}`)
                 }
 
                 return classes
@@ -81,7 +81,7 @@
                 if (this.color === 'white') {
                     classes.push(`p-4 border-t bg-${this.color} rounded-b-lg border-gray-200`)
                 } else {
-                    classes.push(`p-4 border-t bg-${this.color}-200 rounded-b-lg border-${this.color}-${this.border}`)
+                    classes.push(`p-4 border-t bg-${this.color}-100 rounded-b-lg border-${this.color}-${this.border}`)
                 }
 
                 return classes

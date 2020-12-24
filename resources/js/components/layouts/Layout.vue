@@ -1,7 +1,7 @@
 <template>
     <div>
         <div class="relative bg-light-blue-900 pb-32 overflow-hidden">
-            <nav class="relative z-10 border-b border-teal-500 border-opacity-25 lg:bg-transparent lg:border-none">
+            <nav class="relative z-10 border-b border-light-blue-500 border-opacity-25 lg:bg-transparent lg:border-none">
                 <navbar @toggle="toggleMobileMenu"></navbar>
                 <navbar-menu v-show="showMobileMenu"></navbar-menu>
             </nav>

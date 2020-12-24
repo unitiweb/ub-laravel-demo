@@ -31,7 +31,7 @@ export default {
         }
     },
     TInput: {
-        classes: 'bg-white border-2 rounded-md border-gray-400 py-2 px-4 block w-full leading-normal focus:outline-none focus:shadow-outline',
+        classes: 'bg-white border-2 rounded-md border-gray-300 py-2 px-4 block w-full leading-normal focus:outline-none focus:shadow-outline',
         variants: {
             success: 'text-green-600 bg-green-100 focus:outline-none focus:shadow-outline border border-green-300 rounded py-2 px-4 block w-full leading-normal placeholder-green-300',
             error: 'text-red-600 bg-red-100 focus:outline-none focus:shadow-outline border border-red-300 rounded py-2 px-4 block w-full leading-normal placeholder-red-300'
@@ -65,7 +65,7 @@ export default {
     },
     TCard: {
         fixedClasses: {
-            wrapper: 'rounded-lg shadow-lg m-2 border-2 border-gray-400 max-w-lg mx-auto',
+            wrapper: 'rounded-lg shadow-lg m-2 border-2 border-gray-300 max-w-lg mx-auto',
             body: 'bg-white rounded-md text-gray-700 p-4',
             header: 'p-4 border-b rounded-t-lg',
             footer: 'p-4 border-t rounded-b-lg'
@@ -119,7 +119,7 @@ export default {
                 close: 'text-orange-700 hover:text-orange-500 hover:bg-orange-200'
             },
             clean: {
-                wrapper: 'bg-gray-100 border border-gray-400',
+                wrapper: 'bg-gray-100 border border-gray-300',
                 body: 'text-gray-700',
                 close: 'text-gray-700 hover:text-gray-500 hover:bg-gray-200'
             }
@@ -127,10 +127,10 @@ export default {
     },
     TTable: {
         classes: {
-            table: 'shadow-md border border-gray-400 min-w-full divide-y divide-gray-200',
+            table: 'shadow-md border border-gray-300 min-w-full divide-y divide-gray-200',
             tbody: 'bg-white divide-y divide-gray-200',
             td: 'px-6 py-4 whitespace-no-wrap text-sm leading-5 text-gray-700',
-            theadTh: 'px-6 py-3 border-b border-gray-400 bg-gray-200 text-left text-xs leading-4 font-medium text-gray-700 uppercase tracking-wider'
+            theadTh: 'px-6 py-3 border-b border-gray-300 bg-gray-200 text-left text-xs leading-4 font-medium text-gray-700 uppercase tracking-wider'
         },
         variants: {
             thin: {

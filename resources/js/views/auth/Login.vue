@@ -27,16 +27,13 @@
             </div>
 
             <template v-slot:footer>
-                <ub-button @click="login" icon-left="login" block>Login</ub-button>
+                <div class="flex gap-2">
+                    <ub-button @click="register" block outline size="sm" variant="secondary" class="flex-1">New User</ub-button>
+                    <ub-button @click="login" block size="sm" class="flex-1">Login</ub-button>
+                </div>
             </template>
+
         </card>
-
-        <div class="text-center text-sm leading-5">
-            <a href="#" class="font-medium text-indigo-600 hover:text-indigo-500 focus:outline-none focus:underline transition ease-in-out duration-150">
-                Forgot your password?
-            </a>
-        </div>
-
     </div>
 </template>
 
@@ -60,6 +57,9 @@
         },
 
         methods: {
+            register () {
+                this.$router.push({ name: 'register' })
+            },
             login () {
                 this.error = null;
                 this.$store.commit('loading', true)

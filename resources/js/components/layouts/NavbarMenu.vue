@@ -20,7 +20,7 @@
                         <div class="text-base font-medium leading-6 text-white">Debbie Lewis</div>
                         <div class="text-sm font-medium leading-5 text-light-blue-200">debbielewis@example.com</div>
                     </div>
-                    <button class="ml-auto flex-shrink-0 border-2 border-transparent rounded-full p-1 text-light-blue-200 hover:bg-light-blue-800 hover:text-white focus:outline-none focus:text-white focus:bg-light-blue-700 transition duration-150 ease-in-out">
+                    <button class="ml-auto flex-shrink-0 border border-transparent rounded-full p-1 text-light-blue-200 hover:bg-light-blue-800 hover:text-white focus:outline-none focus:text-white focus:bg-light-blue-700 transition duration-150 ease-in-out">
                         <span class="sr-only">Notifications</span>
                         <navbar-icon-link icon="bell"/>
                     </button>

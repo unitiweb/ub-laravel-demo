@@ -28,25 +28,25 @@ export default {
 
     computed: {
         defaultStatusClasses () {
-            return 'bg-gray-300 border-gray-400'
+            return 'bg-gray-300 border-gray-300'
         },
         clearedClasses () {
             if (this.value.cleared) {
-                return 'bg-green-300 border-green-400'
+                return 'bg-green-300 border-green-300'
             } else {
                 return this.defaultStatusClasses
             }
         },
         paidClasses () {
             if (this.value.paid) {
-                return 'bg-yellow-300 border-yellow-500'
+                return 'bg-yellow-300 border-yellow-300'
             } else {
                 return this.defaultStatusClasses
             }
         },
         goalClasses () {
             if (this.value.goal) {
-                return 'bg-red-300 border-red-400'
+                return 'bg-red-300 border-red-300'
             } else {
                 return this.defaultStatusClasses
             }

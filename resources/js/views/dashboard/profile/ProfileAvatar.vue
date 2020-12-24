@@ -12,9 +12,9 @@
             <div class="grid grid-cols-1 gap-4 sm:grid-cols-2">
                 <div class="sm:hidden form-width mx-auto my-auto pb-2">
                     <div class="text-center mb-6 text-lg font-bold">Current Avatar</div>
-                    <img :src="avatar" :alt="fullName" class="mx-auto border border-gray-400 rounded-full shadow-lg" style="width:100px;"/>
+                    <img :src="avatar" :alt="fullName" class="mx-auto border border-gray-300 rounded-full shadow-lg" style="width:100px;"/>
                 </div>
-                <div class="form-width mx-auto pb-2 bg-gray-200 border border-gray-400 rounded shadow-lg">
+                <div class="form-width mx-auto pb-2 bg-gray-200 border border-gray-300 rounded shadow-lg">
                     <div class="p-1">
                         <croppa v-model="myCroppa"
                                 :width="300"
@@ -45,7 +45,7 @@
                 </div>
                 <div class="hidden sm:inline form-width mx-auto my-auto pt-2">
                     <div class="text-center mb-6 text-lg font-bold">Current Avatar</div>
-                    <img :src="avatar" :alt="fullName" class="border border-gray-400 rounded-full shadow-lg"/>
+                    <img :src="avatar" :alt="fullName" class="border border-gray-300 rounded-full shadow-lg"/>
                 </div>
             </div>
         </div>

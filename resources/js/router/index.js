@@ -25,6 +25,7 @@ import Login from '@/views/auth/Login'
 import Locked from '@/views/auth/Locked'
 import Lock from '@/views/auth/Lock'
 import Logout from '@/views/auth/Logout'
+import Register from '@/views/register/Register'
 
 /**
  * Load the budget components
@@ -82,6 +83,10 @@ const routes = [
                         path: 'logout',
                         name: 'logout',
                         component: Logout
+                    }, {
+                        path: 'register',
+                        name: 'register',
+                        component: Register
                     }
                 ]
             }, {

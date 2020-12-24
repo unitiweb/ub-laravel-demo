@@ -1,6 +1,6 @@
 <template>
-    <div class="flex border border-gray-400 bg-gray-100 rounded-md shadow mx-1 my-2">
-        <div class="flex-none border-r border-gray-400 hover:bg-blue-200 py-1">
+    <div class="flex border border-gray-300 bg-gray-100 rounded-md shadow mx-1 my-2">
+        <div class="flex-none border-r border-gray-300 hover:bg-blue-200 py-1">
             <icon size="6" name="order-bar" class="cursor-move text-gray-700"></icon>
             <icon name="link" size="3" class="cursor-pointer float-left ml-1 mt-1"></icon>
         </div>
