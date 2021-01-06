@@ -94,7 +94,6 @@
              * Watch the slider value so the zoom can be updated when the slider is moved
              */
             sliderValue (newValue, oldValue) {
-                console.log('newValue', newValue)
                 if (newValue > oldValue) {
                     this.myCroppa.zoomIn()
                 } else if (newValue < oldValue) {

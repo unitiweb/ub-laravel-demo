@@ -26,6 +26,7 @@ import Locked from '@/views/auth/Locked'
 import Lock from '@/views/auth/Lock'
 import Logout from '@/views/auth/Logout'
 import Register from '@/views/register/Register'
+import VerifyEmail from '@/views/auth/VerifyEmail'
 
 /**
  * Load the budget components
@@ -87,6 +88,10 @@ const routes = [
                         path: 'register',
                         name: 'register',
                         component: Register
+                    }, {
+                        path: 'verify-email',
+                        name: 'verify-email',
+                        component: VerifyEmail
                     }
                 ]
             }, {

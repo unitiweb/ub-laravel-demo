@@ -103,7 +103,6 @@ export default {
             this.opened = !this.opened
         },
         select (value) {
-            console.log(value)
             this.$emit('input', value[this.idKey])
             this.$emit('updated', value[this.idKey], value[this.labelKey])
         },

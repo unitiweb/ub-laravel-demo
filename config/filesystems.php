@@ -55,14 +55,16 @@ return [
             'visibility' => 'public',
         ],
 
-        's3' => [
+        'remote' => [
             'driver' => 's3',
-            'key' => env('AWS_ACCESS_KEY_ID'),
-            'secret' => env('AWS_SECRET_ACCESS_KEY'),
-            'region' => env('AWS_DEFAULT_REGION'),
-            'bucket' => env('AWS_BUCKET'),
-            'url' => env('AWS_URL'),
-            'endpoint' => env('AWS_ENDPOINT'),
+            'key' => env('UPLOAD_AWS_ACCESS_KEY_ID'),
+            'secret' => env('UPLOAD_AWS_SECRET_ACCESS_KEY'),
+            'region' => env('UPLOAD_AWS_DEFAULT_REGION', 'us-west-2'),
+            'bucket' => env('UPLOAD_AWS_BUCKET', 'unitibudget-development'),
+            'url' => env('UPLOAD_AWS_URL', 'https://unitibudget-development.s3-us-west-2.amazonaws.com'),
+            'folders' => [
+                'avatars' => env('UPLOAD_AWS_AVATAR_FOLDER', 'avatars'),
+            ],
         ],
 
     ],

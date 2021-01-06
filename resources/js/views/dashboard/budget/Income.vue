@@ -38,12 +38,15 @@
         <modal v-if="changeDueDay"
                variant="info"
                title="Modify Due Day"
-               confirm-label="Make it so"
-               cancel-label="Oops! No"
-               @confirm="entryMoveConfirm"
-               @cancel="entryMoveCanceled">
+               confirm-label="Done"
+               hide-cancel
+               @confirm="entryMoveConfirm">
 
             <entry-row :month="budgetDate" :entry="changeDueDay" hide-progress></entry-row>
+
+            <p class="p-4 pb-0">
+                <strong>Note:</strong> Income entries are ordered by due day, so select the new due day for this entry.
+            </p>
 
             <div class="flex">
                 <div class="flex-1">
@@ -207,8 +210,8 @@
                     autoPay: false,
                     dueDay: 1,
                     amount: 0.00,
-                    incomeId: income.id,
-                    groupId: null,
+                    budgetIncomeId: income.id,
+                    budgetGroupId: null,
                     url: ''
                 })
             },
@@ -219,8 +222,13 @@
                 }
             },
 
-            modifyEntry (entry) {
-                this.$emit('modify-entry', entry)
+            async modifyEntry (entry) {
+                try {
+                    const { data } = await this.$http.getEntry(this.budgetDate, entry.id)
+                    this.$emit('modify-entry', data)
+                } catch (error) {
+                    console.log('error here', error)
+                }
             },
 
             /**
@@ -234,7 +242,6 @@
                 console.log('evt', evt)
                 if (evt.added) {
                     this.addedTo(evt.added.newIndex, evt.added.element)
-                    console.log(`${evt.added.element.name} was added to the group`)
                 } else if (evt.moved) {
                     this.moveTo(evt.moved.oldIndex, evt.moved.newIndex, evt.moved.element)
                 }
@@ -244,7 +251,6 @@
              * Resort the income's entries by dueDay
              */
             orderEntriesByDueDay () {
-                console.log('orderEntriesByDueDay', this.income.entries);
                 this.income.entries.sort((a, b) => {
                     if (a.dueDay === b.dueDay) {
                         // Name is only important when dueDays are the same
@@ -260,14 +266,14 @@
              */
             async addedTo (newIndex, entry) {
                 try {
-                    await this.$http.updateEntry(this.budgetDate, entry.id, { incomeId: this.income.id, order: newIndex })
+                    await this.$http.updateEntry(this.budgetDate, entry.id, { budgetIncomeId: this.income.id, order: newIndex })
                     // Update the entries income id here so we don't have to reload the entire budget
                     entry.incomeId = this.income.id
                     this.orderEntriesByDueDay()
                     // If entry as been added then un-collapse so results can be seen
                     this.collapsed = false
                 } catch ({ error }) {
-                    console.log('addedTo error', error)
+                    console.log('error', error)
                 }
             },
 
@@ -304,18 +310,18 @@
                     // Close the dialog
                     this.changeDueDay = null
                 } catch (error) {
-                    console.log('entryMoveConfirm error', error)
+                    console.log('error', error)
                 }
             },
 
             /**
              * Move the entry back to it's original location
              */
-            entryMoveCanceled () {
-                const entry = this.income.entries.splice(this.changeDueDay.newIndex, 1)
-                this.income.entries.splice(this.changeDueDay.oldIndex, 0, entry[0])
-                this.changeDueDay = null
-            }
+            // entryMoveCanceled () {
+            //     const entry = this.income.entries.splice(this.changeDueDay.newIndex, 1)
+            //     this.income.entries.splice(this.changeDueDay.oldIndex, 0, entry[0])
+            //     this.changeDueDay = null
+            // }
 
         },
 

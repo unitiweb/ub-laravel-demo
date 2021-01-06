@@ -1,6 +1,16 @@
 <?php
 
-use Illuminate\Http\Request;
+use App\Exceptions\ApiRouteNotFoundException;
+use App\Http\Controllers\Api\AuthController;
+use App\Http\Controllers\Api\BudgetController;
+use App\Http\Controllers\Api\BudgetEntryController;
+use App\Http\Controllers\Api\BudgetGroupController;
+use App\Http\Controllers\Api\BudgetIncomeController;
+use App\Http\Controllers\Api\Profile\ProfileController;
+use App\Http\Controllers\Api\Profile\SettingsController;
+use App\Http\Controllers\Api\SiteController;
+use App\Mail\Registration;
+use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -14,17 +24,43 @@ use Illuminate\Support\Facades\Route;
 |
 */
 
-//Route::group(['prefix' => '/api'], function () {
+/**
+ * Auth related requests
+ * These requests do not require authentication
+ */
+Route::group(['prefix' => 'auth', 'excluded_middleware' => ['auth:api']], function() {
+    Route::post('/login', [AuthController::class, 'login'])->name('auth.login');
+    Route::post('/refresh', [AuthController::class, 'refresh'])->name('auth.login');
+    Route::post('/register', [AuthController::class, 'register'])->name('auth.register');
+    Route::post('/verify-email', [AuthController::class, 'verifyEmail'])->name('auth.verify-email');
+    Route::post('/email-available', [AuthController::class, 'emailAvailable'])->name('auth.email-available');
+});
 
-    Route::group(['prefix' => '/auth', 'namespace' => 'Auth'], function () {
-        Route::post('/login', 'LoginController@login')->name('auth.login');
-        Route::post('/register', 'registerController@store')->name('auth.register');
-    });
+Route::apiResource('budgets', BudgetController::class)->only('show', 'store', 'destroy');
 
-//    Route::middleware('auth:api')->get('/user', function (Request $request) {
-//        return $request->user();
-//    });
+Route::name('budgets.')->group(function () {
+    Route::apiResource('budgets/{budget}/entries', BudgetEntryController::class);
+    Route::apiResource('budgets/{budget}/incomes', BudgetIncomeController::class);
+    Route::apiResource('budgets/{budget}/groups', BudgetGroupController::class);
+});
 
-//});
+Route::prefix('profile')->name('profile.')->group(function () {
+    Route::patch('/', [ProfileController::class, 'update'])->name('update');
+    Route::patch('/password', [ProfileController::class, 'updatePassword'])->name('password.update');
+    Route::post('/avatar', [ProfileController::class, 'uploadAvatar'])->name('avatar.upload');
+    Route::patch('/site', [ProfileController::class, 'updateSite'])->name('site.update');
+    Route::patch('/settings', [SettingsController::class, 'update'])->name('settings');
+});
 
 
+Route::get('/mailable', function () {
+    $user = \App\Facades\Services\AuthService::getUser();
+    return new Registration($user);
+});
+
+/**
+ * A catch all api route if none above are matched
+ */
+Route::get('/{any}', function () {
+    throw new ApiRouteNotFoundException;
+})->where('any', '.*');

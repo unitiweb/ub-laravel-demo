@@ -2,23 +2,25 @@
     <section>
         <budget-header class="mb-4" :view="currentState.left" @view-changed="viewChanged"></budget-header>
         <div class="px-4 pb-4">
-            <div v-if="!budget">
+            <div v-if="hasBudget === false">
                 <budget-create :month="budgetDate" @created="budgetCreated"></budget-create>
             </div>
-            <budget-divided v-if="budget">
+            <budget-divided v-if="hasBudget === true">
                 <template v-slot:left>
                     <div :class="leftVisibility">
                         <div v-if="['incomes', 'groups'].includes(currentState.left)">
-                            <div class="flex align-middle p-1 m-1">
-                                <div class="flex-initial">
-                                    <ub-button @click="viewIncomes" size="sm" icon="currencyDollar" :variant="currentState.left === 'incomes' ? 'primary' : 'secondary'" outline></ub-button>
-                                    <ub-button @click="viewGroups" size="sm" icon="viewBoard" :variant="currentState.left === 'groups' ? 'success' : 'secondary'" outline></ub-button>
-                                </div>
-                                <div class="flex-initial ml-2 pt-1 font-bold">
-                                    <span  v-if="currentState.left === 'incomes'">View by Income</span>
-                                    <span  v-if="currentState.left === 'groups'">View by Group</span>
-                                </div>
-                            </div>
+                            <budget-right-header>
+                                <template v-slot:left>
+                                    <ub-button @click="viewIncomes" size="sm" icon-left="currencyDollar" :variant="currentState.left === 'incomes' ? 'primary' : 'secondary'" outline></ub-button>
+                                    <ub-button @click="viewGroups" size="sm" icon-left="viewBoard" :variant="currentState.left === 'groups' ? 'success' : 'secondary'" outline></ub-button>
+                                </template>
+<!--                                <template v-slot:right>-->
+<!--                                    <div class="pt-4">-->
+<!--                                        <span  v-if="currentState.left === 'incomes'">View by Income</span>-->
+<!--                                        <span  v-if="currentState.left === 'groups'">View by Group</span>-->
+<!--                                    </div>-->
+<!--                                </template>-->
+                            </budget-right-header>
                             <incomes v-if="currentState.left === 'incomes'" :active-income="activeIncome" :active-row="activeRow" :budget="budget" @modify-income="modifyIncome" @modify-entry="modifyEntry"/>
                             <groups v-if="currentState.left === 'groups'" :active-group="activeGroup" :active-row="activeRow" :budget="budget" @modify-group="modifyGroup" @modify-entry="modifyEntry"/>
                         </div>
@@ -26,10 +28,10 @@
                 </template>
                 <template v-slot:right>
                     <div :class="rightVisibility">
-                        <budget-stats v-show="!currentState.right" :budget="budget"/>
-                        <income-form v-show="currentState.right === 'modify-income'" class="object-top" :income="currentState.data" :budget="budget" @done="done"/>
-                        <group-form v-show="currentState.right === 'modify-group'" class="object-top" :group="currentState.data" :budget="budget" @done="done"/>
-                        <entry-form v-show="currentState.right === 'modify-entry'" class="object-top" :entry="currentState.data" :incomes="incomes" :groups="groups" :other-groups="otherGroups" @done="done"/>
+                        <budget-stats v-if="!currentState.right" :budget="budget"/>
+                        <income-form v-if="currentState.right === 'modify-income'" class="object-top" :income="currentState.data" :budget="budget" @done="done"/>
+                        <group-form v-if="currentState.right === 'modify-group'" class="object-top" :group="currentState.data" :budget="budget" @done="done"/>
+                        <entry-form v-if="currentState.right === 'modify-entry'" class="object-top" :entry="currentState.data" :incomes="incomes" :groups="groups" @done="done"/>
                     </div>
                 </template>
             </budget-divided>
@@ -48,6 +50,7 @@
 
 <script>
     import BudgetHeader from '@/components/budget/BudgetHeader'
+    import BudgetRightHeader from '@/views/dashboard/budget/BudgetRightHeader'
     import BudgetSidebar from '@/components/budget/BudgetSidebar'
     import BudgetStats from '@/views/dashboard/budget/BudgetStats'
     import Incomes from '@/views/dashboard/budget/Incomes'
@@ -65,6 +68,7 @@
 
         components: {
             BudgetHeader,
+            BudgetRightHeader,
             BudgetSidebar,
             BudgetStats,
             BudgetDivided,
@@ -80,10 +84,8 @@
 
         data () {
             return {
-                budget: {
-                    id: null,
-                    month: null
-                },
+                budget: null,
+                hasBudget: null,
                 incomes: [],
                 groups: [],
                 otherGroups: [],
@@ -121,12 +123,9 @@
 
             rightVisibility () {
                 const classes = []
+
                 if (this.state.left === 'budget') {
-                    console.log('state', this.state)
                     classes.push('hidden md:inline')
-                } else {
-                    // classes.push('hidden md:inline')
-                    classes.push('')
                 }
 
                 return classes
@@ -175,22 +174,22 @@
             },
 
             async viewIncomes () {
-                await this.$http.updateSettings({ lastView: 'incomes' })
+                await this.$http.updateSettings({ view: 'incomes' })
                 await this.$store.dispatch('lastView', 'incomes');
                 await this.loadBudget()
             },
 
             async viewGroups () {
-                await this.$http.updateSettings({ lastView: 'groups' })
+                await this.$http.updateSettings({ view: 'groups' })
                 await this.$store.dispatch('lastView', 'groups');
                 await this.loadBudget()
             },
 
             async redirectIfNoDate () {
                 if (!this.year || !this.month) {
-                    const now = moment()
-                    const year = now.format('YYYY')
-                    const month = now.format('MM')
+                    const date = moment(this.$store.getters.lastMonth)
+                    const year = date.format('YYYY')
+                    const month = date.format('MM')
                     await this.$router.push({ name: 'budget', params: { year, month }})
                 }
             },
@@ -199,26 +198,31 @@
                 // If there is no date then create today's date and redirect
                 await this.redirectIfNoDate()
 
+                this.hasBudget = null
+
                 // Reset the relations if view is groups
-                let relations = 'incomes,incomes.entries,incomes.entries.group,unassignedIncomeEntries'
+                let relations = 'incomes'
                 if (this.budgetView === 'groups') {
-                    relations = 'groups,groups.entries,groups.entries.group,groups.entries.income,unassignedGroupEntries'
+                    relations = 'groups'
                 }
 
                 try {
-                    this.budget = {}
+                    this.budget = null
                     const budget = await this.$http.getBudget(this.budgetDate, relations)
                     this.budget = budget.data
                     this.incomes = budget.incomes
-                    this.groups = budget.groups.budget
-                    this.otherGroups = budget.groups.other
+                    this.groups = budget.groups
+                    // Set the last existing month in settings
+                    await this.$http.updateSettings({ month: this.budget.month })
+                    this.hasBudget = true
                     this.setState('budget')
-                } catch ({ error }) {
+                } catch (error) {
                     if (error.code === 404) {
                         this.budget = null
                     } else {
                         console.log('error', error.code)
                     }
+                    this.hasBudget = false
                 }
             },
 
@@ -230,7 +234,9 @@
             },
 
             setState (left = null, right = null, data = null) {
-                if (left === 'budget') left = this.budgetView
+                if (left === 'budget') {
+                    left = this.budgetView
+                }
                 this.state = { left, right, data }
             },
 
@@ -256,7 +262,7 @@
                 }
             },
 
-            modifyEntry (entry) {
+            async modifyEntry (entry) {
                 this.activeIncome = null
                 this.activeGroup = null
                 if (entry.id !== null && entry.id === this.activeRow) {
@@ -264,15 +270,15 @@
                     this.setState('budget')
                 } else {
                     this.activeRow = entry.id
-                    this.state.right = 'modify-entry'
-                    this.state.data = entry
                     this.setState('budget', 'modify-entry', entry)
                 }
             },
 
-            async done () {
+            async done (refresh) {
                 this.setState('budget', null);
-                await this.loadBudget()
+                if (refresh) {
+                    await this.loadBudget()
+                }
                 this.activeIncome = null
                 this.activeRow = null
             },

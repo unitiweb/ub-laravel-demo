@@ -2,14 +2,42 @@
 
 namespace App\Models;
 
-use Illuminate\Contracts\Auth\MustVerifyEmail;
-use Illuminate\Database\Eloquent\Factories\HasFactory;
-use Illuminate\Foundation\Auth\User as Authenticatable;
-use Illuminate\Notifications\Notifiable;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasOne;
+use Illuminate\Database\Eloquent\SoftDeletes;
+use Illuminate\Support\Str;
 
-class User extends Authenticatable
+/**
+ * Class User
+ *
+ * @package App\Models
+ *
+ * @property int id
+ * @property int siteId
+ * @property string uid
+ * @property string email
+ * @property string password
+ * @property bool verified
+ * @property Settings settings
+ * @property Site site
+ * @property string avatar
+ */
+class User extends BaseModel
 {
-    use HasFactory, Notifiable;
+    /**
+     * Enables soft delete functionality
+     */
+    use SoftDeletes;
+
+    // Available role types
+    const ROLE_OWNER = 'OWNER';
+    const ROLE_MANAGER = 'MANAGER';
+    const ROLE_USER = 'USER';
+
+    // Available status types
+    const STATUS_PENDING = 'PENDING';
+    const STATUS_ACTIVE = 'ACTIVE';
+    const STATUS_DISABLED = 'DISABLED';
 
     /**
      * The attributes that are mass assignable.
@@ -17,27 +45,55 @@ class User extends Authenticatable
      * @var array
      */
     protected $fillable = [
-        'name',
+        'siteId',
         'email',
+        'emailChange',
         'password',
+        'avatar',
+        'verified',
+        'firstName',
+        'lastName',
+        'role',
     ];
 
     /**
-     * The attributes that should be hidden for arrays.
+     * The attributes excluded from the model's JSON form.
      *
      * @var array
      */
     protected $hidden = [
         'password',
-        'remember_token',
     ];
 
     /**
-     * The attributes that should be cast to native types.
-     *
-     * @var array
+     * Hooks for model lifecycle
      */
-    protected $casts = [
-        'email_verified_at' => 'datetime',
-    ];
+    public static function boot()
+    {
+        parent::boot();
+
+        self::creating(function ($model) {
+            $model->uid = (string) Str::uuid();
+        });
+    }
+
+    /**
+     * The the user's site
+     *
+     * @return BelongsTo
+     */
+    public function site(): BelongsTo
+    {
+        return $this->belongsTo(Site::class, 'siteId');
+    }
+
+    /**
+     * Get the site's settings
+     *
+     * @return HasOne
+     */
+    public function settings(): HasOne
+    {
+        return $this->hasOne(Settings::class, 'userId');
+    }
 }

@@ -21,6 +21,10 @@
                     </div>
                 </div>
                 <alert :show="formError" :message="formError" icon variant="danger"/>
+                <alert :show="successful || user.emailChange" icon title="Email Change Initiated" variant="success">
+                    You email change and been initiated. You have been sent an email with instructions for validating the new email.
+                    Once your new email has been validated you can use your new email to login.
+                </alert>
             </div>
             <div class="flex justify-between bg-gray-100 py-4 px-4 sm:px-6">
                 <div class="text-green-500 pt-2"><span v-if="saved">saved</span></div>
@@ -42,6 +46,7 @@
         data () {
             return {
                 formError: null,
+                successful: false,
                 disabled: true,
                 saved: false,
                 form: {
@@ -95,10 +100,13 @@
 
             async save () {
                 try {
+                    this.successful = false;
                     this.state('validating')
                     if (this.$v.$invalid) return;
-                    await this.$http.updateEmail(this.form.email)
-                    await this.$store.dispatch('user', this.form)
+                    await this.$http.updateProfile({ email: this.form.email })
+                    this.successful = true;
+                    // await this.$http.updateEmail(this.form.email)
+                    // await this.$store.dispatch('user', this.form)
                     this.state('saved')
                     setTimeout(() => {
                         this.saved = false

@@ -5,8 +5,9 @@
             <div class="flex justify-between h-16">
                 <div class="flex">
                     <div class="flex-shrink-0 flex items-center text-2xl font-bold text-gray-700 sm:text-2xl sm:truncate">
+                        <icon name="calendar" size="6" class="text-blue-500 mr-1"></icon>
                         {{ monthName }}
-                        <span class="text-sm text-gray-600 pt-2 ml-2">{{ year }}</span>
+                        <span class="text-sm text-blue-600 pt-2 ml-1">{{ year }}</span>
                     </div>
                 </div>
                 <div class="flex gap-x-2 items-center">
@@ -119,11 +120,14 @@
 
         computed: {
             budgetViewName () {
-                const view = this.$store.getters.lastView
+                const view = this.$store.getters.settings.view
                 return view.charAt(0).toUpperCase() + view.slice(1) + ' View'
             },
             monthName () {
-                return moment(this.budgetDate).format('MMMM')
+                if (this.budgetDate) {
+                    return moment(this.budgetDate).format('MMMM')
+                }
+                return ''
             },
             month () {
                 return this.$route.params.month
@@ -132,7 +136,9 @@
                 return this.$route.params.year
             },
             budgetDate () {
-                return `${this.year}-${this.month}-01`
+                if (this.year && this.month) {
+                    return `${this.year}-${this.month}-01`
+                }
             },
             isCurrentMonth () {
                 const current = moment().format('YYYY-MM') + '-01'
@@ -147,16 +153,16 @@
             changeView (view) {
                 let reload = false
                 if (view === 'incomes' || view === 'groups') {
-                    this.$http.updateSettings({ lastView: view })
-                    this.$store.dispatch('lastView', view)
+                    this.$http.updateSettings({ view: view })
+                    this.$store.dispatch('settings', { view: view })
                     reload = true
                 } else if (view === 'create-income') {
-                    this.$http.updateSettings({ lastView: 'incomes' })
-                    this.$store.dispatch('lastView', 'incomes')
+                    this.$http.updateSettings({ view: 'incomes' })
+                    this.$store.dispatch('settings', { view: 'incomes' })
                     reload = true
                 } else if (view === 'create-group') {
-                    this.$http.updateSettings({ lastView: 'groups' })
-                    this.$store.dispatch('lastView', 'groups')
+                    this.$http.updateSettings({ view: 'groups' })
+                    this.$store.dispatch('settings', { view: 'groups' })
                     reload = true
                 }
                 this.showViewMenu = false
@@ -181,10 +187,10 @@
                 this.redirect(date)
             },
 
-            redirect (date) {
+            async redirect (date) {
                 const year = date.format('YYYY')
                 const month = date.format('MM')
-                this.$router.push({ name: 'budget', params: { year, month }})
+                await this.$router.push({ name: 'budget', params: { year, month }})
             }
         }
 

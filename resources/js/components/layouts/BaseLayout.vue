@@ -23,7 +23,7 @@
                 return this.$store.getters.loading
             },
             onCancel () {
-                console.log('spinner cancel')
+                //...
             }
         }
 

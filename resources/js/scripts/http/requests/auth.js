@@ -34,6 +34,6 @@ export default {
 
     // Send the email verification code to validate the user's email
     verifyEmail: (code) => {
-        return request('post', ['auth', 'tokens', 'verify-email'], { code })
+        return request('post', ['auth', 'verify-email'], { code })
     }
 }

@@ -144,14 +144,24 @@
             },
 
             entryCreate (group) {
+                console.log('entryCreate', {
+                    id: null,
+                    name: '',
+                    autoPay: false,
+                    dueDay: 1,
+                    amount: 0.00,
+                    budgetIncomeId: null,
+                    budgetGroupId: group.id,
+                    url: ''
+                })
                 this.$emit('modify-entry', {
                     id: null,
                     name: '',
                     autoPay: false,
                     dueDay: 1,
                     amount: 0.00,
-                    incomeId: null,
-                    groupId: group.id,
+                    budgetIncomeId: null,
+                    budgetGroupId: group.id,
                     url: ''
                 })
             },
@@ -162,8 +172,13 @@
                 }
             },
 
-            modifyEntry (entry) {
-                this.$emit('modify-entry', entry)
+            async modifyEntry (entry) {
+                try {
+                    const { data } = await this.$http.getEntry(this.budgetDate, entry.id)
+                    this.$emit('modify-entry', data)
+                } catch (error) {
+                    console.log('error here', error)
+                }
             },
 
             /**
@@ -174,10 +189,8 @@
              * When a drag changes this function will be executed
              */
             dragChanged (evt) {
-                console.log('evt', evt)
                 if (evt.added) {
                     this.addedTo(evt.added.newIndex, evt.added.element)
-                    console.log(`${evt.added.element.name} was added to the group`)
                 } else if (evt.moved) {
                     this.moveTo(evt.moved.oldIndex, evt.moved.newIndex, evt.moved.element)
                 }
@@ -188,7 +201,7 @@
              */
             async addedTo (newIndex, entry) {
                 try {
-                    await this.$http.updateEntry(this.budgetDate, entry.id, { groupId: this.group.id, order: newIndex })
+                    await this.$http.updateEntry(this.budgetDate, entry.id, { budgetGroupId: this.group.id, order: (newIndex + 1) })
                 } catch ({ error }) {
                     console.log('error', error)
                 }
@@ -200,7 +213,8 @@
             async moveTo(oldIndex, newIndex, entry) {
                 const ids = this.group.entries.map(e => e.id)
                 try {
-                    await this.$http.orderBudgetGroupEntries(this.budgetDate, this.group.id, { order: ids })
+                    await this.$http.updateEntry(this.budgetDate, entry.id, { order: (newIndex + 1) })
+                    // await this.$http.updateEntry(this.budgetDate, entry.id, this.group.id, { order: ids })
                     entry.groupId = this.group.id
                     // If entry as been added then un-collapse so results can be seen
                     this.collapsed = false

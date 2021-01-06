@@ -130,8 +130,8 @@
                     autoPay: this.entry.autoPay,
                     dueDay: this.entry.dueDay,
                     amount: this.entry.amount,
-                    incomeId: this.entry.incomeId,
-                    groupId: this.entry.groupId,
+                    budgetIncomeId: this.entry.incomeId,
+                    budgetGroupId: this.entry.groupId,
                     url: this.entry.url,
                 }).then(({ data }) => {
                     this.$emit('updatedEntry', this.entry)
