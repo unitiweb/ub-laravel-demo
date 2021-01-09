@@ -12,10 +12,11 @@ Once your new email address has been validated you will be able to login with th
 
 The button below will take you to the validation form.
 
-@component('mail::button', ['url' => config('app.web') . '/auth/verify-email/' . $code, 'color' => 'primary'])
+@component('mail::button', ['url' => config('app.web') . '/auth/verify-email', 'color' => 'primary'])
 Validate Email
 @endcomponent
 
-Thanks,<br>
+Thanks,
+
 {{ config('app.name') }}
 @endcomponent

@@ -3,7 +3,7 @@
         <div class="mb-4">
             <logo size="lg" class="mx-auto"></logo>
         </div>
-        <card>
+        <card variant="primary">
             <template v-slot:header>
                 <h2 class="text-center text-3xl leading-9 font-extrabold text-gray-500">
                     Sign in to your account
@@ -11,14 +11,6 @@
                 <p class="mt-2 text-center text-sm leading-5 text-gray-500">
                     enter your credentials or register to gain access
                 </p>
-
-
-                <!--                <p class="mt-2 text-center text-sm leading-5 text-gray-600">-->
-<!--                    Or-->
-<!--                    <a href="#" class="font-medium text-indigo-600 hover:text-indigo-500 focus:outline-none focus:underline transition ease-in-out duration-150">-->
-<!--                        start your 14-day free trial-->
-<!--                    </a>-->
-<!--                </p>-->
             </template>
 
             <div class="p-4">
@@ -37,8 +29,10 @@
                     <ub-button @click="login" block size="sm" class="flex-1">Login</ub-button>
                 </div>
             </template>
-
         </card>
+        <div class="text-center text-sm text-blue-700 mt-4">
+            <router-link :to="{ name: 'forgot-password' }">forgot password</router-link>
+        </div>
     </div>
 </template>
 

@@ -14,12 +14,6 @@
                                     <ub-button @click="viewIncomes" size="sm" icon-left="currencyDollar" :variant="currentState.left === 'incomes' ? 'primary' : 'secondary'" outline></ub-button>
                                     <ub-button @click="viewGroups" size="sm" icon-left="viewBoard" :variant="currentState.left === 'groups' ? 'success' : 'secondary'" outline></ub-button>
                                 </template>
-<!--                                <template v-slot:right>-->
-<!--                                    <div class="pt-4">-->
-<!--                                        <span  v-if="currentState.left === 'incomes'">View by Income</span>-->
-<!--                                        <span  v-if="currentState.left === 'groups'">View by Group</span>-->
-<!--                                    </div>-->
-<!--                                </template>-->
                             </budget-right-header>
                             <incomes v-if="currentState.left === 'incomes'" :active-income="activeIncome" :active-row="activeRow" :budget="budget" @modify-income="modifyIncome" @modify-entry="modifyEntry"/>
                             <groups v-if="currentState.left === 'groups'" :active-group="activeGroup" :active-row="activeRow" :budget="budget" @modify-group="modifyGroup" @modify-entry="modifyEntry"/>
@@ -159,17 +153,23 @@
         methods: {
 
             async viewChanged (view, reload) {
+                if (view === 'create-income') {
+                    await this.incomeCreate()
+                } else if (view === 'create-group') {
+                    await this.groupCreate()
+                } else if (view === 'delete-budget') {
+                    await this.budgetDelete()
+                } else if (view === 'incomes') {
+                    console.log('view', view)
+                    await this.viewIncomes()
+                } else if (view === 'groups') {
+                    console.log('view', view)
+                    await this.viewGroups()
+                } else {
+                    await this.setState(view)
+                }
                 if (reload) {
                     await this.loadBudget()
-                }
-                if (view === 'create-income') {
-                    this.incomeCreate()
-                } else if (view === 'create-group') {
-                    this.groupCreate()
-                } else if (view === 'delete-budget') {
-                    this.budgetDelete()
-                } else {
-                    this.setState(view)
                 }
             },
 

@@ -23,10 +23,6 @@ export default {
         return request('post', ['auth', 'refresh'], { refreshToken })
     },
 
-    tryRefresh: (method, url, params, relations) => {
-
-    },
-
     // Check to see if the email is available
     emailAvailable: (email) => {
         return request('post', ['auth', 'register', 'email-available'], { email })
@@ -35,5 +31,22 @@ export default {
     // Send the email verification code to validate the user's email
     verifyEmail: (code) => {
         return request('post', ['auth', 'verify-email'], { code })
+    },
+
+    // Send the reset email to the user's email so they can reset their password
+    forgotPassword: (email) => {
+        return request('post', ['auth', 'forgot-password'], { email })
+    },
+
+    // Validate the change password request with email and code
+    forgotPasswordValidate: (email, code) => {
+        return request('post', ['auth', 'forgot-password-validate'], { email, code })
+    },
+
+    // Validate the change password request with email and code
+    forgotPasswordReset: (email, password, token) => {
+        console.log('password', password)
+        password = sha256(password)
+        return request('post', ['auth', 'forgot-password-reset'], { email, password, token })
     }
 }

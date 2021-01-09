@@ -10,21 +10,27 @@ use App\Facades\Services\AuthService;
 use App\Facades\Services\SettingsService;
 use App\Facades\Services\TokenService;
 use App\Http\Requests\Api\Auth\EmailAvailableRequest;
+use App\Http\Requests\Api\Auth\ForgotPasswordResetRequest;
+use App\Http\Requests\Api\Auth\ForgotPasswordValidateRequest;
+use App\Http\Requests\Api\Auth\ForgotPasswordRequest;
 use App\Http\Requests\Api\Auth\LoginRequest;
 use App\Http\Requests\Api\Auth\RefreshRequest;
 use App\Http\Requests\Api\Auth\RegisterRequest;
 use App\Http\Requests\Api\Auth\VerifyEmailRequest;
 use App\Http\Resources\UserResource;
 use App\Mail\EmailValidationCode;
+use App\Mail\ForgotEmail;
 use App\Mail\Registration;
 use App\Models\Site;
 use App\Models\Token;
 use App\Models\User;
+use Carbon\Carbon;
 use Exception;
 use Illuminate\Http\Resources\Json\JsonResource;
 use Illuminate\Http\Response;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Mail;
+use Illuminate\Support\Str;
 
 /**
  * Login related requests
@@ -133,6 +139,88 @@ class AuthController extends ApiController
         Mail::to($user->email)->send(new Registration($user));
 
         return new UserResource($user);
+    }
+
+    /**
+     * Send a forgot password email to the users email address
+     *
+     * @param ForgotPasswordRequest $request
+     *
+     * @return Response
+     */
+    public function forgotPassword(ForgotPasswordRequest $request): Response
+    {
+        $data = $request->validated();
+        $email = $data['email'];
+
+        // Get user by email address
+        $user = User::where('email', $email)->first();
+
+        // Send out the forgot email message
+        Mail::to($user->email)->send(new ForgotEmail($user));
+
+        return response()->noContent();
+    }
+
+    /**
+     * @param ForgotPasswordValidateRequest $request
+     *
+     * @return JsonResource
+     */
+    public function forgotPasswordValidate(ForgotPasswordValidateRequest $request): JsonResource
+    {
+        $data = $request->validated();
+        $email = $data['email'];
+        $code = $data['code'];
+
+        // Get user and make sure the proper token exists
+        $user = User::where('email', $email)->firstOrFail();
+        Token::where('userUid', $user->uid)->where('token', $code)->firstOrFail();
+
+        // Delete any previous set password reset validate tokens
+        Token::where('userUid', $user->uid)->where('tokenType', Token::PASSWORD_RESET_VALIDATE)->delete();
+
+        // Create the password reset validate token
+        $token = Token::create([
+            'userUid' => $user->uid,
+            'tokenType' => Token::PASSWORD_RESET_VALIDATE,
+            'token' => Str::uuid()->toString(),
+            'expiresAt' => new Carbon(60 * 60),
+        ]);
+
+        return new JsonResource([
+            'token' => $token->token,
+        ]);
+    }
+
+    /**
+     * Reset the user's password
+     *
+     * @param ForgotPasswordResetRequest $request
+     *
+     * @return Response
+     */
+    public function forgotPasswordReset(ForgotPasswordResetRequest $request): Response
+    {
+        $data = $request->validated();
+        $email = $data['email'];
+        $password = $data['password'];
+        $token = $data['token'];
+
+        $user = User::where('email', $email)->firstOrFail();
+        Token::where('userUid', $user->uid)
+            ->where('token', $token)
+            ->where('tokenType', Token::PASSWORD_RESET_VALIDATE)
+            ->firstOrFail();
+
+        $user->password = AuthService::hashPassword($password);
+        $user->save();
+
+        // Clean up by removing related tokens
+        Token::where('userUid', $user->uid)->where('tokenType', Token::PASSWORD_RESET)->delete();
+        Token::where('userUid', $user->uid)->where('tokenType', Token::PASSWORD_RESET_VALIDATE)->delete();
+
+        return response()->noContent();
     }
 
     /**

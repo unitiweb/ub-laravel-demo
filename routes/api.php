@@ -8,9 +8,7 @@ use App\Http\Controllers\Api\BudgetGroupController;
 use App\Http\Controllers\Api\BudgetIncomeController;
 use App\Http\Controllers\Api\Profile\ProfileController;
 use App\Http\Controllers\Api\Profile\SettingsController;
-use App\Http\Controllers\Api\SiteController;
 use App\Mail\Registration;
-use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -34,6 +32,9 @@ Route::group(['prefix' => 'auth', 'excluded_middleware' => ['auth:api']], functi
     Route::post('/register', [AuthController::class, 'register'])->name('auth.register');
     Route::post('/verify-email', [AuthController::class, 'verifyEmail'])->name('auth.verify-email');
     Route::post('/email-available', [AuthController::class, 'emailAvailable'])->name('auth.email-available');
+    Route::post('/forgot-password', [AuthController::class, 'forgotPassword'])->name('auth.forgot-password');
+    Route::post('/forgot-password-validate', [AuthController::class, 'forgotPasswordValidate'])->name('auth.forgot-password-validate');
+    Route::post('/forgot-password-reset', [AuthController::class, 'forgotPasswordReset'])->name('auth.forgot-password-reset');
 });
 
 Route::apiResource('budgets', BudgetController::class)->only('show', 'store', 'destroy');

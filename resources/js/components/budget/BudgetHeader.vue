@@ -153,16 +153,10 @@
             changeView (view) {
                 let reload = false
                 if (view === 'incomes' || view === 'groups') {
-                    this.$http.updateSettings({ view: view })
-                    this.$store.dispatch('settings', { view: view })
                     reload = true
                 } else if (view === 'create-income') {
-                    this.$http.updateSettings({ view: 'incomes' })
-                    this.$store.dispatch('settings', { view: 'incomes' })
                     reload = true
                 } else if (view === 'create-group') {
-                    this.$http.updateSettings({ view: 'groups' })
-                    this.$store.dispatch('settings', { view: 'groups' })
                     reload = true
                 }
                 this.showViewMenu = false

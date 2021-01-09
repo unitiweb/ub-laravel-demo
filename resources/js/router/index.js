@@ -27,6 +27,8 @@ import Lock from '@/views/auth/Lock'
 import Logout from '@/views/auth/Logout'
 import Register from '@/views/register/Register'
 import VerifyEmail from '@/views/auth/VerifyEmail'
+import ForgotPassword from '@/views/auth/ForgotPassword'
+import ForgotPasswordValidate from '@/views/auth/ForgotPasswordValidate'
 
 /**
  * Load the budget components
@@ -92,6 +94,14 @@ const routes = [
                         path: 'verify-email',
                         name: 'verify-email',
                         component: VerifyEmail
+                    }, {
+                        path: 'forgot-password',
+                        name: 'forgot-password',
+                        component: ForgotPassword
+                    }, {
+                        path: 'forgot-password-validate',
+                        name: 'forgot-password-validate',
+                        component: ForgotPasswordValidate
                     }
                 ]
             }, {

@@ -37,45 +37,7 @@
                 Forgot your password?
             </a>
         </div>
-
     </div>
-
-
-
-
-
-
-
-<!--    <section>-->
-<!--        <div>-->
-<!--            <logo size="lg" class="mx-auto"></logo>-->
-<!--            <h2 class="mt-6 mb-0 text-center text-3xl leading-9 font-extrabold text-gray-900">-->
-<!--                Dave Torres-->
-<!--            </h2>-->
-<!--            <p class="mb-4 italic text-center text-sm leading-5 text-gray-600">-->
-<!--                Enter your password to access-->
-<!--            </p>-->
-<!--        </div>-->
-<!--        <div>-->
-<!--&lt;!&ndash;            <input type="hidden" name="remember" value="true">&ndash;&gt;-->
-<!--            <div class="-mt-px">-->
-<!--                <f-input type="password" label="Password" :error="hasError" :feedback="errorMessage" placeholder="password" v-model="credentials.password"/>-->
-<!--            </div>-->
-
-<!--&lt;!&ndash;            <alert variant="danger" :show="!!error">{{ error }}</alert>&ndash;&gt;-->
-
-<!--            <div class="mt-6">-->
-<!--                <div class="flex">-->
-<!--                    <div class="flex-auto p-2">-->
-<!--                        <ub-button @click="logout" variant="outline" icon-left="logout" size="sm" block>Sign Out</ub-button>-->
-<!--                    </div>-->
-<!--                    <div class="flex-auto p-2">-->
-<!--                        <ub-button @click="login" variant="primary" icon-left="login" size="sm" block>Unlock</ub-button>-->
-<!--                    </div>-->
-<!--                </div>-->
-<!--            </div>-->
-<!--        </div>-->
-<!--    </section>-->
 </template>
 
 <script>
