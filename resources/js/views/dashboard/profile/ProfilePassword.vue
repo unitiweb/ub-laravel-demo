@@ -91,14 +91,22 @@
             async change () {
                 this.$v.$touch()
                 if (this.$v.$invalid) return;
+                this.formError = null
+                this.success = false
                 try {
-                    this.formError = null
-                    this.success = false
-                    await this.$http.updatePassword(this.form)
-                    this.success = true
-                    this.resetForm()
+                    if (this.form.original === this.form.password) {
+                        this.formError = 'The new password can not match the original'
+                    } else if (this.form.password !== this.form.retype) {
+                        this.formError = 'The new password and retype do not match'
+                    } else {
+                        await this.$http.updatePassword({
+                            original: this.form.original,
+                            password: this.form.password
+                        })
+                        this.success = true
+                        this.resetForm()
+                    }
                 } catch ({ error }) {
-                    console.log('error.code', error.code)
                     this.resetForm()
                     if (error.code === 422) {
                         console.log('error', error.message)

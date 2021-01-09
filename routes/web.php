@@ -14,5 +14,9 @@ use Illuminate\Support\Facades\Route;
 */
 
 Route::get('/{any}', function () {
-    return view('home');
+    $env = [
+        'VUE_AVATAR_BASE_PATH' => config('filesystems.disks.remote.url') . '/' . config('filesystems.disks.remote.folders.avatars'),
+        'VUE_APP_API_HTTP' => config('app.url') . '/api'
+    ];
+    return view('home', ['env' => $env]);
 })->where('any', '.*');

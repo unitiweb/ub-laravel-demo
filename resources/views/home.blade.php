@@ -8,7 +8,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.5">
 
     <link href="{{ mix('css/app.css') }}" rel="stylesheet">
-    <script src="/js/env.js"></script>
+    <script>window.env = @json($env)</script>
 </head>
 <body>
 <div id="app"></div>

@@ -2,6 +2,8 @@
 
 namespace App\Providers;
 
+use App\Models\Budget;
+use Carbon\Carbon;
 use Illuminate\Cache\RateLimiting\Limit;
 use Illuminate\Foundation\Support\Providers\RouteServiceProvider as ServiceProvider;
 use Illuminate\Http\Request;
@@ -37,12 +39,19 @@ class RouteServiceProvider extends ServiceProvider
     {
         $this->configureRateLimiting();
 
+//        Route::bind('budget', function($value) {
+//            dd($value);
+//            return Budget::where('month', $value)->first();
+//        });
+
+
         $this->routes(function () {
+            // The api routes
             Route::prefix('api')
                 ->middleware('api')
-                ->namespace($this->namespace)
                 ->group(base_path('routes/api.php'));
 
+            // The web routes
             Route::middleware('web')
                 ->namespace($this->namespace)
                 ->group(base_path('routes/web.php'));

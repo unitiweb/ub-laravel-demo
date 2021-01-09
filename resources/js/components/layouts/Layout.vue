@@ -24,7 +24,7 @@
         </div>
         <main v-show="!showMobileMenu" class="relative -mt-32">
             <div class="max-w-screen-xl mx-auto pb-6 px-1 lg:pb-16 lg:px-8">
-                <div class="bg-white rounded-lg shadow-lg">
+                <div class="bg-white border border-gray-300 rounded-lg shadow-lg min-h-200">
                     <slot/>
                 </div>
             </div>

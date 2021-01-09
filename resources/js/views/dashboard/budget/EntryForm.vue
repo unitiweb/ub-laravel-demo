@@ -1,13 +1,16 @@
 <template>
-    <div class="p-2">
-        <div v-if="entry" class="grid grid-cols-2 gap-6">
-            <div class="col-span-1">
+    <div>
+        <budget-right-header title="Budget Entry">
+            <template v-slot:left>
                 <ub-button v-if="entry.id" @click="showDelete = true" outline variant="danger" size="sm" icon="trash" class="float-left"></ub-button>
-            </div>
-            <div class="col-span-1 text-right">
+            </template>
+            <template v-slot:right>
                 <ub-button variant="secondary" @click="cancel" size="sm" outline>Cancel</ub-button>
                 <ub-button @click="save" size="sm">Save</ub-button>
-            </div>
+            </template>
+        </budget-right-header>
+
+        <div class="bg-gray-100 border border-gray-300 rounded-md shadow-md p-4 grid grid-cols-2 gap-6">
             <div v-if="errors.length >= 1" class="col-span-2">
                 {{ errors[0] }}
             </div>
@@ -30,28 +33,20 @@
                 <f-input label="Amount" placeholder="0.00" v-model="entry.amount" :filter="currencyFilter" left-add-on="$"></f-input>
             </div>
             <div class="col-span-2">
-                <ub-select label="Income" v-model="entry.incomeId" :options="incomes" id-key="id" label-key="name" placeholder="select income">
+                <ub-select label="Income" v-model="entry.budgetIncomeId" :options="incomes" id-key="id" label-key="name" :placeholder="noIncomeLabel">
                     <ub-select-divider></ub-select-divider>
                     <ub-select-option @click="noIncome" :value="null" label="none"/>
                 </ub-select>
             </div>
             <div class="col-span-2">
-                <ub-select label="Group" v-model="entry.groupId" placeholder="select group">
+                <ub-select label="Group" :placeholder="noGroupLabel">
                     <template v-slot:selected-label>
-                        {{ groupSelectedName }}
+                        {{ entry.group && entry.group.name ? entry.group.name : noGroupLabel }}
                     </template>
                     <ub-select-option v-for="(option, index) in groups"
                                       :key="`group-option-${index}`"
-                                      @click="groupSelect('group', option)"
-                                      :selected="isGroupSelected('other', option)"
-                                      :value="option.id"
-                                      :label="option.name">
-                    </ub-select-option>
-                    <ub-select-divider>Other</ub-select-divider>
-                    <ub-select-option v-for="(option, index) in otherGroups"
-                                      :key="`group-other-option-${index}`"
-                                      @click="groupSelect('other', option)"
-                                      :selected="isGroupSelected('other', option)"
+                                      @click="selectGroup(option)"
+                                      :selected="isGroupSelected(option)"
                                       :value="option.id"
                                       :label="option.name">
                     </ub-select-option>
@@ -63,6 +58,7 @@
                 <f-input label="Url" placeholder="http://" v-model="entry.url"></f-input>
             </div>
         </div>
+
         <modal v-if="showDelete" variant="danger" title="Are you sure?" confirm-label="Yes, Delete!" cancel-label="Oops! No" @confirm="deleteEntryConfirmed" @cancel="deleteEntryCanceled">
             Do you really want to delete this entry? It can't be undone.
         </modal>
@@ -73,12 +69,16 @@
     import moment from "moment";
     import Modal from "@/components/ui/modal/Modal";
     import DueDayPicker from '@/views/dashboard/budget/DueDayPicker'
+    import BudgetRightHeader from '@/views/dashboard/budget/BudgetRightHeader'
+    import Budget from "@/views/dashboard/budget/Budget";
 
     export default {
 
         components: {
+            Budget,
             Modal,
-            DueDayPicker
+            DueDayPicker,
+            BudgetRightHeader
         },
 
         props: {
@@ -96,63 +96,30 @@
                 default: () => {
                     return []
                 }
-            },
-            otherGroups: {
-                type: Array,
-                default: () => {
-                    return []
-                }
             }
         },
 
         data () {
             return {
                 showDelete: false,
+                noIncomeLabel: 'select income',
+                noGroupLabel: 'select group',
                 errors: [],
                 groupSelectedObject: null
             }
         },
 
         watch: {
-            entry (value) {
-                this.resetGroup(value)
+            async entry (value) {
+                // await this.loadEntry()
             }
         },
 
         computed: {
 
-            groupSelected () {
-                console.log(this.entry.groupId + ' === ' + this.groups.budgetGroupId)
-                if (this.entry.groupId === this.groups.budgetGroupId) {
-                    return this.entry.groupId
-                }
-                return null
-            },
-
-            selectedGroup () {
-                if (this.groupSelectedObject === null) {
-                    const selected = this.groups.find(g => g.id === this.entry.groupId)
-                    this.groupSelectedObject = {
-                        type: 'group',
-                        name: selected.name || 'select group',
-                        id: this.entry.groupId
-                    }
-                }
-
-                return this.groupSelectedObject
-            },
-
-            groupSelectedName () {
-                if (this.groupSelectedObject) {
-                    return this.groupSelectedObject.name
-                }
-                return 'select group'
-            },
-
             date () {
                 const year = this.$route.params.year
                 const month = this.$route.params.month
-
                 let dueDay = this.entry.dueDay ? this.entry.dueDay : '01'
                 return moment(`${year}-${month}-${dueDay}`, "YYYY-M-DD")
             },
@@ -174,52 +141,37 @@
                 return this.$options.filters.currency(value, false)
             },
 
-            dueDayFilter (value) {
-                const year = this.$route.params.year
-                const month = this.$route.params.month
-                const max = moment(`${year}-${month}-01`, "YYYY-M-DD").endOf('month').date()
-                return Math.min(Math.max(parseInt(value), 1), max)
-            },
-
-            resetGroup (entry) {
-                let id = null
-                let name = 'select group'
-                if (entry && entry.groupId) {
-                    const group = this.groups.find(g => g.id === entry.groupId)
-                    if (group) {
-                        id = group.id
-                        name = group.name
-                    }
-                }
-                this.groupSelectedObject = { type: 'group', name, id}
-            },
-
             noIncome () {
-                this.entry.incomeId = null
+                this.entry.budgetIncomeId = null
+                this.entry.income.name = this.noIncomeLabel
             },
 
             noGroup () {
-                this.groupSelectedObject = {
-                    type: 'group',
-                    name: 'select group',
-                    id: null
-                }
+                this.entry.groupId = null
+                this.entry.budgetGroupId = null
+                this.entry.group.name = this.noGroupLabel
             },
 
-            groupSelect (type, option) {
-                this.groupSelectedObject = {
-                    type: type,
-                    name: option.name,
-                    id: option.id
+            selectGroup (option) {
+                if (option.type === 'group') {
+                    this.entry.groupId = option.id
+                    this.entry.budgetGroupId = null
+                    this.entry.group = { name: option.name }
+                } else {
+                    this.entry.groupId = null
+                    this.entry.budgetGroupId = option.id
+                    this.entry.group = { name: option.name }
                 }
+                console.log('this.entry.group', this.entry.group)
             },
 
             isGroupSelected (type, option) {
-                if (type === 'group') {
-                    return option.id === this.selectedGroup.id
-                }
-                if (type === 'other') {
-                    return option.id === this.selectedGroup.id
+                if (option) {
+                    if (type === 'group') {
+                        return option.id === this.entry.groupId
+                    } else {
+                        return option.id === this.entry.budgetGroupId
+                    }
                 }
             },
 
@@ -227,23 +179,36 @@
                 this.$emit('done', false)
             },
 
+            /**
+             * Save the entry data
+             */
             async save () {
                 try {
+                    // Setup the entry object to be saved
                     const saveEntry = {
                         name: this.entry.name,
                         autoPay: this.entry.autoPay,
                         dueDay: this.entry.dueDay,
                         amount: this.entry.amount,
-                        incomeId: this.entry.incomeId,
-                        groupId: this.entry.groupId,
+                        budgetIncomeId: this.entry.budgetIncomeId,
                         url: this.entry.url
                     }
 
-                    this.setGroupId(saveEntry)
+                    // Set the budget group id or global group id if one or the other has been set
+                    if (this.entry.groupId) {
+                        saveEntry.groupId = this.entry.groupId
+                    } else if (this.entry.budgetGroupId) {
+                        saveEntry.budgetGroupId = this.entry.budgetGroupId
+                    } else {
+                        saveEntry.budgetGroupId = null
+                    }
+
                     if (this.entry.id) {
+                        // Update the entry
                         await this.$http.updateEntry(this.budgetMonth, this.entry.id, saveEntry)
                         this.$emit('done', true)
                     } else {
+                        // Create a new entry
                         await this.$http.addEntry(this.budgetMonth, saveEntry)
                         this.$emit('done', true)
                     }
@@ -254,27 +219,42 @@
                 }
             },
 
-            setGroupId (entry) {
-                if (this.groupSelectedObject) {
-                    if (this.groupSelectedObject.type === 'other') {
-                        entry.otherGroupId = this.groupSelectedObject.id
-                    } else {
-                        entry.groupId = this.groupSelectedObject.id
-                    }
-                }
-            },
-
+            /**
+             * Since delete was confirmed then actually delete the entry
+             */
             async deleteEntryConfirmed () {
                 await this.$http.deleteEntry(this.budgetMonth, this.entry.id)
                 this.$emit('done', true)
                 this.showDelete = false
             },
 
+            /**
+             * Cancel the delete of this entry
+             */
             deleteEntryCanceled () {
                 this.showDelete = false
-            }
+            },
 
+            // /**
+            //  * Load the entry
+            //  */
+            // async loadEntry () {
+            //     try {
+            //         const { data } = await this.$http.getEntry(this.budgetMonth, this.entry.id)
+            //         console.log('data', data)
+            //         if (!data.group) {
+            //             data.group = { name: this.noGroupLabel }
+            //         }
+            //         this.entry = data
+            //     } catch (error) {
+            //         console.log('error here', error)
+            //     }
+            // }
         }
+
+        // async mounted () {
+        //     await this.loadEntry()
+        // }
     }
 
 </script>

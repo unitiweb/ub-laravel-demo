@@ -13,7 +13,6 @@ export default {
     updatePassword: (passwords) => {
         passwords.original = sha256(passwords.original)
         passwords.password = sha256(passwords.password)
-        passwords.retype = sha256(passwords.retype)
         return request('patch', ['profile', 'password'], passwords)
     },
 

@@ -37,7 +37,7 @@
 
         data () {
             return {
-                border: '300'
+                border: '200'
             }
         },
 
@@ -61,7 +61,7 @@
                 if (this.color === 'white') {
                     classes.push(`bg-${this.color} border-gray-${this.border}`)
                 } else {
-                    classes.push(`bg-${this.color}-100 border-${this.color}-${this.border}`)
+                    classes.push(`bg-${this.color}-50 border-${this.color}-${this.border}`)
                 }
 
                 return classes
@@ -81,7 +81,7 @@
                 if (this.color === 'white') {
                     classes.push(`p-4 border-t bg-${this.color} rounded-b-lg border-gray-200`)
                 } else {
-                    classes.push(`p-4 border-t bg-${this.color}-100 rounded-b-lg border-${this.color}-${this.border}`)
+                    classes.push(`p-4 border-t bg-${this.color}-50 rounded-b-lg border-${this.color}-${this.border}`)
                 }
 
                 return classes

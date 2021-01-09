@@ -42,6 +42,14 @@ stack:
             commands: |
               export COMPOSE_INTERACTIVE_NO_CLI=1
               docker-compose exec app php artisan migrate:rollback
+      seed:
+        dev:
+          description: Seed some development data
+          commands: |
+            export COMPOSE_INTERACTIVE_NO_CLI=1
+            docker-compose exec app php artisan db:seed --class=DevDataSeeder
+
+
     docker:
       stop:
         description: Stop all docker containers on this system

@@ -1,13 +1,15 @@
 <template>
-    <div class="p-2">
-        <div v-if="group" class="grid grid-cols-2 gap-6">
-            <div class="col-span-1">
+    <div>
+        <budget-right-header title="Budget Group">
+            <template v-slot:left>
                 <ub-button v-if="group.id" @click="deleteGroup" outline variant="danger" icon="trash" class="float-left" size="sm"></ub-button>
-            </div>
-            <div class="col-span-1 text-right">
+            </template>
+            <template v-slot:right>
                 <ub-button variant="secondary" @click="cancel" outline size="sm">Cancel</ub-button>
                 <ub-button @click="save" size="sm">Save</ub-button>
-            </div>
+            </template>
+        </budget-right-header>
+        <div class="bg-gray-100 border border-gray-300 rounded-md shadow-md p-4 grid grid-cols-2 gap-6">
             <div class="col-span-2">
                 <f-input label="Group Name"
                          placeholder="entry name"
@@ -23,11 +25,13 @@
 
 <script>
     import Modal from "@/components/ui/modal/Modal";
+    import BudgetRightHeader from '@/views/dashboard/budget/BudgetRightHeader'
 
     export default {
 
         components: {
-            Modal
+            Modal,
+            BudgetRightHeader
         },
 
         props: {

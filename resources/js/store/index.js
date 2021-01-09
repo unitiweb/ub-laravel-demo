@@ -71,13 +71,16 @@ export default new Vuex.Store({
         user: state => {
             return state.user
         },
+        fullName: state => {
+            return state.user.firstName + ' ' + state.user.lastName
+        },
         avatar: (state) => {
             const avatar = state.user.avatar
             if (avatar && avatar.length > 0) {
                 return `${config.AVATAR_BASE_PATH}/${avatar}`
             }
             // default if since an avatar is not set
-            return '/static/img/mike.jpg'
+            return '/assets/static/img/no-photo.png'
         },
         site: state => {
             return state.site
@@ -87,8 +90,10 @@ export default new Vuex.Store({
             else return moment().format('YYYY-MM-01')
         },
         lastView: state => {
-            if (state.settings.lastView === 'groups') return 'groups'
-            else return 'incomes'
+            return state.settings.view || 'incomes'
+        },
+        lastMonth: state => {
+            return state.settings.month || moment().format('YYYY-MM-DD')
         },
         page: state => {
             return state.page
@@ -140,7 +145,7 @@ export default new Vuex.Store({
             state.budgetDate = date
         },
         lastView (state, view) {
-            state.settings.lastView = view
+            state.settings.view = view
         },
         page (state, payload) {
             state.page.title = payload.title
@@ -148,9 +153,11 @@ export default new Vuex.Store({
     },
     actions: {
         login ({ commit, getters }, payload) {
-            commit('site', payload.site)
-            commit('settings', payload.settings)
-            commit('user', payload.user)
+            commit('site', payload.data.site)
+            commit('settings', payload.data.settings)
+            delete payload.data.site
+            delete payload.data.settings
+            commit('user', payload.data)
             commit('tokens', payload.tokens)
             commit('appLoaded', true)
             commit('loggedIn', true)

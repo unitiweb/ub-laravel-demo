@@ -7,7 +7,7 @@
                     id="user-menu"
                     aria-haspopup="true">
                 <span class="sr-only">Open profile menu</span>
-                <img class="rounded-full h-8 w-8" :src="avatar" alt="fullName">
+                <avatar rounded size="8"/>
             </button>
         </div>
         <transition enter-active-class="transition ease-out duration-100"
@@ -40,8 +40,13 @@
 </template>
 
 <script>
+    import Avatar from '@/components/ui/Avatar'
 
     export default {
+
+        components: {
+            Avatar
+        },
 
         data () {
             return {

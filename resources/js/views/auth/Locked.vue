@@ -9,14 +9,11 @@
         </div>
         <card>
             <template v-slot:header>
-                <h2 class="text-center text-3xl leading-9 font-extrabold text-gray-900">
+                <h2 class="text-center text-3xl leading-9 font-extrabold text-gray-700">
                     Account Locked
                 </h2>
-                <p class="mt-2 text-center text-sm leading-5 text-gray-600">
-                    Or
-                    <a href="#" class="font-medium text-indigo-600 hover:text-indigo-500 focus:outline-none focus:underline transition ease-in-out duration-150">
-                        enter your password to unlock
-                    </a>
+                <p class="mt-2 text-center text-sm leading-5 text-gray-500">
+                    enter your password to unlock
                 </p>
             </template>
 
@@ -40,45 +37,7 @@
                 Forgot your password?
             </a>
         </div>
-
     </div>
-
-
-
-
-
-
-
-<!--    <section>-->
-<!--        <div>-->
-<!--            <logo size="lg" class="mx-auto"></logo>-->
-<!--            <h2 class="mt-6 mb-0 text-center text-3xl leading-9 font-extrabold text-gray-900">-->
-<!--                Dave Torres-->
-<!--            </h2>-->
-<!--            <p class="mb-4 italic text-center text-sm leading-5 text-gray-600">-->
-<!--                Enter your password to access-->
-<!--            </p>-->
-<!--        </div>-->
-<!--        <div>-->
-<!--&lt;!&ndash;            <input type="hidden" name="remember" value="true">&ndash;&gt;-->
-<!--            <div class="-mt-px">-->
-<!--                <f-input type="password" label="Password" :error="hasError" :feedback="errorMessage" placeholder="password" v-model="credentials.password"/>-->
-<!--            </div>-->
-
-<!--&lt;!&ndash;            <alert variant="danger" :show="!!error">{{ error }}</alert>&ndash;&gt;-->
-
-<!--            <div class="mt-6">-->
-<!--                <div class="flex">-->
-<!--                    <div class="flex-auto p-2">-->
-<!--                        <ub-button @click="logout" variant="outline" icon-left="logout" size="sm" block>Sign Out</ub-button>-->
-<!--                    </div>-->
-<!--                    <div class="flex-auto p-2">-->
-<!--                        <ub-button @click="login" variant="primary" icon-left="login" size="sm" block>Unlock</ub-button>-->
-<!--                    </div>-->
-<!--                </div>-->
-<!--            </div>-->
-<!--        </div>-->
-<!--    </section>-->
 </template>
 
 <script>
@@ -129,9 +88,9 @@
                 this.errorMessage = ''
                 this.$store.commit('loading', true)
                 this.$http.login(this.credentials.email, this.credentials.password)
-                    .then(({data, settings, tokens, site}) => {
+                    .then(({data, tokens }) => {
                         setTimeout(() => {
-                            this.$store.dispatch('login', {user: data, settings, tokens, site})
+                            this.$store.dispatch('login', { data, tokens })
                             location.href = this.getUrl('dashboard')
                         }, 500);
                     }).catch(({ error }) => {

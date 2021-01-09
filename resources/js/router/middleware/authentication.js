@@ -15,8 +15,8 @@ export default async (to, from, next) => {
         if (store.getters.appLoaded === false) {
             try {
                 const token = store.getters.refreshToken
-                const { data, site, settings, tokens } = await $http.refresh(token)
-                await store.dispatch('login', { user: data, site, settings, tokens })
+                const { data, tokens } = await $http.refresh(token)
+                await store.dispatch('login', { data, tokens })
             } catch (error) {
                 await store.dispatch('logout')
                 next({ name: 'logout' })
