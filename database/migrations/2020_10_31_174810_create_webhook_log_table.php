@@ -20,8 +20,8 @@ class CreateWebhookLogTable extends Migration
             $table->unsignedBigInteger('siteId');
             $table->string('identifier', 128);
             $table->string('message', 255)->nullable();
-            $table->timestamp('executedAt');
-            $table->timestamp('availableAt');
+            $table->timestamp('executedAt')->nullable();
+            $table->timestamp('availableAt')->nullable();
             $table->integer('totalRecords')->default(0);
             $table->boolean('success')->default(false);
             $table->timestamp(BaseModel::CREATED_AT)->default(Carbon::now());
