@@ -51,13 +51,15 @@
                                      :validator="$v.form.email"/>
                         </div>
                         <div>
-                            <f-input label="Password"
+                            <f-input type="password"
+                                     label="Password"
                                      placeholder="password"
                                      v-model="$v.form.password.$model"
                                      :validator="$v.form.password"/>
                         </div>
                         <div>
-                            <f-input label="Retype Password"
+                            <f-input type="password"
+                                     label="Retype Password"
                                      placeholder="retype password"
                                      v-model="$v.form.retype.$model"
                                      :validator="$v.form.retype"/>

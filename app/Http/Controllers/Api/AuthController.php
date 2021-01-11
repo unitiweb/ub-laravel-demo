@@ -118,13 +118,13 @@ class AuthController extends ApiController
 
             $site = Site::create(['name' => $site['name']]);
 
-            // Decode the password before it is hashed
-            $password = AuthService::decodePassword($user['password']);
+//            // Decode the password before it is hashed
+//            $password = AuthService::decodePassword($user['password']);
 
             $newUser = User::create([
                 'siteId' => $site->id,
                 'email' => $user['email'],
-                'password' => AuthService::hashPassword($password, true),
+                'password' => AuthService::hashPassword($user['password']),
                 'firstName' => $user['firstName'],
                 'lastName' => $user['lastName'],
                 'status' => User::STATUS_PENDING,
