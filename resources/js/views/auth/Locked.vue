@@ -54,8 +54,8 @@
         data () {
             return {
                 credentials: {
-                    email: null,
-                    password: 'Testing01'
+                    email: '',
+                    password: ''
                 },
                 hasError: false,
                 errorMessage: '',

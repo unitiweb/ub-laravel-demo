@@ -48,8 +48,8 @@
         data () {
             return {
                 credentials: {
-                    email: 'dave@unitiweb.com',
-                    password: 'Testing01'
+                    email: '',
+                    password: ''
                 },
                 error: null
             }
