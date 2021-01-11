@@ -97,6 +97,7 @@
         computed: {
 
             currentState () {
+                console.log('currentState', this.state)
                 if (this.state.left === null) {
                     this.state.left = this.budgetView
                 }
@@ -153,6 +154,9 @@
         methods: {
 
             async viewChanged (view, reload) {
+                if (reload) {
+                    await this.loadBudget()
+                }
                 if (view === 'create-income') {
                     await this.incomeCreate()
                 } else if (view === 'create-group') {
@@ -167,9 +171,6 @@
                     await this.viewGroups()
                 } else {
                     await this.setState(view)
-                }
-                if (reload) {
-                    await this.loadBudget()
                 }
             },
 
@@ -238,6 +239,7 @@
                     left = this.budgetView
                 }
                 this.state = { left, right, data }
+                console.log('setState', left, right, data)
             },
 
             modifyIncome (income) {

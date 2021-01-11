@@ -119,6 +119,10 @@
                 this.showDelete = false
             }
 
+        },
+
+        mounted () {
+            console.log('income mounted', this.income)
         }
 
     }
