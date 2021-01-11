@@ -30,7 +30,7 @@
                 <due-day-picker v-model="entry.dueDay" :date="budgetMonth"></due-day-picker>
             </div>
             <div class="col-span-1">
-                <f-input label="Amount" placeholder="0.00" v-model="entry.amount" :filter="currencyFilter" left-add-on="$"></f-input>
+                <f-input label="Amount" placeholder="0.00" v-model="entry.amount" left-add-on="$"></f-input>
             </div>
             <div class="col-span-2">
                 <ub-select label="Income" v-model="entry.budgetIncomeId" :options="incomes" id-key="id" label-key="name" :placeholder="noIncomeLabel">
