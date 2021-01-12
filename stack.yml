@@ -10,23 +10,23 @@ stack:
       description: Build for development environment
       commands: |
         export COMPOSE_INTERACTIVE_NO_CLI=1
-        docker-compose exec app npm run dev
+        sail npm run dev
     prod:
       description: Build for development environment
       commands: |
         export COMPOSE_INTERACTIVE_NO_CLI=1
-        docker-compose exec app npm run prod
+        sail npm run prod
     watch:
       description: Start the npm watcher inside the container
       commands: |
         export COMPOSE_INTERACTIVE_NO_CLI=1
-        docker-compose exec app npm run watch
+        sail npm run watch
     npm:
       install:
         description: Run npm install inside the container
         commands: |
           export COMPOSE_INTERACTIVE_NO_CLI=1
-          docker-compose exec app npm install
+          sail npm install
     db:
       open:
         description: Open phpmyadmin in your browser (works on mac)
@@ -36,18 +36,18 @@ stack:
           description: Migrate the database through the app container
           commands: |
             export COMPOSE_INTERACTIVE_NO_CLI=1
-            docker-compose exec app php artisan migrate
+            sail artisan migrate
           rollback:
             description: Roll back the database
             commands: |
               export COMPOSE_INTERACTIVE_NO_CLI=1
-              docker-compose exec app php artisan migrate:rollback
+              sail artisan migrate:rollback
       seed:
         dev:
           description: Seed some development data
           commands: |
             export COMPOSE_INTERACTIVE_NO_CLI=1
-            docker-compose exec app php artisan db:seed --class=DevDataSeeder
+            sail artisan db:seed --class=DevDataSeeder
 
 
     docker:
