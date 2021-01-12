@@ -10,10 +10,4 @@ Homestead.json
 Homestead.yaml
 npm-debug.log
 yarn-error.log
-
 .docker/services/mysql
-
-#build artifacts
-public/css/app.*
-public/js/app.*
-public/mix-manifest.json

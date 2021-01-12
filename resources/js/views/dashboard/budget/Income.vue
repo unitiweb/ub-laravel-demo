@@ -1,7 +1,7 @@
 <template>
     <div class="border border-gray-300 rounded-md shadow-md m-1">
         <div>
-            <div :class="incomeClasses" class="flex border border-t-0 border-l-0 border-r-0 border-b border-gray-300 rounded-md rounded-b-none">
+            <div :class="incomeClasses" class="sticky top-0 flex border border-t-0 border-l-0 border-r-0 border-b border-gray-300 rounded-md rounded-b-none">
                 <div class="flex-none text-lg text-right px-3 py-2">
                     <ub-button @click="collapsed = !collapsed"
                               size="sm" variant="secondary"
@@ -29,11 +29,11 @@
             <div v-else-if="collapsed === true" class="text-gray-400 px-4 py-1">
                 <icon name="dotsHorizontal"></icon>
             </div>
-        </div>
-        <div v-if="!this.income.unassigned" class="text-center bg-gray-100 border border-t border-l-0 border-r-0 border-b-0 border-gray-300 rounded-md rounded-t-none pb-1 pt-1">
-            <ub-badge variant="danger" rounded outline>Expenses: {{ balances.expenses | currency }}</ub-badge>
-            <ub-badge :variant="outstandingVariant(income)" rounded outline>Out Standing: {{ balances.outstanding | currency }}</ub-badge>
-            <ub-badge :variant="leftOverVariant(income)" rounded outline>Left Over: {{ balances.leftOver | currency }}</ub-badge>
+            <div v-if="!this.income.unassigned" class="text-center bg-gray-100 border border-t border-l-0 border-r-0 border-b-0 border-gray-300 rounded-md rounded-t-none pb-1 pt-1">
+                <ub-badge variant="danger" rounded outline>Expenses: {{ balances.expenses | currency }}</ub-badge>
+                <ub-badge :variant="outstandingVariant(income)" rounded outline>Out Standing: {{ balances.outstanding | currency }}</ub-badge>
+                <ub-badge :variant="leftOverVariant(income)" rounded outline>Left Over: {{ balances.leftOver | currency }}</ub-badge>
+            </div>
         </div>
         <modal v-if="changeDueDay"
                variant="info"
