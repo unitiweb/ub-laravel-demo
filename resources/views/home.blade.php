@@ -2,6 +2,10 @@
 <html lang="en">
 <head>
     <meta charset="utf-8">
+    <link rel="apple-touch-icon" sizes="180x180" href="/assets/static/favicons/apple-touch-icon.png">
+    <link rel="icon" type="image/png" sizes="32x32" href="/assets/static/favicons/favicon-32x32.png">
+    <link rel="icon" type="image/png" sizes="16x16" href="/assets/static/favicons/favicon-16x16.png">
+    <link rel="manifest" href="/assets/static/favicons/site.webmanifest">
     <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1" />
     <title>UnitiBudget</title>
     <meta name="description" content="A simple but powerful family budget tracker helping manage where hard earned money going.">
