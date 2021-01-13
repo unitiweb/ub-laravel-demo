@@ -103,6 +103,7 @@
                     if (error.code === 422) {
                         this.state('error')
                         this.formError = error.message
+                    } else {
                         console.log('error', error)
                     }
                 }

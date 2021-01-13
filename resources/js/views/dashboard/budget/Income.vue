@@ -1,6 +1,6 @@
 <template>
     <div class="border border-gray-300 rounded-md shadow-md m-1">
-        <div>
+        <div v-if="">
             <div :class="incomeClasses" class="sticky top-0 flex border border-t-0 border-l-0 border-r-0 border-b border-gray-300 rounded-md rounded-b-none">
                 <div class="flex-none text-lg text-right px-3 py-2">
                     <ub-button @click="collapsed = !collapsed"
@@ -21,7 +21,7 @@
                 </div>
             </div>
             <draggable handle=".entry-handle" :list="income.entries" v-bind="dragOptions" group="entries" @change="dragChanged">
-                <entry-row v-if="collapsed === false" v-for="(entry, index) in income.entries" :key="`${entry}-${index}`" :active="isActive(entry)" :month="budgetDate" @calculate="calculate" @modify="modifyEntry" :entry="entry"></entry-row>
+                <entry-row v-for="(entry, index) in income.entries" v-if="entry && collapsed === false" :key="`${entry}-${index}`" :active="isActive(entry)" :month="budgetDate" @calculate="calculate" @modify="modifyEntry" :entry="entry"></entry-row>
             </draggable>
             <div v-if="this.income.entries.length === 0" class="text-gray-400 px-4 py-1">
                 no entries
@@ -224,10 +224,9 @@
 
             async modifyEntry (entry) {
                 try {
-                    const { data } = await this.$http.getEntry(this.budgetDate, entry.id)
-                    this.$emit('modify-entry', data)
+                    this.$emit('modify-entry', entry)
                 } catch (error) {
-                    console.log('error here', error)
+                    console.log('error', error)
                 }
             },
 
@@ -239,7 +238,6 @@
              * Triggered when an entry row drag is dropped
              */
             dragChanged (evt) {
-                console.log('evt', evt)
                 if (evt.added) {
                     this.addedTo(evt.added.newIndex, evt.added.element)
                 } else if (evt.moved) {

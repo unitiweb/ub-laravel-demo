@@ -1,63 +1,65 @@
 <template>
     <div>
-        <budget-right-header title="Budget Entry">
-            <template v-slot:left>
-                <ub-button v-if="entry.id" @click="showDelete = true" outline variant="danger" size="sm" icon="trash" class="float-left"></ub-button>
-            </template>
-            <template v-slot:right>
-                <ub-button variant="secondary" @click="cancel" size="sm" outline>Cancel</ub-button>
-                <ub-button @click="save" size="sm">Save</ub-button>
-            </template>
-        </budget-right-header>
+        <form @submit.prevent="save">
+            <budget-right-header title="Budget Entry">
+                <template v-slot:left>
+                    <ub-button v-if="entry.id" @click="showDelete = true" outline variant="danger" size="sm" icon="trash" class="float-left"></ub-button>
+                </template>
+                <template v-slot:right>
+                    <ub-button variant="secondary" @click="cancel" size="sm" outline>Cancel</ub-button>
+                    <ub-button type="submit" size="sm">Save</ub-button>
+                </template>
+            </budget-right-header>
 
-        <div class="bg-gray-100 border border-gray-300 rounded-md shadow-md p-4 grid grid-cols-2 gap-6">
-            <div v-if="errors.length >= 1" class="col-span-2">
-                {{ errors[0] }}
+            <div class="bg-gray-100 border border-gray-300 rounded-md shadow-md p-4 grid grid-cols-2 gap-6">
+                <div v-if="errors.length >= 1" class="col-span-2">
+                    {{ errors[0] }}
+                </div>
+                <div class="col-span-2">
+                    <f-input label="Entry Name" placeholder="entry name" v-model="entry.name">
+                        <template v-slot:right-add-on>
+                            <div class="flex items-center">
+                                <input id="dueDay" type="checkbox" v-model="entry.autoPay" class="form-checkbox h-4 w-4 text-indigo-600 transition duration-150 ease-in-out">
+                                <label for="dueDay" class="ml-2 block text-sm leading-5 text-gray-900">
+                                    AutoPay
+                                </label>
+                            </div>
+                        </template>
+                    </f-input>
+                </div>
+                <div class="col-span-1">
+                    <due-day-picker v-model="entry.dueDay" :date="budgetMonth"></due-day-picker>
+                </div>
+                <div class="col-span-1">
+                    <f-input label="Amount" placeholder="0.00" v-model="entry.amount" left-add-on="$"></f-input>
+                </div>
+                <div class="col-span-2">
+                    <ub-select label="Income" v-model="entry.budgetIncomeId" :options="incomes" id-key="id" label-key="name" :placeholder="noIncomeLabel">
+                        <ub-select-divider></ub-select-divider>
+                        <ub-select-option @click="noIncome" :value="null" label="none"/>
+                    </ub-select>
+                </div>
+                <div class="col-span-2">
+                    <ub-select label="Group" :placeholder="noGroupLabel">
+                        <template v-slot:selected-label>
+                            {{ entry.group && entry.group.name ? entry.group.name : noGroupLabel }}
+                        </template>
+                        <ub-select-option v-for="(option, index) in groups"
+                                          :key="`group-option-${index}`"
+                                          @click="selectGroup(option)"
+                                          :selected="isGroupSelected(option)"
+                                          :value="option.id"
+                                          :label="option.name">
+                        </ub-select-option>
+                        <ub-select-divider></ub-select-divider>
+                        <ub-select-option @click="noGroup" :value="null" label="none"/>
+                    </ub-select>
+                </div>
+                <div class="col-span-2">
+                    <f-input label="Url" placeholder="http://" v-model="entry.url"></f-input>
+                </div>
             </div>
-            <div class="col-span-2">
-                <f-input label="Entry Name" placeholder="entry name" v-model="entry.name">
-                    <template v-slot:right-add-on>
-                        <div class="flex items-center">
-                            <input id="dueDay" type="checkbox" v-model="entry.autoPay" class="form-checkbox h-4 w-4 text-indigo-600 transition duration-150 ease-in-out">
-                            <label for="dueDay" class="ml-2 block text-sm leading-5 text-gray-900">
-                                AutoPay
-                            </label>
-                        </div>
-                    </template>
-                </f-input>
-            </div>
-            <div class="col-span-1">
-                <due-day-picker v-model="entry.dueDay" :date="budgetMonth"></due-day-picker>
-            </div>
-            <div class="col-span-1">
-                <f-input label="Amount" placeholder="0.00" v-model="entry.amount" left-add-on="$"></f-input>
-            </div>
-            <div class="col-span-2">
-                <ub-select label="Income" v-model="entry.budgetIncomeId" :options="incomes" id-key="id" label-key="name" :placeholder="noIncomeLabel">
-                    <ub-select-divider></ub-select-divider>
-                    <ub-select-option @click="noIncome" :value="null" label="none"/>
-                </ub-select>
-            </div>
-            <div class="col-span-2">
-                <ub-select label="Group" :placeholder="noGroupLabel">
-                    <template v-slot:selected-label>
-                        {{ entry.group && entry.group.name ? entry.group.name : noGroupLabel }}
-                    </template>
-                    <ub-select-option v-for="(option, index) in groups"
-                                      :key="`group-option-${index}`"
-                                      @click="selectGroup(option)"
-                                      :selected="isGroupSelected(option)"
-                                      :value="option.id"
-                                      :label="option.name">
-                    </ub-select-option>
-                    <ub-select-divider></ub-select-divider>
-                    <ub-select-option @click="noGroup" :value="null" label="none"/>
-                </ub-select>
-            </div>
-            <div class="col-span-2">
-                <f-input label="Url" placeholder="http://" v-model="entry.url"></f-input>
-            </div>
-        </div>
+        </form>
 
         <modal v-if="showDelete" variant="danger" title="Are you sure?" confirm-label="Yes, Delete!" cancel-label="Oops! No" @confirm="deleteEntryConfirmed" @cancel="deleteEntryCanceled">
             Do you really want to delete this entry? It can't be undone.
@@ -71,6 +73,7 @@
     import DueDayPicker from '@/views/dashboard/budget/DueDayPicker'
     import BudgetRightHeader from '@/views/dashboard/budget/BudgetRightHeader'
     import Budget from "@/views/dashboard/budget/Budget";
+    import { budgetRemoveEntry } from '@/scripts/helpers/budgetTasks'
 
     export default {
 
@@ -105,13 +108,8 @@
                 noIncomeLabel: 'select income',
                 noGroupLabel: 'select group',
                 errors: [],
-                groupSelectedObject: null
-            }
-        },
-
-        watch: {
-            async entry (value) {
-                // await this.loadEntry()
+                groupSelectedObject: null,
+                originalEntry: null
             }
         },
 
@@ -162,7 +160,6 @@
                     this.entry.budgetGroupId = option.id
                     this.entry.group = { name: option.name }
                 }
-                console.log('this.entry.group', this.entry.group)
             },
 
             isGroupSelected (type, option) {
@@ -176,6 +173,10 @@
             },
 
             cancel () {
+                // Reset this.entry to it's original state
+                for (const [key, value] of Object.entries(this.originalEntry)) {
+                    this.entry[key] = value
+                }
                 this.$emit('done', false)
             },
 
@@ -206,7 +207,7 @@
                     if (this.entry.id) {
                         // Update the entry
                         await this.$http.updateEntry(this.budgetMonth, this.entry.id, saveEntry)
-                        this.$emit('done', true)
+                        this.$emit('done', false)
                     } else {
                         // Create a new entry
                         await this.$http.addEntry(this.budgetMonth, saveEntry)
@@ -224,7 +225,9 @@
              */
             async deleteEntryConfirmed () {
                 await this.$http.deleteEntry(this.budgetMonth, this.entry.id)
-                this.$emit('done', true)
+                await budgetRemoveEntry(this.entry)
+                this.group = null
+                this.$emit('done', false)
                 this.showDelete = false
             },
 
@@ -233,28 +236,12 @@
              */
             deleteEntryCanceled () {
                 this.showDelete = false
-            },
+            }
+        },
 
-            // /**
-            //  * Load the entry
-            //  */
-            // async loadEntry () {
-            //     try {
-            //         const { data } = await this.$http.getEntry(this.budgetMonth, this.entry.id)
-            //         console.log('data', data)
-            //         if (!data.group) {
-            //             data.group = { name: this.noGroupLabel }
-            //         }
-            //         this.entry = data
-            //     } catch (error) {
-            //         console.log('error here', error)
-            //     }
-            // }
+        mounted () {
+            this.originalEntry = { ...this.entry }
         }
-
-        // async mounted () {
-        //     await this.loadEntry()
-        // }
     }
 
 </script>

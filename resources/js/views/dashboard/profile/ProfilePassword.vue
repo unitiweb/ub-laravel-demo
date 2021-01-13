@@ -109,8 +109,9 @@
                 } catch ({ error }) {
                     this.resetForm()
                     if (error.code === 422) {
-                        console.log('error', error.message)
                         this.formError = error.message
+                    } else {
+                        console.log('error', error.message)
                     }
                 }
 

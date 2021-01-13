@@ -41,7 +41,7 @@
             setTimeout(() => {
                 this.$store.dispatch('logout')
                 location.href = this.getUrl()
-            }, 500)
+            }, 100)
         }
 
     }

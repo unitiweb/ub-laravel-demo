@@ -2,10 +2,10 @@
     <section>
         <budget-header class="mb-4" :view="currentState.left" @view-changed="viewChanged"></budget-header>
         <div class="px-4 pb-4">
-            <div v-if="hasBudget === false">
+            <div v-if="budgetLoaded === false">
                 <budget-create :month="budgetDate" @created="budgetCreated"></budget-create>
             </div>
-            <budget-divided v-if="hasBudget === true">
+            <budget-divided v-if="budgetLoaded === true">
                 <template v-slot:left>
                     <div :class="leftVisibility">
                         <div v-if="['incomes', 'groups'].includes(currentState.left)">
@@ -23,9 +23,9 @@
                 <template v-slot:right>
                     <div :class="rightVisibility">
                         <budget-stats v-if="!currentState.right" :budget="budget"/>
-                        <income-form v-if="currentState.right === 'modify-income'" class="object-top" :income="currentState.data" :budget="budget" @done="done"/>
+                        <income-form v-if="currentState.right === 'modify-income'" class="object-top" :income="currentState.data" @done="done"/>
                         <group-form v-if="currentState.right === 'modify-group'" class="object-top" :group="currentState.data" :budget="budget" @done="done"/>
-                        <entry-form v-if="currentState.right === 'modify-entry'" class="object-top" :entry="currentState.data" :incomes="incomes" :groups="groups" @done="done"/>
+                        <entry-form v-if="currentState.right === 'modify-entry'" class="object-top" :entry="currentState.data" :budget="budget" :incomes="incomes" :groups="groups" @done="done"/>
                     </div>
                 </template>
             </budget-divided>
@@ -57,6 +57,7 @@
     import BudgetDivided from '@/components/budget/BudgetDivided'
     import TransitionSlide from '@/components/transitions/TransitionSlide'
     import moment from "moment";
+    import { mapGetters, mapActions } from 'vuex'
 
     export default {
 
@@ -78,8 +79,7 @@
 
         data () {
             return {
-                budget: null,
-                hasBudget: null,
+                budgetLoaded: null,
                 incomes: [],
                 groups: [],
                 otherGroups: [],
@@ -96,50 +96,35 @@
 
         computed: {
 
+            ...mapGetters(['budget', 'lastView', 'lastMonth']),
+
             currentState () {
-                console.log('currentState', this.state)
                 if (this.state.left === null) {
-                    this.state.left = this.budgetView
+                    this.state.left = this.lastView
                 }
                 return this.state
             },
 
             leftVisibility () {
                 const classes = []
-
                 if (this.state.right) {
                     classes.push('hidden md:inline')
-                } else {
-                    classes.push('')
                 }
-
                 return classes
             },
 
             rightVisibility () {
                 const classes = []
-
                 if (this.state.left === 'budget') {
                     classes.push('hidden md:inline')
                 }
-
                 return classes
             },
 
-            year () {
-                return this.$route.params.year
-            },
-
-            month () {
-                return this.$route.params.month
-            },
-
-            budgetView () {
-                return this.$store.getters.lastView || 'incomes'
-            },
-
             budgetDate () {
-                return `${this.year}-${this.month}-01`
+                const year = this.$route.params.year
+                const month = this.$route.params.month
+                return `${year}-${month}-01`
             }
 
         },
@@ -153,10 +138,13 @@
 
         methods: {
 
+            ...mapActions(['setBudget', 'setLastView']),
+
             async viewChanged (view, reload) {
                 if (reload) {
                     await this.loadBudget()
                 }
+
                 if (view === 'create-income') {
                     await this.incomeCreate()
                 } else if (view === 'create-group') {
@@ -164,10 +152,8 @@
                 } else if (view === 'delete-budget') {
                     await this.budgetDelete()
                 } else if (view === 'incomes') {
-                    console.log('view', view)
                     await this.viewIncomes()
                 } else if (view === 'groups') {
-                    console.log('view', view)
                     await this.viewGroups()
                 } else {
                     await this.setState(view)
@@ -176,19 +162,21 @@
 
             async viewIncomes () {
                 await this.$http.updateSettings({ view: 'incomes' })
-                await this.$store.dispatch('lastView', 'incomes');
+                await this.setLastView('incomes')
                 await this.loadBudget()
             },
 
             async viewGroups () {
                 await this.$http.updateSettings({ view: 'groups' })
-                await this.$store.dispatch('lastView', 'groups');
+                await this.setLastView('groups')
                 await this.loadBudget()
             },
 
             async redirectIfNoDate () {
-                if (!this.year || !this.month) {
-                    const date = moment(this.$store.getters.lastMonth)
+                const year = this.$route.params.year
+                const month = this.$route.params.month
+                if (!year || !month) {
+                    const date = moment(this.lastMonth)
                     const year = date.format('YYYY')
                     const month = date.format('MM')
                     await this.$router.push({ name: 'budget', params: { year, month }})
@@ -199,31 +187,32 @@
                 // If there is no date then create today's date and redirect
                 await this.redirectIfNoDate()
 
-                this.hasBudget = null
-
                 // Reset the relations if view is groups
                 let relations = 'incomes'
-                if (this.budgetView === 'groups') {
+                if (this.lastView === 'groups') {
                     relations = 'groups'
                 }
 
                 try {
-                    this.budget = null
+                    this.budgetLoaded = null
+                    this.activeIncome = null
+                    this.activeRow = null
+                    await this.setBudget(null)
                     const budget = await this.$http.getBudget(this.budgetDate, relations)
-                    this.budget = budget.data
+                    await this.setBudget(budget.data)
                     this.incomes = budget.incomes
                     this.groups = budget.groups
                     // Set the last existing month in settings
                     await this.$http.updateSettings({ month: this.budget.month })
-                    this.hasBudget = true
                     this.setState('budget')
+                    this.budgetLoaded = true
                 } catch (error) {
                     if (error.code === 404) {
-                        this.budget = null
+                        await this.setBudget(null)
                     } else {
                         console.log('error', error.code)
                     }
-                    this.hasBudget = false
+                    this.budgetLoaded = false
                 }
             },
 
@@ -236,10 +225,9 @@
 
             setState (left = null, right = null, data = null) {
                 if (left === 'budget') {
-                    left = this.budgetView
+                    left = this.lastView
                 }
                 this.state = { left, right, data }
-                console.log('setState', left, right, data)
             },
 
             modifyIncome (income) {
@@ -281,8 +269,6 @@
                 if (refresh) {
                     await this.loadBudget()
                 }
-                this.activeIncome = null
-                this.activeRow = null
             },
 
             incomeCreate () {

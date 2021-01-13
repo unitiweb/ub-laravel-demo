@@ -164,9 +164,10 @@
                     })
                     this.complete = true
                 } catch ({ error }) {
-                    console.log('error', error)
                     if (error.code === 422) {
                         this.formError = error.message
+                    } else {
+                        console.log('error', error)
                     }
                 }
 

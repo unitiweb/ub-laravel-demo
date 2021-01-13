@@ -18,7 +18,6 @@
 
         components: {
             Income
-            // Draggable
         },
 
         props: {

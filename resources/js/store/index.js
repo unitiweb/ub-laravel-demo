@@ -1,6 +1,7 @@
 import Vuex from 'vuex'
 import Vue from 'vue'
 import config from '@/config'
+import $http from '@/scripts/http'
 import moment from 'moment'
 
 // Add Vuex to the Vue instance
@@ -37,6 +38,7 @@ export default new Vuex.Store({
         site: {},
         settings: {},
         budgetDate: null,
+        budget: null,
         user: {},
         page: {
             title: ''
@@ -56,9 +58,9 @@ export default new Vuex.Store({
             return state.auth.isLoggedIn
         },
         isLocked: state => {
-            const email = localStorage.getItem(config.AUTH_USER_LOCKED)
-            state.auth.isLocked = email
-            return email
+            const user = localStorage.getItem(config.AUTH_USER_LOCKED)
+            state.auth.isLocked = JSON.parse(user)
+            return state.auth.isLocked
         },
         refreshToken: state => {
             const token = localStorage.getItem(config.LOCAL_REFRESH_TOKEN_KEY)
@@ -80,14 +82,27 @@ export default new Vuex.Store({
                 return `${config.AVATAR_BASE_PATH}/${avatar}`
             }
             // default if since an avatar is not set
-            return '/assets/static/img/no-photo.png'
+            // return '/assets/static/img/no-photo.png'
         },
         site: state => {
             return state.site
         },
+        budget: state => {
+            return state.budget
+        },
         budgetDate: state => {
-            if (state.budgetDate) return this.budgetDate
-            else return moment().format('YYYY-MM-01')
+            if (state.budget) {
+                return moment(state.budget.month, "YYYY-M-DD")
+            } else {
+                return moment()
+            }
+        },
+        budgetDateFormatted: state => {
+            if (state.budget) {
+                return moment(state.budget.month, "YYYY-M-DD").format('YYYY-MM-DD')
+            } else {
+                return moment().format('YYYY-MM-DD')
+            }
         },
         lastView: state => {
             return state.settings.view || 'incomes'
@@ -109,9 +124,9 @@ export default new Vuex.Store({
         loggedIn (state, loggedIn) {
             state.auth.isLoggedIn = loggedIn
         },
-        locked (state, email) {
-            if (email) {
-                localStorage.setItem(config.AUTH_USER_LOCKED, email)
+        locked (state, user) {
+            if (user) {
+                localStorage.setItem(config.AUTH_USER_LOCKED, JSON.stringify(user))
             } else {
                 localStorage.removeItem(config.AUTH_USER_LOCKED)
             }
@@ -141,6 +156,9 @@ export default new Vuex.Store({
                 localStorage.setItem(config.LOCAL_REFRESH_TOKEN_KEY, tokens.refresh.token)
             }
         },
+        budget (state, budget) {
+            state.budget = budget
+        },
         budgetDate (state, date) {
             state.budgetDate = date
         },
@@ -163,9 +181,8 @@ export default new Vuex.Store({
             commit('loggedIn', true)
             commit('locked', null)
         },
-        lock ({ commit, dispatch, getters }) {
-            const email = getters.user.email
-            commit('locked', email)
+        lock ({ commit, getters }) {
+            commit('locked', getters.user)
             commit('loggedIn', false)
             commit('appLoaded', false)
             commit('site', {})
@@ -198,13 +215,16 @@ export default new Vuex.Store({
             }
             commit('site', site)
         },
+        setBudget ({ commit }, payload) {
+            commit('budget', payload)
+        },
         appLoaded ({ commit }, payload) {
             commit('appLoaded', payload)
         },
         budgetDate ({ commit }, date) {
             commit('budgetDate', date)
         },
-        lastView ({ commit }, view) {
+        setLastView ({ commit }, view) {
             commit('lastView', view)
         }
     }

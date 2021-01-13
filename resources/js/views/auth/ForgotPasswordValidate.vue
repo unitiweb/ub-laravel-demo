@@ -131,23 +131,6 @@
                     console.log('error', error)
                 }
             }
-
-            // async send () {
-            //     this.error = null
-            //     this.$v.$touch()
-            //     if (this.$v.$invalid) return;
-            //     try {
-            //         this.$store.commit('loading', true);
-            //         await this.$http.forgotPassword(this.email)
-            //         this.success = true
-            //         this.$store.commit('loading', false);
-            //     } catch ({ error }) {
-            //         console.log('error', error)
-            //         this.error = error.message
-            //         this.success = false
-            //         this.$store.commit('loading', false);
-            //     }
-            // }
         }
     }
 </script>

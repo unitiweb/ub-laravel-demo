@@ -118,10 +118,11 @@ import {required, minLength, maxLength} from 'vuelidate/lib/validators'
                         this.saved = false
                     }, 3000)
                 } catch (error) {
-                    console.log('error', error)
                     if (error.code === 422) {
                         this.state('error')
                         this.formError = error.message
+                    } else {
+                        console.log('error', error)
                     }
                 }
             },

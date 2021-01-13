@@ -43,7 +43,8 @@
 
         data () {
             return {
-                showDelete: false
+                showDelete: false,
+                originalGroup: null
             }
         },
 
@@ -81,6 +82,10 @@
                 }
             },
             cancel () {
+                // Reset this.group to it's original state
+                for (const [key, value] of Object.entries(this.originalGroup)) {
+                    this.group[key] = value
+                }
                 this.$emit('done', false)
             },
             deleteGroup () {
@@ -100,6 +105,10 @@
                 this.showDelete = false
             }
 
+        },
+
+        mounted () {
+            this.originalGroup = { ...this.group }
         }
 
     }

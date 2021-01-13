@@ -45,7 +45,6 @@ export default {
 
     // Validate the change password request with email and code
     forgotPasswordReset: (email, password, token) => {
-        console.log('password', password)
         password = sha256(password)
         return request('post', ['auth', 'forgot-password-reset'], { email, password, token })
     }

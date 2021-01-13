@@ -1,7 +1,7 @@
 <template>
     <div class="border border-gray-300 rounded-md shadow-md m-1">
         <div>
-            <div :class="groupClasses" class="flex border border-t-0 border-l-0 border-r-0 border-b border-gray-300 rounded-md rounded-b-none">
+            <div :class="groupClasses" class="sticky top-0 flex border border-t-0 border-l-0 border-r-0 border-b border-gray-300 rounded-md rounded-b-none">
                 <div class="flex-none text-lg text-right px-3 py-2">
                     <ub-button @click="collapsed = !collapsed"
                                size="sm" variant="secondary"
@@ -17,7 +17,7 @@
                 </div>
             </div>
             <draggable handle=".entry-handle" :list="group.entries" v-bind="dragOptions" group="entries" @change="dragChanged">
-                <entry-row v-if="collapsed === false" v-for="(entry, index) in group.entries" :key="`${entry}-${index}`" :active="isActive(entry)" :month="budgetDate" @calculate="calculate" @modify="modifyEntry" :entry="entry"></entry-row>
+                <entry-row v-for="(entry, index) in group.entries" v-if="entry && collapsed === false" :key="`${entry}-${index}`" :active="isActive(entry)" :month="budgetDate" @calculate="calculate" @modify="modifyEntry" :entry="entry"></entry-row>
             </draggable>
             <div v-if="this.group.entries.length === 0" class="text-gray-400 px-4 py-1">
                 no entries
@@ -144,16 +144,6 @@
             },
 
             entryCreate (group) {
-                console.log('entryCreate', {
-                    id: null,
-                    name: '',
-                    autoPay: false,
-                    dueDay: 1,
-                    amount: 0.00,
-                    budgetIncomeId: null,
-                    budgetGroupId: group.id,
-                    url: ''
-                })
                 this.$emit('modify-entry', {
                     id: null,
                     name: '',
@@ -177,7 +167,7 @@
                     const { data } = await this.$http.getEntry(this.budgetDate, entry.id)
                     this.$emit('modify-entry', data)
                 } catch (error) {
-                    console.log('error here', error)
+                    console.log('error', error)
                 }
             },
 

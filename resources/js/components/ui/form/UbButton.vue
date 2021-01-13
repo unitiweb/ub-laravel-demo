@@ -1,5 +1,5 @@
 <template>
-    <button type="button" class="btn" :class="classes" @click="click" @blur="blur" :disabled="disabled">
+    <button :type="type" class="btn" :class="classes" @click="click" @blur="blur" :disabled="disabled">
         <icon v-if="iconLeft" :name="iconLeft" class="btn-icon-left"></icon>
         <icon v-if="icon" :name="icon"></icon>
         <slot v-if="!icon"/>
@@ -17,6 +17,10 @@
         },
 
         props: {
+            type: {
+                type: String,
+                default: 'button'
+            },
             outline: {
                 type: Boolean,
                 default: false

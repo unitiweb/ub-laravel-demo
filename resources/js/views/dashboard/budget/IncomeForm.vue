@@ -33,6 +33,7 @@
     import moment from 'moment'
     import Modal from "@/components/ui/modal/Modal";
     import BudgetRightHeader from '@/views/dashboard/budget/BudgetRightHeader'
+    import { mapGetters } from 'vuex'
 
     export default {
 
@@ -50,24 +51,21 @@
 
         data () {
             return {
-                showDelete: false
+                showDelete: false,
+                originalIncome: null
             }
         },
 
         computed: {
-            year () {
-                return this.$route.params.year
-            },
-            month () {
-                return this.$route.params.month
-            },
-            budgetMonth () {
-                return `${this.year}-${this.month}-01`
-            },
+
+            ...mapGetters(['budget']),
+
             date () {
                 let dueDay = this.income.dueDay ? this.income.dueDay : '1'
-                return moment(`${this.year}-${this.month}-${dueDay}`, "YYYY-M-DD")
+                const date = moment(this.budget.month, "YYYY-M-DD").day(dueDay)
+                return moment(`${year}-${month}-${dueDay}`, "YYYY-M-DD")
             },
+
             dueDaySuffix () {
                 const day = this.date.format('Do')
                 return day.slice(-2)
@@ -79,13 +77,13 @@
                 this.$store.commit('loading', true)
                 try {
                     if (this.income.id) {
-                        const { data } = await this.$http.updateIncome(this.budgetMonth, this.income.id, {
+                        const { data } = await this.$http.updateIncome(this.budget.month, this.income.id, {
                             name: this.income.name,
                             dueDay: parseInt(this.income.dueDay),
                             amount: parseFloat(this.income.amount)
                         })
                     } else {
-                        const { data } = await this.$http.addIncome(this.budgetMonth, {
+                        const { data } = await this.$http.addIncome(this.budget.month, {
                             name: this.income.name,
                             dueDay: parseInt(this.income.dueDay),
                             amount: parseFloat(this.income.amount)
@@ -100,6 +98,11 @@
                 }
             },
             cancel () {
+                // Reset this.income to it's original state
+                for (const [key, value] of Object.entries(this.originalIncome)) {
+                    this.income[key] = value
+                }
+
                 this.$emit('done', false)
             },
             deleteIncome () {
@@ -107,7 +110,7 @@
             },
             async deleteConfirmed () {
                 try {
-                    await this.$http.deleteIncome(this.budgetMonth, this.income.id)
+                    await this.$http.deleteIncome(this.budget.month, this.income.id)
                     this.$emit('done', true)
                     this.showDelete = false
                 } catch ({ error }) {
@@ -122,9 +125,8 @@
         },
 
         mounted () {
-            console.log('income mounted', this.income)
+            this.originalIncome = { ...this.income }
         }
-
     }
 
 </script>
