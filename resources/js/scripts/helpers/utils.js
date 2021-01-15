@@ -61,3 +61,21 @@ export const currency = (value, includeSymbol = true) => {
 
     return formatter.format(value)
 }
+
+export const calculateBalances = (entries, amount) => {
+    const balances = {
+        expenses: 0,
+        outstanding: 0,
+        leftOver: 0
+    }
+    for (let ii = 0; ii < entries.length; ii++) {
+        const entry = entries[ii]
+        balances.expenses = balances.expenses + entry.amount
+        if (!entry.cleared) {
+            balances.outstanding = balances.outstanding + entry.amount
+        }
+    }
+    balances.leftOver = amount - balances.expenses
+
+    return balances
+}

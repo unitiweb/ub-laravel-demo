@@ -1,6 +1,6 @@
 <template>
     <section>
-        <budget-header class="mb-4" :view="currentState.left" @view-changed="viewChanged"></budget-header>
+        <budget-header class="mb-4" :has-budget="!!budget" :view="currentState.left" @view-changed="viewChanged"></budget-header>
         <div class="px-4 pb-4">
             <div v-if="budgetLoaded === false">
                 <budget-create :month="budgetDate" @created="budgetCreated"></budget-create>

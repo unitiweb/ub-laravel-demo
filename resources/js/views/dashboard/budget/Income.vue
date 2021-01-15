@@ -1,7 +1,8 @@
 <template>
     <div class="border border-gray-300 rounded-md shadow-md m-1">
-        <div v-if="">
+        <div>
             <div :class="incomeClasses" class="sticky top-0 flex border border-t-0 border-l-0 border-r-0 border-b border-gray-300 rounded-md rounded-b-none">
+                <!-- Collapse Button -->
                 <div class="flex-none text-lg text-right px-3 py-2">
                     <ub-button @click="collapsed = !collapsed"
                               size="sm" variant="secondary"
@@ -9,19 +10,22 @@
                               outline>
                     </ub-button>
                 </div>
+                <!-- Income Title -->
                 <div @click="modifyIncome" :class="{'cursor-pointer': !this.income.unassigned}" class="flex-1 text-xl pb-2 pt-3">
                     {{ income.name }}
                     <span v-if="!this.income.unassigned" class="text-xs text-gray-600">Due: <due-day :value="income.dueDay"></due-day></span>
                 </div>
+                <!-- Income Amount -->
                 <div v-if="!this.income.unassigned" @click="modifyIncome" :class="{'cursor-pointer': !this.income.unassigned}" class="flex-none text-xl text-right px-3 pb-2 pt-3" style="width: 125px;">
                     {{ income.amount | currency }}
                 </div>
+                <!-- Create Entry Button -->
                 <div v-if="!this.income.unassigned" class="flex-none text-lg text-right px-3 py-2">
                     <ub-button @click="entryCreate(income)" size="sm" variant="secondary" icon="plus" outline></ub-button>
                 </div>
             </div>
             <draggable handle=".entry-handle" :list="income.entries" v-bind="dragOptions" group="entries" @change="dragChanged">
-                <entry-row v-for="(entry, index) in income.entries" v-if="entry && collapsed === false" :key="`${entry}-${index}`" :active="isActive(entry)" :month="budgetDate" @calculate="calculate" @modify="modifyEntry" :entry="entry"></entry-row>
+                <entry v-for="(entry, index) in income.entries" v-if="entry && collapsed === false" :key="`${entry}-${index}`" :active="isActive(entry)" :month="budgetDate" @calculate="calculate" @modify="modifyEntry" :entry="entry"></entry>
             </draggable>
             <div v-if="this.income.entries.length === 0" class="text-gray-400 px-4 py-1">
                 no entries
@@ -29,10 +33,8 @@
             <div v-else-if="collapsed === true" class="text-gray-400 px-4 py-1">
                 <icon name="dotsHorizontal"></icon>
             </div>
-            <div v-if="!this.income.unassigned" class="text-center bg-gray-100 border border-t border-l-0 border-r-0 border-b-0 border-gray-300 rounded-md rounded-t-none pb-1 pt-1">
-                <ub-badge variant="danger" rounded outline>Expenses: {{ balances.expenses | currency }}</ub-badge>
-                <ub-badge :variant="outstandingVariant(income)" rounded outline>Out Standing: {{ balances.outstanding | currency }}</ub-badge>
-                <ub-badge :variant="leftOverVariant(income)" rounded outline>Left Over: {{ balances.leftOver | currency }}</ub-badge>
+            <div v-if="!this.income.unassigned" class="bg-gray-100 border border-t border-l-0 border-r-0 border-b-0 border-gray-300 rounded-md rounded-t-none">
+                <budget-balances :balances="balances" class="border border-b rounded-md rounded-t-none"></budget-balances>
             </div>
         </div>
         <modal v-if="changeDueDay"
@@ -42,7 +44,7 @@
                hide-cancel
                @confirm="entryMoveConfirm">
 
-            <entry-row :month="budgetDate" :entry="changeDueDay" hide-progress></entry-row>
+            <entry :month="budgetDate" :entry="changeDueDay" hide-progress></entry>
 
             <p class="p-4 pb-0">
                 <strong>Note:</strong> Income entries are ordered by due day, so select the new due day for this entry.
@@ -73,17 +75,20 @@
 <script>
     import DueDay from '@/components/ui/DueDay'
     import Draggable from 'vuedraggable'
-    import EntryRow from '@/components/budget/EntryRow'
+    import Entry from '@/views/dashboard/budget/Entry'
     import DueDayPicker from '@/views/dashboard/budget/DueDayPicker'
+    import BudgetBalances from '@/views/dashboard/budget/BudgetBalances'
     import Modal from "@/components/ui/modal/Modal";
     import moment from "moment";
+    import { calculateBalances } from '@/scripts/helpers/utils'
 
     export default {
 
         components: {
             Draggable,
-            EntryRow,
+            Entry,
             DueDayPicker,
+            BudgetBalances,
             Modal,
             DueDay
         },
@@ -107,8 +112,8 @@
                 drag: false,
                 collapsed: false,
                 dragging: null,
-                balances: [],
-                changeDueDay: null
+                changeDueDay: null,
+                balances: null
             }
         },
 
@@ -147,7 +152,7 @@
                     disabled: false,
                     ghostClass: "ghost"
                 };
-            }
+            },
         },
 
         methods: {
@@ -156,40 +161,8 @@
                 return entry.id === this.activeRow
             },
 
-            outstandingVariant (income) {
-                if (this.balances.outstanding === 0) {
-                    return 'success'
-                } else if (this.balances.outstanding === this.balances.expenses) {
-                    return 'secondary'
-                }
-
-                return 'warning'
-            },
-
-            leftOverVariant (income) {
-                if (this.balances.leftOver === 0) {
-                    return 'warning'
-                } else if (this.balances.leftOver < 0) {
-                    return 'danger'
-                }
-
-                return 'success'
-            },
-
             async calculate () {
-                this.balances = {
-                    expenses: 0,
-                    outstanding: 0,
-                    leftOver: 0
-                }
-                for (let ii = 0; ii < this.income.entries.length; ii++) {
-                    const entry = this.income.entries[ii]
-                    this.balances.expenses = this.balances.expenses + entry.amount
-                    if (!entry.cleared) {
-                        this.balances.outstanding = this.balances.outstanding + entry.amount
-                    }
-                }
-                this.balances.leftOver = this.income.amount - this.balances.expenses
+                this.balances = calculateBalances(this.income.entries, this.income.amount)
             },
 
             async initialCollapse () {

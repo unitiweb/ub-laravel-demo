@@ -16,8 +16,7 @@
                             <span class="hidden sm:inline">Previous</span>
                         </ub-button>
                     </div>
-                    <div class="flex-shrink-0">
-                        <!-- This example requires Tailwind CSS v2.0+ -->
+                    <div v-if="hasBudget" class="flex-shrink-0">
                         <div class="relative inline-block text-left">
                             <div>
                                 <ub-button @click="showViewMenu = !showViewMenu" @blur="showViewMenu = false" variant="secondary" outline size="sm">
@@ -95,6 +94,10 @@
             view: {
                 type: String,
                 default: null
+            },
+            hasBudget: {
+                type: Boolean,
+                default: false
             },
             income: {
                 type: Number,

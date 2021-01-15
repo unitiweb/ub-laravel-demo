@@ -17,7 +17,7 @@
                 </div>
             </div>
             <draggable handle=".entry-handle" :list="group.entries" v-bind="dragOptions" group="entries" @change="dragChanged">
-                <entry-row v-for="(entry, index) in group.entries" v-if="entry && collapsed === false" :key="`${entry}-${index}`" :active="isActive(entry)" :month="budgetDate" @calculate="calculate" @modify="modifyEntry" :entry="entry"></entry-row>
+                <entry v-for="(entry, index) in group.entries" v-if="entry && collapsed === false" :key="`${entry}-${index}`" :active="isActive(entry)" :month="budgetDate" @calculate="calculate" @modify="modifyEntry" :entry="entry"></entry>
             </draggable>
             <div v-if="this.group.entries.length === 0" class="text-gray-400 px-4 py-1">
                 no entries
@@ -27,9 +27,7 @@
             </div>
         </div>
         <div v-if="!this.group.unassigned" class="text-center bg-gray-200 border border-t border-l-0 border-r-0 border-b-0 border-gray-300 rounded-md rounded-t-none pb-1 pt-1">
-            <ub-badge variant="danger" rounded outline>Expenses: {{ balances.expenses | currency }}</ub-badge>
-            <ub-badge :variant="outstandingVariant(group)" rounded outline>Out Standing: {{ balances.outstanding | currency }}</ub-badge>
-            <ub-badge :variant="leftOverVariant(group)" rounded outline>Left Over: {{ balances.leftOver | currency }}</ub-badge>
+            <budget-balances :balances="balances" class="border border-b"></budget-balances>
         </div>
     </div>
 </template>
@@ -37,14 +35,17 @@
 <script>
     import DueDay from '@/components/ui/DueDay'
     import Draggable from 'vuedraggable'
-    import EntryRow from '@/components/budget/EntryRow'
+    import Entry from '@/views/dashboard/budget/Entry'
+    import BudgetBalances from '@/views/dashboard/budget/BudgetBalances'
+    import { calculateBalances } from "@/scripts/helpers/utils";
 
     export default {
 
         components: {
             Draggable,
-            EntryRow,
-            DueDay
+            Entry,
+            DueDay,
+            BudgetBalances
         },
 
         props: {
@@ -65,7 +66,7 @@
             return {
                 drag: false,
                 collapsed: false,
-                balances: [],
+                balances: {},
                 draggableObject: []
             }
         },
@@ -77,9 +78,11 @@
                 }
                 return ' bg-gray-100 hover:bg-gray-200'
             },
+
             budgetDate () {
                 return `${this.$route.params.year}-${this.$route.params.month}-01`
             },
+
             dragOptions() {
                 return {
                     animation: 200,
@@ -96,40 +99,8 @@
                 return entry.id === this.activeRow
             },
 
-            outstandingVariant () {
-                if (this.balances.outstanding === 0) {
-                    return 'success'
-                } else if (this.balances.outstanding === this.balances.expenses) {
-                    return 'secondary'
-                }
-
-                return 'warning'
-            },
-
-            leftOverVariant () {
-                if (this.balances.leftOver === 0) {
-                    return 'warning'
-                } else if (this.balances.leftOver < 0) {
-                    return 'danger'
-                }
-
-                return 'success'
-            },
-
             async calculate () {
-                this.balances = {
-                    expenses: 0,
-                    outstanding: 0,
-                    leftOver: 0
-                }
-                for (let ii = 0; ii < this.group.entries.length; ii++) {
-                    const entry = this.group.entries[ii]
-                    this.balances.expenses = this.balances.expenses + entry.amount
-                    if (!entry.cleared) {
-                        this.balances.outstanding = this.balances.outstanding + entry.amount
-                    }
-                }
-                this.balances.leftOver = this.group.amount - this.balances.expenses
+                this.balances = calculateBalances(this.group.entries, this.group.amount)
             },
 
             async initialCollapse () {
