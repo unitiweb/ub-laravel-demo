@@ -81,7 +81,7 @@ class BudgetService
             array_push($groups, [
                 'siteId' => $siteId,
                 'budgetId' => $budget->id,
-                'groupId' => $prevGroup->id,
+                'groupId' => $prevGroup->groupId,
                 'name' => $prevGroup->name,
                 'order' => $prevGroup->order,
             ]);
