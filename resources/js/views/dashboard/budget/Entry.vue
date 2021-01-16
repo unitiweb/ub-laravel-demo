@@ -14,7 +14,7 @@
                 {{ entry.amount | currency }}
             </div>
         </div>
-        <div v-if="!hideProgress" class="flex-none rounded-md">
+        <div v-if="!hideProgress" class="flex-none rounded-md pt-2 pr-2">
             <entry-progress v-model="entry" :month="this.month" @updated="updateStatus"></entry-progress>
         </div>
     </div>

@@ -18,7 +18,7 @@
             <div v-if="!!this.$slots.default" :class="inputClasses">
                 <slot/>
             </div>
-            <input v-if="!!!this.$slots.default" :type="type" :class="inputClasses" :value="getValue" @input="input" :placeholder="placeholder" :disabled="disabled">
+            <input v-if="!!!this.$slots.default" :type="type" :class="inputClasses" aria-autocomplete="none" :value="getValue" @input="input" :placeholder="placeholder" :disabled="disabled">
             <span v-if="showRightAddOn" class="inline-flex items-center px-3 text-gray-600 bg-gray-200 border border-gray-300 rounded-r-md left-0 px-3 flex items-center pointer-events-none">
                 {{ rightAddOn }}
             </span>

@@ -62,6 +62,10 @@
             disabled: {
                 type: Boolean,
                 default: false
+            },
+            center: {
+                type: Boolean,
+                default: false
             }
         },
 
@@ -94,6 +98,10 @@
                     classes.push(`btn-${this.variant}-outline`)
                 } else {
                     classes.push(`btn-${this.variant}`)
+                }
+
+                if (this.center) {
+                    classes.push('text-center')
                 }
 
                 classes.push(`btn-${this.size}`)
