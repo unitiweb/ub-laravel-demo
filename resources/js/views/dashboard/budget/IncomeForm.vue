@@ -63,6 +63,8 @@
             date () {
                 let dueDay = this.income.dueDay ? this.income.dueDay : '1'
                 const date = moment(this.budget.month, "YYYY-M-DD").day(dueDay)
+                const year = date.format('YYYY')
+                const month = date.format('MM');
                 return moment(`${year}-${month}-${dueDay}`, "YYYY-M-DD")
             },
 
