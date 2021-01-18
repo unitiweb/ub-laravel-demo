@@ -35,8 +35,8 @@ class TransactionController extends ApiController
         ]);
 
         // Set the start and end dates as Carbon instances if they exist
-        $startDate = isset($data['startDate']) ? new Carbon($data['startDate']) : null;
-        $endDate = isset($data['endDate']) ? new Carbon($data['endDate']) : null;
+        $startDate = isset($data['startDate']) ? new Carbon($data['startDate']) : new Carbon;
+        $endDate = isset($data['endDate']) ? new Carbon($data['endDate']) : (new Carbon)->subDays(45);
 
 //        $query = BankTransaction::includeWith();
 //
@@ -47,9 +47,9 @@ class TransactionController extends ApiController
 //        $transactions = $query->get();
 
         $transactions = BankTransaction::where('bankAccountId', $bankAccount->id)
-//            ->whereBetween('transactionDate', [$startDate, $endDate])
+            ->whereBetween('transactionDate', [$startDate, $endDate])
             ->orderBy('transactionDate', 'desc')
-            ->limit(40)
+//            ->limit(40)
             ->get();
 
         return BankTransactionResource::collection($transactions);
