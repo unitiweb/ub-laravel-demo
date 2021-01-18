@@ -39,6 +39,7 @@ export default new Vuex.Store({
         settings: {},
         budgetDate: null,
         budget: null,
+        institutions: null,
         user: {},
         page: {
             title: ''
@@ -104,6 +105,9 @@ export default new Vuex.Store({
                 return moment().format('YYYY-MM-DD')
             }
         },
+        institutions: state => {
+            return state.institutions
+        },
         lastView: state => {
             return state.settings.view || 'incomes'
         },
@@ -162,6 +166,9 @@ export default new Vuex.Store({
         budgetDate (state, date) {
             state.budgetDate = date
         },
+        institutions (state, institutions) {
+            state.institutions = institutions
+        },
         lastView (state, view) {
             state.settings.view = view
         },
@@ -170,6 +177,9 @@ export default new Vuex.Store({
         }
     },
     actions: {
+        setLoading ({ commit }, loading) {
+            commit('loading', loading)
+        },
         login ({ commit, getters }, payload) {
             commit('site', payload.data.site)
             commit('settings', payload.data.settings)
@@ -217,6 +227,9 @@ export default new Vuex.Store({
         },
         setBudget ({ commit }, payload) {
             commit('budget', payload)
+        },
+        setInstitutions ({ commit }, payload) {
+            commit('institutions', payload)
         },
         appLoaded ({ commit }, payload) {
             commit('appLoaded', payload)

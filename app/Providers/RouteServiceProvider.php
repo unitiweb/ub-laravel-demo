@@ -39,17 +39,15 @@ class RouteServiceProvider extends ServiceProvider
     {
         $this->configureRateLimiting();
 
-//        Route::bind('budget', function($value) {
-//            dd($value);
-//            return Budget::where('month', $value)->first();
-//        });
-
-
         $this->routes(function () {
             // The api routes
             Route::prefix('api')
                 ->middleware('api')
                 ->group(base_path('routes/api.php'));
+
+            // The webhook routes
+            Route::prefix('webhook')
+                ->group(base_path('routes/webhook.php'));
 
             // The web routes
             Route::middleware('web')

@@ -2,29 +2,6 @@
     <div class="border border-gray-300 rounded-md shadow-md m-1">
         <div>
             <income-header class="sticky top-0" :income="income" :collapsed="collapsed" @collapsed="collapsed = !collapsed" @modify-income="modifyIncome" @create-entry="createEntry"></income-header>
-<!--            <div :class="incomeClasses" class="sticky top-0 flex md:hidden border border-t-0 border-l-0 border-r-0 border-b border-gray-300 rounded-md rounded-b-none">-->
-<!--&lt;!&ndash;                Small Income Header&ndash;&gt;-->
-<!--                <div class="flex-none text-lg text-right px-3 py-2">-->
-<!--                    <ub-button @click="collapsed = !collapsed"-->
-<!--                               size="sm" variant="secondary"-->
-<!--                               :icon="collapsed ? 'chevronDoubleRight' : 'chevronDoubleDown'"-->
-<!--                               outline>-->
-<!--                    </ub-button>-->
-<!--                </div>-->
-<!--                &lt;!&ndash; Income Title &ndash;&gt;-->
-<!--                <div @click="modifyIncome" :class="{'cursor-pointer': !this.income.unassigned}" class="flex-1 text-xl pb-2 pt-3">-->
-<!--                    {{ income.name }}-->
-<!--                    <span v-if="!this.income.unassigned" class="text-xs text-gray-600">Due: <due-day :value="income.dueDay"></due-day></span>-->
-<!--                </div>-->
-<!--                &lt;!&ndash; Income Amount &ndash;&gt;-->
-<!--                <div v-if="!this.income.unassigned" @click="modifyIncome" :class="{'cursor-pointer': !this.income.unassigned}" class="flex-none text-xl text-right px-3 pb-2 pt-3" style="width: 125px;">-->
-<!--                    {{ income.amount | currency }}-->
-<!--                </div>-->
-<!--                &lt;!&ndash; Create Entry Button &ndash;&gt;-->
-<!--                <div v-if="!this.income.unassigned" class="flex-none text-lg text-right px-3 py-2">-->
-<!--                    <ub-button @click="createEntry(income)" size="sm" variant="secondary" icon="plus" outline></ub-button>-->
-<!--                </div>-->
-<!--            </div>-->
             <draggable handle=".entry-handle" :list="income.entries" v-bind="dragOptions" group="entries" @change="dragChanged">
                 <entry v-for="(entry, index) in income.entries" v-if="entry && collapsed === false" :key="`${entry}-${index}`" :active="isActive(entry)" :month="budgetDate" @calculate="calculate" @modify="modifyEntry" :entry="entry"></entry>
             </draggable>

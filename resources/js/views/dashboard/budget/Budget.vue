@@ -43,7 +43,7 @@
 </template>
 
 <script>
-    import BudgetHeader from '@/components/budget/BudgetHeader'
+    import BudgetHeader from '@/views/dashboard/budget/BudgetHeader'
     import BudgetRightHeader from '@/views/dashboard/budget/BudgetRightHeader'
     import BudgetSidebar from '@/components/budget/BudgetSidebar'
     import BudgetStats from '@/views/dashboard/budget/BudgetStats'
@@ -56,7 +56,7 @@
     import Modal from "@/components/ui/modal/Modal";
     import BudgetDivided from '@/components/budget/BudgetDivided'
     import TransitionSlide from '@/components/transitions/TransitionSlide'
-    import moment from "moment";
+    import moment from "moment"
     import { mapGetters, mapActions } from 'vuex'
 
     export default {

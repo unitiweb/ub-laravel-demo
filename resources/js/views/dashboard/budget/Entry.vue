@@ -10,7 +10,7 @@
             </div>
         </div>
         <div @click="modify" class="flex-none">
-            <div class="text-right text-lg amount-width px-3 pt-3" v-model="entry.amount" :width="125">
+            <div class="text-right text-lg amount-width px-3 pt-3">
                 {{ entry.amount | currency }}
             </div>
         </div>

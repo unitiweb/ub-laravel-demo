@@ -48,8 +48,6 @@ stack:
           commands: |
             export COMPOSE_INTERACTIVE_NO_CLI=1
             sail artisan db:seed --class=DevDataSeeder
-
-
     docker:
       stop:
         description: Stop all docker containers on this system
