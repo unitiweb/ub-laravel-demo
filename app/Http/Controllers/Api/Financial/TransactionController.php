@@ -8,6 +8,7 @@ use App\Models\BankAccount;
 use App\Models\BankInstitution;
 use App\Models\BankTransaction;
 use Carbon\Carbon;
+use Carbon\CarbonImmutable;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\AnonymousResourceCollection;
 use Illuminate\Validation\ValidationException;
@@ -38,18 +39,10 @@ class TransactionController extends ApiController
         $startDate = isset($data['startDate']) ? new Carbon($data['startDate']) : new Carbon;
         $endDate = isset($data['endDate']) ? new Carbon($data['endDate']) : (new Carbon)->subDays(45);
 
-//        $query = BankTransaction::includeWith();
-//
-//        if ($startDate && $endDate) {
-//            $query->whereBetween('transactionDate', [$startDate, $endDate]);
-//        }
-//
-//        $transactions = $query->get();
-
         $transactions = BankTransaction::where('bankAccountId', $bankAccount->id)
-            ->whereBetween('transactionDate', [$startDate, $endDate])
+            ->whereBetween('transactionDate', [$endDate, $startDate])
             ->orderBy('transactionDate', 'desc')
-//            ->limit(40)
+            ->limit(200)
             ->get();
 
         return BankTransactionResource::collection($transactions);
