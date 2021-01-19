@@ -38,5 +38,10 @@ export default {
     // get financial account transactions
     financialTransactions: (institutionId, accountId, relations) => {
         return request('get', ['financial', 'institutions', institutionId, 'accounts', accountId, 'transactions'], relations)
+    },
+
+    // get financial account transactions
+    financialTransactionsStore: (institutionId, accountId, relations) => {
+        return request('post', ['financial', 'institutions', institutionId, 'accounts', accountId, 'transactions'], relations)
     }
 }

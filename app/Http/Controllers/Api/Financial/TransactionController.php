@@ -4,6 +4,8 @@ namespace App\Http\Controllers\Api\Financial;
 
 use App\Http\Controllers\Api\ApiController;
 use App\Http\Resources\Financial\BankTransactionResource;
+use App\Jobs\BankAccountSync;
+use App\Models\BankAccessToken;
 use App\Models\BankAccount;
 use App\Models\BankInstitution;
 use App\Models\BankTransaction;
@@ -50,6 +52,13 @@ class TransactionController extends ApiController
 
     public function show()
     {
-        return new BankTransactionResource($this->transaction);
+//        return new BankTransactionResource($this->transaction);
+    }
+
+    public function store(BankInstitution $bankInstitution, BankAccount $bankAccount)
+    {
+        BankAccountSync::dispatch($bankAccount->bankAccessTokenId);
+
+        return response()->noContent();
     }
 }

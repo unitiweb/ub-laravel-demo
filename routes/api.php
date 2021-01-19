@@ -79,7 +79,7 @@ Route::prefix('financial')->name('financial.')->group(function () {
     /**
      * Financial institution account transaction routes
      */
-    Route::apiResource('institutions/{bankInstitution}/accounts/{bankAccount}/transactions', TransactionController::class)->only('index');
+    Route::apiResource('institutions/{bankInstitution}/accounts/{bankAccount}/transactions', TransactionController::class)->only('index', 'store');
 });
 
 Route::get('/mailable', function () {
