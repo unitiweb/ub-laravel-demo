@@ -1,7 +1,7 @@
 <template>
     <router-link class="block rounded-md py-2 px-3 text-base font-medium text-white focus:outline-none focus:text-white focus:bg-light-blue-800 transition duration-150 ease-in-out"
                  active-class="bg-black bg-opacity-25"
-                 @click="click"
+                 @click.native="click"
                  :to="to">
         <slot/>
     </router-link>
@@ -9,28 +9,29 @@
 
 <script>
 
-export default {
+    export default {
 
-    components: {},
+        components: {},
 
-    props: {
-        to: {
-            type: [String, Object]
+        props: {
+            to: {
+                type: [String, Object]
+            }
+        },
+
+        data() {
+            return {}
+        },
+
+        computed: {},
+
+        methods: {
+            click () {
+                console.log('clicked')
+                this.$emit('click')
+            }
         }
-    },
 
-    data() {
-        return {}
-    },
-
-    computed: {},
-
-    methods: {
-        click () {
-            this.$emit('click')
-        }
     }
-
-}
 
 </script>

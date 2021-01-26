@@ -61,6 +61,7 @@ const makeRequest = (method, url, params, relations) => {
     const options = {
         method: method,
         headers: {
+            'accept': 'application/json',
             'content-type': 'application/json'
         },
     }

@@ -7,18 +7,17 @@
                 leave-to-class="transform opacity-0 scale-95">
         <div class="bg-light-blue-900 lg:hidden">
             <div class="pt-2 pb-3 px-2 space-y-1">
-                <navbar-menu-link :to="{ name: 'budget' }">Dashboard</navbar-menu-link>
-                <navbar-menu-link :to="{ name: 'lock' }">Lock</navbar-menu-link>
-                <navbar-menu-link :to="{ name: 'logout' }">Logout</navbar-menu-link>
+                <navbar-menu-link @click="close" :to="{ name: 'budget' }">Budget</navbar-menu-link>
+                <navbar-menu-link @click="close" :to="{ name: 'banks' }">Banks</navbar-menu-link>
             </div>
             <div class="pt-4 pb-3 border-t border-light-blue-800">
                 <div class="flex items-center px-4">
                     <div class="flex-shrink-0">
-                        <img class="rounded-full h-10 w-10" src="https://images.unsplash.com/photo-1517365830460-955ce3ccd263?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=facearea&facepad=4&w=256&h=256&q=80h" alt="">
+                        <avatar :size="10" rounded/>
                     </div>
                     <div class="ml-3">
-                        <div class="text-base font-medium leading-6 text-white">Debbie Lewis</div>
-                        <div class="text-sm font-medium leading-5 text-light-blue-200">debbielewis@example.com</div>
+                        <div class="text-base font-medium leading-6 text-white">{{ fullName }}</div>
+                        <div class="text-sm font-medium leading-5 text-light-blue-200">{{ email }}</div>
                     </div>
                     <button class="ml-auto flex-shrink-0 border border-transparent rounded-full p-1 text-light-blue-200 hover:bg-light-blue-800 hover:text-white focus:outline-none focus:text-white focus:bg-light-blue-700 transition duration-150 ease-in-out">
                         <span class="sr-only">Notifications</span>
@@ -26,9 +25,9 @@
                     </button>
                 </div>
                 <div class="mt-3 px-2">
-                    <navbar-menu-link :to="{ name: 'login' }" class="text-light-blue-200 font-weight-light">Your Profile</navbar-menu-link>
-                    <navbar-menu-link :to="{ name: 'login' }" class="text-light-blue-200">Settings</navbar-menu-link>
-                    <navbar-menu-link :to="{ name: 'logout' }" class="text-light-blue-200">Sign Out</navbar-menu-link>
+                    <navbar-menu-link @click="close" :to="{ name: 'profile' }" class="text-light-blue-200 font-weight-light">My Profile</navbar-menu-link>
+                    <navbar-menu-link @click="close" :to="{ name: 'lock' }" class="text-light-blue-200">Lock Login</navbar-menu-link>
+                    <navbar-menu-link @click="close" :to="{ name: 'logout' }" class="text-light-blue-200">Logout</navbar-menu-link>
                 </div>
             </div>
         </div>
@@ -36,24 +35,29 @@
 </template>
 
 <script>
-    import NavbarMenuLink from "@/components/layouts/NavbarMenuLink";
-    import NavbarIconLink from "@/components/layouts/NavbarIconLink";
+    import NavbarMenuLink from '@/components/layouts/NavbarMenuLink'
+    import NavbarIconLink from '@/components/layouts/NavbarIconLink'
+    import Avatar from '@/components/ui/Avatar'
+    import { mapGetters } from 'vuex'
 
     export default {
 
         components: {
             NavbarMenuLink,
-            NavbarIconLink
+            NavbarIconLink,
+            Avatar
         },
 
-        props: {
-            // show: {
-            //     type: Boolean,
-            //     default: false
-            // }
+        computed: {
+            ...mapGetters(['fullName', 'email']),
         },
 
-
+        methods: {
+            close () {
+                console.log('close')
+                this.$emit('close')
+            }
+        }
 
     }
 

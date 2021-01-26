@@ -36,6 +36,11 @@ import ForgotPasswordValidate from '@/views/auth/ForgotPasswordValidate'
 import Budget from '@/views/dashboard/budget/Budget'
 
 /**
+ * Load the banks components
+ */
+import Banks from '@/views/dashboard/banks/Banks'
+
+/**
  * Load the profile components
  */
 import Profile from '@/views/dashboard/profile/Profile'
@@ -119,6 +124,10 @@ const routes = [
                         path: 'profile',
                         name: 'profile',
                         component: Profile
+                    }, {
+                        path: 'banks',
+                        name: 'banks',
+                        component: Banks
                     }
                 ]
             }

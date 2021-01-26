@@ -8,6 +8,7 @@
                 <div class="hidden lg:block lg:ml-6 lg:space-x-4">
                     <div class="flex">
                         <navbar-link :to="{ name: 'budget' }">Budget</navbar-link>
+                        <navbar-link :to="{ name: 'banks' }">Banks</navbar-link>
                         <navbar-link :to="{ name: 'profile' }">My Profile</navbar-link>
                         <navbar-link :to="{ name: 'lock' }">Lock</navbar-link>
                         <navbar-link :to="{ name: 'logout' }">Logout</navbar-link>

@@ -20,18 +20,28 @@ export default {
         return request('get', ['financial', 'institutions'], null, relations)
     },
 
-    // Get all financial accounts
-    financialAccounts: (relations) => {
-        return request('get', ['financial', 'accounts'], null, relations)
-    },
-
-    // Get a financial account
-    financialAccount: (accountId, relations) => {
-        return request('get', ['financial', 'accounts', accountId], null, relations)
-    },
+    // // Get all financial accounts
+    // financialAccounts: (institutionId, relations) => {
+    //     return request('get', ['financial', 'institutions', institutionId, 'accounts'], null, relations)
+    // },
+    //
+    // // Get a financial account
+    // financialAccount: (institutionId, accountId, relations) => {
+    //     return request('get', ['financial', 'institutions', institutionId, 'accounts', accountId], null, relations)
+    // },
 
     // Update a financial account
-    financialUpdateAccount: (accountId, account, relations) => {
-        return request('patch', ['financial', 'accounts', accountId], account, relations)
+    financialUpdateAccount: (institutionId, accountId, account, relations) => {
+        return request('patch', ['financial', 'institutions', institutionId, 'accounts', accountId], account, relations)
+    },
+
+    // get financial account transactions
+    financialTransactions: (institutionId, accountId, relations) => {
+        return request('get', ['financial', 'institutions', institutionId, 'accounts', accountId, 'transactions'], relations)
+    },
+
+    // get financial account transactions
+    financialTransactionsStore: (institutionId, accountId, relations) => {
+        return request('post', ['financial', 'institutions', institutionId, 'accounts', accountId, 'transactions'], relations)
     }
 }

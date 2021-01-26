@@ -46,7 +46,7 @@ class Handler extends ExceptionHandler
 //        });
 
         $this->renderable(function (Throwable $exception, Request $request) {
-            if ($request->is('api/*')) {
+            if ($request->is('api/*') || $request->is('webhook/*')) {
                 return $this->handleApiException($exception);
             }
 

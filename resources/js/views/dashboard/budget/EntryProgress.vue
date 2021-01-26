@@ -1,15 +1,11 @@
 <template>
-    <!-- Added @mousedown.prevent=" to this element to prevent the browser from selected text on page when clicking fast -->
-    <div class="cursor-pointer shadow-md rounded-md m-1" @click="update" @mousedown.prevent="">
-        <div class="px-3 border-t border-l border-r border-b-0 rounded-t-md" :class="clearedClasses">
-            <icon name="dotsHorizontal" size="3" class="text-gray-600"></icon>
-        </div>
-        <div class="px-3 border-l border-r border-t border-b-0" :class="paidClasses">
-            <icon name="dotsHorizontal" size="3" class="text-gray-600"></icon>
-        </div>
-        <div class="px-3 border rounded-b-md" :class="goalClasses">
-            <icon name="dotsHorizontal" size="3" class="text-gray-600"></icon>
-        </div>
+    <div>
+<!--        <ub-button @click="update" size="sm" :icon="icon" :variant="variant"/>-->
+        <ub-button v-if="value.cleared" @click="update" size="sm" icon="check" variant="success"/>
+        <ub-button v-else-if="value.paid" @click="update" size="sm" icon="dotsHorizontal" variant="warning"/>
+        <ub-button v-else-if="value.goal" @click="update" size="sm" icon="dotsHorizontal" variant="danger"/>
+        <ub-button v-else @click="update" size="sm" icon="dotsHorizontal" variant="secondary" outline/>
+<!--        <div class="text-xs text-center">{{ label }}</div>-->
     </div>
 </template>
 
@@ -30,27 +26,50 @@ export default {
         defaultStatusClasses () {
             return 'bg-gray-300 border-gray-300'
         },
-        clearedClasses () {
+        icon () {
             if (this.value.cleared) {
-                return 'bg-green-300 border-green-300'
+                return 'check'
+            } else if (this.value.paid) {
+                return 'dotsHorizontal'
+            } else if (this.value.goal) {
+                return 'dotsHorizontal'
             } else {
-                return this.defaultStatusClasses
+                return 'dotsHorizontal'
             }
         },
-        paidClasses () {
-            if (this.value.paid) {
-                return 'bg-yellow-300 border-yellow-300'
+        label () {
+            if (this.value.cleared) {
+                return 'cleared'
+            } else if (this.value.paid) {
+                return 'paid'
+            } else if (this.value.goal) {
+                return 'saved'
             } else {
-                return this.defaultStatusClasses
+                return 'none'
             }
         },
-        goalClasses () {
-            if (this.value.goal) {
-                return 'bg-red-300 border-red-300'
+        variant () {
+            if (this.value.cleared) {
+                return 'success'
+            } else if (this.value.paid) {
+                return 'warning'
+            } else if (this.value.goal) {
+                return 'danger'
             } else {
-                return this.defaultStatusClasses
+                return 'secondary'
             }
-        }
+        },
+        // classes () {
+        //     if (this.value.cleared) {
+        //         return 'bg-green-300 border-green-300'
+        //     } else if (this.value.paid) {
+        //         return 'bg-yellow-300 border-yellow-300'
+        //     } else if (this.value.goal) {
+        //         return 'bg-red-300 border-red-300'
+        //     } else {
+        //         return this.defaultStatusClasses
+        //     }
+        // }
     },
 
     methods: {

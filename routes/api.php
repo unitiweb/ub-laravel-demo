@@ -6,8 +6,12 @@ use App\Http\Controllers\Api\BudgetController;
 use App\Http\Controllers\Api\BudgetEntryController;
 use App\Http\Controllers\Api\BudgetGroupController;
 use App\Http\Controllers\Api\BudgetIncomeController;
+use App\Http\Controllers\Api\Financial\AccountController;
 use App\Http\Controllers\Api\Profile\ProfileController;
 use App\Http\Controllers\Api\Profile\SettingsController;
+use App\Http\Controllers\Api\Financial\FinancialController;
+use App\Http\Controllers\Api\Financial\InstitutionController;
+use App\Http\Controllers\Api\Financial\TransactionController;
 use App\Mail\Registration;
 use Illuminate\Support\Facades\Route;
 
@@ -53,11 +57,37 @@ Route::prefix('profile')->name('profile.')->group(function () {
     Route::patch('/settings', [SettingsController::class, 'update'])->name('settings');
 });
 
+/**
+ * Financial routes
+ */
+Route::prefix('financial')->name('financial.')->group(function () {
+    /**
+     * Financial token routes
+     */
+    Route::prefix('token')->name('token.')->group(function () {
+        Route::post('/link',  [FinancialController::class, 'linkToken'])->name('link');
+        Route::post('/public', [FinancialController::class, 'exchangePublicToken'])->name('public');
+    });
+    /**
+     * Financial institution routes
+     */
+    Route::apiResource('institutions', InstitutionController::class)->only('index');
+    /**
+     * Financial institution account routes
+     */
+    Route::apiResource('institutions/{bankInstitution}/accounts', AccountController::class)->only('index', 'show', 'update');
+    /**
+     * Financial institution account transaction routes
+     */
+    Route::apiResource('institutions/{bankInstitution}/accounts/{bankAccount}/transactions', TransactionController::class)->only('index', 'store');
+});
 
 Route::get('/mailable', function () {
     $user = \App\Facades\Services\AuthService::getUser();
     return new Registration($user);
 });
+
+Route::post('/temp', [App\Http\Controllers\Api\TempController::class, 'temp']);
 
 /**
  * A catch all api route if none above are matched

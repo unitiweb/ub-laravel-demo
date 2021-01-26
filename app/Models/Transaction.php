@@ -7,12 +7,11 @@ use Exception;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\SoftDeletes;
-use Illuminate\Support\Facades\Auth;
 
 class Transaction extends BaseModel
 {
     /**
-     * Enables soft delete functionallity
+     * Enables soft delete functionality
      */
     use SoftDeletes;
 
