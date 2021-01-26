@@ -2,12 +2,17 @@
 
 namespace App\Financials;
 
+use App\Financials\Models\FinancialInstitution;
+use App\Financials\Sync\FinancialAccountSync;
+use App\Financials\Sync\FinancialCategoriesSync;
+use App\Financials\Sync\FinancialTransactionsSync;
+use App\Financials\Traits\FinancialTraits;
 use App\Models\BankAccessToken;
-use App\Models\BankAccount;
 use App\Models\BankLinkToken;
 use Carbon\Carbon;
-use GuzzleHttp\Exception\GuzzleException;
-use Illuminate\Database\Eloquent\Collection;
+use Exception;
+use Illuminate\Support\Collection;
+use Illuminate\Support\Facades\App;
 
 /**
  * Class Financial
@@ -15,17 +20,30 @@ use Illuminate\Database\Eloquent\Collection;
  */
 class Financial
 {
+    use FinancialTraits;
+
+    const DEFAULT_DAYS_BACK = 90;
+
     /**
      * @var FinancialClientInterface
      */
     protected $client;
 
+    /**
+     * The authenticated siteId
+     *
+     * @var int
+     */
+    protected $siteId;
+
+    /**
+     * Financial constructor
+     *
+     * @throws Exception
+     */
     public function __construct()
     {
-        $currentDriver = config('financial.driver');
-
-        $this->client = new $currentDriver();
-        assert($this->client instanceof FinancialClientInterface);
+        $this->client = $this->loadDriver();
     }
 
     /**
@@ -59,7 +77,6 @@ class Financial
      * @param int $siteId
      *
      * @return BankAccessToken
-     * @throws GuzzleException
      */
     public function createAccessToken(string $publicToken, int $siteId): BankAccessToken
     {
@@ -84,18 +101,87 @@ class Financial
     /**
      * Get all bank accounts
      *
-     * @param array|null $accountIds
+     * @param BankAccessToken $bankAccessToken
      *
      * @return Collection
      */
-    public function getAccounts(array $accountIds = null): Collection
+    public function getAccounts(BankAccessToken $bankAccessToken): Collection
     {
-        $query = BankAccount::siteOnly()->inclueWith();
+        return $this->client->getAccounts($bankAccessToken);
+    }
 
-        if ($accountIds !== null) {
-            $query->whereIn('accountId', $accountIds);
+    /**
+     * Get all transactions from the client
+     *
+     * @param BankAccessToken $token
+     * @param Carbon|null $startDate
+     * @param Carbon|null $endDate
+     * @param array $options
+     *
+     * @return Collection
+     */
+    public function getTransactions(BankAccessToken $token, ?Carbon $startDate = null, ?Carbon $endDate = null, array $options = []): Collection
+    {
+        if ($startDate === null) {
+            $startDate = (new Carbon)->days(-self::DEFAULT_DAYS_BACK);
         }
 
-        return $query->get();
+        if ($endDate === null) {
+            $endDate = (new Carbon);
+        }
+
+        return $this->client->getTransactions($token, $startDate, $endDate);
+    }
+
+    /**
+     * Get a list of institutions
+     *
+     * @param BankAccessToken $bankAccessToken
+     * @param string $institutionId
+     *
+     * @return FinancialInstitution|null
+     */
+    public function getInstitution(BankAccessToken $bankAccessToken, string $institutionId): ?FinancialInstitution
+    {
+        return $this->client->getInstitution($bankAccessToken, $institutionId);
+    }
+
+    /**
+     * Sync all accounts
+     *
+     * @param BankAccessToken $bankAccessToken
+     *
+     * @return bool
+     */
+    public function accountsSync(BankAccessToken $bankAccessToken): bool
+    {
+        $sync = App::make(FinancialAccountSync::class);
+        return $sync->sync($bankAccessToken);
+    }
+
+    /**
+     * Sync all transactions
+     *
+     * @param BankAccessToken $bankAccessToken
+     *
+     * @return bool
+     */
+    public function transactionsSync(BankAccessToken $bankAccessToken): bool
+    {
+        $sync = App::make(FinancialTransactionsSync::class);
+        return $sync->sync($bankAccessToken);
+    }
+
+    /**
+     * Sync all categories
+     *
+     * @param BankAccessToken $bankAccessToken
+     *
+     * @return bool
+     */
+    public function categoriesSync(BankAccessToken $bankAccessToken): bool
+    {
+        $sync = App::make(FinancialCategoriesSync::class);
+        return $sync->sync($bankAccessToken);
     }
 }

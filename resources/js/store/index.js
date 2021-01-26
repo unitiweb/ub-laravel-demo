@@ -77,6 +77,9 @@ export default new Vuex.Store({
         fullName: state => {
             return state.user.firstName + ' ' + state.user.lastName
         },
+        email: state => {
+            return state.user.email
+        },
         avatar: (state) => {
             const avatar = state.user.avatar
             if (avatar && avatar.length > 0) {

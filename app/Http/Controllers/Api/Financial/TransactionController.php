@@ -4,7 +4,7 @@ namespace App\Http\Controllers\Api\Financial;
 
 use App\Http\Controllers\Api\ApiController;
 use App\Http\Resources\Financial\BankTransactionResource;
-use App\Jobs\BankAccountSync;
+use App\Jobs\FinancialSyncJob;
 use App\Models\BankAccessToken;
 use App\Models\BankAccount;
 use App\Models\BankInstitution;
@@ -44,6 +44,7 @@ class TransactionController extends ApiController
         $transactions = BankTransaction::where('bankAccountId', $bankAccount->id)
             ->whereBetween('transactionDate', [$endDate, $startDate])
             ->orderBy('transactionDate', 'desc')
+            ->orderBy('id', 'desc')
             ->limit(200)
             ->get();
 
@@ -57,7 +58,8 @@ class TransactionController extends ApiController
 
     public function store(BankInstitution $bankInstitution, BankAccount $bankAccount)
     {
-        BankAccountSync::dispatch($bankAccount->bankAccessTokenId);
+
+        FinancialSyncJob::dispatch($bankAccount->bankAccessToken);
 
         return response()->noContent();
     }

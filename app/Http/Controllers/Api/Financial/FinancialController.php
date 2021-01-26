@@ -6,6 +6,7 @@ use App\Facades\Services\AuthService;
 use App\Financials\Financial;
 use App\Http\Controllers\Api\ApiController;
 use App\Http\Resources\Financial\BankLinkTokenResource;
+use App\Jobs\FinancialSyncJob;
 use Exception;
 use GuzzleHttp\Exception\GuzzleException;
 use Illuminate\Http\JsonResponse;
@@ -39,7 +40,7 @@ class FinancialController extends ApiController
      *
      * @return Response
      * @throws ValidationException
-     * @throws GuzzleException
+     * @throws Exception
      */
     public function exchangePublicToken(Request $request, Financial $financial): Response
     {
@@ -49,13 +50,11 @@ class FinancialController extends ApiController
 
         $siteId = AuthService::getSite()->id;
 
-        if (!$accessToken = $financial->createAccessToken($data['publicToken'], $siteId)) {
-            throw new Exception('The access token could not be created');
-//            throw new JsonError(
-//                'The access token could not be created',
-//                Response::HTTP_INTERNAL_SERVER_ERROR
-//            );
+        if (!$bankAccessToken = $financial->createAccessToken($data['publicToken'], $siteId)) {
+            abort(500, 'The access token could not be created');
         }
+
+        FinancialSyncJob::dispatch($bankAccessToken);
 
         return response()->noContent();
     }

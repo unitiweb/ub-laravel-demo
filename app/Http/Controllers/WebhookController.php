@@ -2,8 +2,11 @@
 
 namespace App\Http\Controllers;
 
-use App\Exceptions\JsonError;
-use App\Financials\Plaid\Webhooks\Webhook;
+use App\Financials\Drivers\Plaid\Webhooks\PlaidWebhook;
+use App\Financials\Financial;
+use App\Jobs\FinancialSyncJob;
+use App\Models\Site;
+use Exception;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 
@@ -18,11 +21,12 @@ class WebhookController extends Controller
      * Handle all the Plaid webhook requests
      *
      * @param Request $request
-     * @param Webhook $webhook
+     * @param PlaidWebhook $webhook
      *
      * @return Response
+     * @throws Exception
      */
-    public function plaid(Request $request, Webhook $webhook): Response
+    public function plaid(Request $request, PlaidWebhook $webhook): Response
     {
         return $webhook->process($request);
     }

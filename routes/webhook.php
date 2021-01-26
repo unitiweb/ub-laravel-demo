@@ -1,7 +1,7 @@
 <?php
 
 use App\Http\Controllers\WebhookController;
-use App\Http\Middleware\PlaidMiddleware;
+use App\Http\Middleware\FinancialWebhookMiddleware;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -15,6 +15,4 @@ use Illuminate\Support\Facades\Route;
 |
 */
 
-Route::post('/plaid/{siteId}', [WebhookController::class, 'plaid'])
-//    ->middleware(PlaidMiddleware::class)
-;
+Route::post('/plaid/{siteId}', [WebhookController::class, 'plaid'])->name('webhook.plaid');

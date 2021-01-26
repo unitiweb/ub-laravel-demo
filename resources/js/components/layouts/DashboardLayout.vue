@@ -10,15 +10,9 @@
     import InactiveAlert from '@/components/layouts/InactiveAlert'
 
     export default {
-
         components: {
             Layout,
             InactiveAlert
-        },
-
-        mounted () {
-
         }
-
     }
 </script>

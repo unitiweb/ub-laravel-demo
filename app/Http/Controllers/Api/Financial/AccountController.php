@@ -4,7 +4,7 @@ namespace App\Http\Controllers\Api\Financial;
 
 use App\Http\Controllers\Api\ApiController;
 use App\Http\Resources\Financial\BankAccountResource;
-use App\Jobs\BankAccountSync;
+use App\Jobs\FinancialSyncJob;
 use App\Models\BankAccount;
 use App\Models\BankInstitution;
 use Illuminate\Http\Request;
@@ -87,7 +87,7 @@ class AccountController extends ApiController
             // If the account has been enabled then send a queue to sync data
             if ($bankAccount->enabled === true) {
                 // Dispatch a queue job to update all transactions for the bank account
-                BankAccountSync::dispatch($bankAccount->bankAccessTokenId);
+                FinancialSyncJob::dispatch($bankAccount->bankAccessToken);
             }
         }
 

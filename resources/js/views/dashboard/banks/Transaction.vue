@@ -8,7 +8,10 @@
                 </div>
             </div>
             <div class="flex-none text-right">
-                <div :class="{ 'text-blue-600': transaction.amount < 0 }">{{ transaction.amount | currency }}</div>
+                <div>
+                    <span v-if="transaction.amount < 0" class="text-green-700 font-bold">{{ amount(transaction.amount) }}</span>
+                    <span v-else class="text-gray-500">{{ amount(transaction.amount) }}</span>
+                </div>
                 <div v-if="transaction.pending" class="text-xs text-red-400">
                     pending
                 </div>
@@ -74,6 +77,26 @@
             transactionDate () {
                 return moment(this.transaction.transactionDate).format('YYYY-MM-DD')
             }
+        },
+
+        methods: {
+
+            amount (value) {
+                let number = value
+                if (value >= 0) {
+                    number = '-' + '$' + Math.abs(value).toFixed(2)
+                } else {
+                    number = '+' + '$' + Math.abs(value).toFixed(2)
+                }
+
+                return number
+            },
+
+            isDeposit(value) {
+                console.log('value < 0', value < 0)
+                return value < 0
+            }
+
         }
     }
 

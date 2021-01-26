@@ -12,22 +12,24 @@ return [
     |
     */
 
-    'driver' => \App\Financials\Plaid\Plaid::class,
+    'driver' => env('FINANCIAL_DRIVER', 'plaid'),
 
     'plaid' => [
-        'webhook' => env('PLAID_WEBHOOK_ROUTE', '/webhook/plaid'),
-        'environment' => env('PLAID_ENV', 'sandbox'),
-        'version' => env('PLAID_VERSION', '2020-09-14'),
-        'language' => env('PLAID_LANGUAGE', 'en'),
-        'country_codes' => env('PLAID_COUNTRY_CODES', 'US'),
-        'products' => [
-            'auth',
-            'transactions',
-        ],
-        'credentials' => [
-            'client_id' => env('PLAID_CLIENT_ID', ''),
-            'secret' => env('PLAID_SECRET', ''),
-            'public_key' => env('PLAID_PUBLIC_KEY', ''),
+        'driver' => \App\Financials\Drivers\Plaid\Plaid::class,
+        'config' => [
+            'environment' => env('PLAID_ENV', 'sandbox'),
+            'version' => env('PLAID_VERSION', '2020-09-14'),
+            'language' => env('PLAID_LANGUAGE', 'en'),
+            'country_codes' => env('PLAID_COUNTRY_CODES', 'US'),
+            'products' => [
+                'auth',
+                'transactions',
+            ],
+            'credentials' => [
+                'client_id' => env('PLAID_CLIENT_ID', ''),
+                'secret' => env('PLAID_SECRET', ''),
+                'public_key' => env('PLAID_PUBLIC_KEY', ''),
+            ],
         ],
     ],
 

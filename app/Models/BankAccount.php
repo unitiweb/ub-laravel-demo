@@ -96,4 +96,14 @@ class BankAccount extends BaseModel
     {
         return $this->belongsTo(BankInstitution::class, 'bankInstitutionId');
     }
+
+    /**
+     * Get the bank access token for this bank account
+     *
+     * @return HasOne
+     */
+    public function bankAccessToken(): HasOne
+    {
+        return $this->hasOne(BankAccessToken::class, 'id', 'bankAccessTokenId');
+    }
 }

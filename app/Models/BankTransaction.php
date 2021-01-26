@@ -22,6 +22,7 @@ use Illuminate\Database\Eloquent\Relations\HasOne;
  * @property mixed isoCurrencyCode
  * @property mixed name
  * @property mixed pending
+ * @property mixed categoryId
  * @property mixed category
  */
 class BankTransaction extends BaseModel

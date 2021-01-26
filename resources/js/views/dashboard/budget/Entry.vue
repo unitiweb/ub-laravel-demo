@@ -9,9 +9,10 @@
                 Due Day: {{ dueDate }}
             </div>
         </div>
-        <div @click="modify" class="flex-none">
-            <div class="text-right text-lg amount-width px-3 pt-3">
-                {{ entry.amount | currency }}
+        <div @click="modify" class="flex-none text-right px-2 pt-1">
+            {{ entry.amount | currency }}
+            <div class="text-xs text-gray-600">
+                {{ stateLabel }}
             </div>
         </div>
         <div v-if="!hideProgress" class="flex-none rounded-md pt-2 pr-2">
@@ -23,7 +24,7 @@
 <script>
     import Currency from '@/components/ui/Currency'
     import DueDay from '@/components/ui/DueDay'
-    import EntryProgress from '@/views/dashboard/budget/EntryProgress2'
+    import EntryProgress from '@/views/dashboard/budget/EntryProgress'
     import { cleanNumber } from '@/scripts/helpers/utils'
     import EditInPlace from '@/components/ui/form/EditInPlace'
     import moment from 'moment'
@@ -78,6 +79,10 @@
                 } else {
                     return 'none'
                 }
+            },
+
+            stateLabel () {
+                return this.getState
             },
 
             rowClasses () {
