@@ -1,16 +1,19 @@
 <template>
     <div class="border border-gray-300 rounded-md shadow-md m-1">
         <div>
-            <income-header class="sticky top-0" :income="income" :collapsed="collapsed" @collapsed="collapsed = !collapsed" @modify-income="modifyIncome" @create-entry="createEntry"></income-header>
-            <draggable handle=".entry-handle" :list="income.entries" v-bind="dragOptions" group="entries" @change="dragChanged">
-                <entry v-for="(entry, index) in income.entries" v-if="entry && collapsed === false" :key="`${entry}-${index}`" :active="isActive(entry)" :month="budgetDate" @calculate="calculate" @modify="modifyEntry" :entry="entry"></entry>
-            </draggable>
-            <div v-if="this.income.entries.length === 0" class="text-gray-400 px-4 py-1">
+            <income-header class="sticky top-0" :income="income" :collapsed="collapsed" @collapsed="toggleCollapsed" @modify-income="modifyIncome" @create-entry="createEntry"></income-header>
+            <div v-if="this.income.entries.length === 0" class="text-gray-400 text-gray-50 text-sm px-4 py-1">
                 no entries
             </div>
-            <div v-else-if="collapsed === true" class="text-gray-400 px-4 py-1">
-                <icon name="dotsHorizontal"></icon>
+            <div v-else-if="collapsed === 3" class="bg-gray-50 text-gray-400 text-sm px-4 py-1">
+                all hidden
             </div>
+            <div v-else-if="collapsed === 2" class="flex bg-gray-50 text-gray-400 text-sm px-4 py-1">
+                cleared hidden
+            </div>
+            <draggable handle=".entry-handle" :list="income.entries" v-bind="dragOptions" @change="dragChanged">
+                <entry v-for="(entry, index) in income.entries" v-if="entryVisibility(entry)" :key="`entry-${index}`" :active="isActive(entry)" :month="budgetDate" @calculate="calculate" @modify="modifyEntry" :entry="entry"></entry>
+            </draggable>
             <div v-if="!this.income.unassigned" class="bg-gray-100 border border-t border-l-0 border-r-0 border-b-0 border-gray-300 rounded-md rounded-t-none">
                 <budget-balances :balances="balances" class="border border-b rounded-md rounded-t-none"></budget-balances>
             </div>
@@ -90,7 +93,7 @@
         data () {
             return {
                 drag: false,
-                collapsed: false,
+                collapsed: 2,
                 dragging: null,
                 changeDueDay: null,
                 balances: null
@@ -128,7 +131,7 @@
             dragOptions() {
                 return {
                     animation: 200,
-                    group: "description",
+                    group: "entries",
                     disabled: false,
                     ghostClass: "ghost"
                 };
@@ -146,14 +149,20 @@
             },
 
             async initialCollapse () {
-                let completed = true
+                let cleared = false
                 for (let i = 0; i < this.income.entries.length; i++) {
-                    if (this.income.entries[i].cleared === false) {
-                        completed = false
-                        break
+                    if (this.income.entries[i].cleared === true) {
+                        cleared++
                     }
                 }
-                this.collapsed = this.income.entries.length === 0 ? false : completed
+
+                if (cleared === this.income.entries.length) {
+                    this.collapsed = 3
+                } else if (cleared >= 1) {
+                    this.collapsed = 2
+                } else {
+                    this.collapsed = 1
+                }
             },
 
             createEntry () {
@@ -191,6 +200,7 @@
              * Triggered when an entry row drag is dropped
              */
             dragChanged (evt) {
+                console.log('evt: entry', evt)
                 if (evt.added) {
                     this.addedTo(evt.added.newIndex, evt.added.element)
                 } else if (evt.moved) {
@@ -222,7 +232,7 @@
                     entry.incomeId = this.income.id
                     this.orderEntriesByDueDay()
                     // If entry as been added then un-collapse so results can be seen
-                    this.collapsed = false
+                    this.collapsed = 1
                 } catch ({ error }) {
                     console.log('error', error)
                 }
@@ -265,6 +275,27 @@
                 }
             },
 
+            toggleCollapsed (collapsed) {
+                if (collapsed) {
+                    this.collapsed = collapsed
+                } else {
+                    this.collapsed++
+                    if (this.collapsed > 3) {
+                        this.collapsed = 1
+                    }
+                }
+            },
+
+            entryVisibility (entry) {
+                if (this.collapsed === 1) {
+                    return true
+                } else if (this.collapsed === 2) {
+                    return !entry.cleared
+                }
+
+                return false;
+            }
+
             /**
              * Move the entry back to it's original location
              */
@@ -290,22 +321,7 @@
 </script>
 
 <style lang="scss" scoped>
-    .flip-list-move {
-        transition: transform 0.5s;
-    }
-    .no-move {
-        transition: transform 0s;
-    }
     .ghost {
         visibility: hidden;
-    }
-    .list-group {
-        min-height: 20px;
-    }
-    .list-group-item {
-        cursor: move;
-    }
-    .list-group-item i {
-        cursor: pointer;
     }
 </style>

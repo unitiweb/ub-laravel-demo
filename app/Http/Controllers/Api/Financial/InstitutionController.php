@@ -28,13 +28,18 @@ class InstitutionController extends ApiController
         return BankInstitutionResource::collection($institutions);
     }
 
-//    /**
-//     * Get a single bank account
-//     *
-//     * @return BankAccountResource
-//     */
-//    public function show(): BankAccountResource
-//    {
-//        return new BankAccountResource($this->bankAccount);
-//    }
+    /**
+     * Get a single bank institution
+     *
+     * @param BankInstitution $institution
+     *
+     * @return BankInstitutionResource
+     */
+    public function show(BankInstitution $institution): BankInstitutionResource
+    {
+        $with = $this->getWith(['accounts']);
+        $institution->load($with->toArray());
+
+        return new BankInstitutionResource($institution);
+    }
 }

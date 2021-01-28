@@ -1,6 +1,10 @@
 <template>
-    <div @click="showDetails = !showDetails" :class="classes">
-        <div class="flex">
+<!--    <div @click="showDetails = !showDetails" :class="classes">-->
+    <div class="select-none">
+        <div class="transaction-handle flex text-sm border rounded-md cursor-pointer m-1 p-2" :class="classes">
+<!--            <div class="flex-none border-r pl-0 pr-1 pt-3">-->
+<!--                <icon name="menu" fill size="4" class="cursor-move text-gray-300 hover:text-gray-700"></icon>-->
+<!--            </div>-->
             <div class="flex-1">
                 {{ transaction.name }}
                 <div class="text-xs text-gray-400">
@@ -17,18 +21,18 @@
                 </div>
             </div>
         </div>
-        <div v-if="showDetails" class="text-sm my-1">
-            <div class="flex border border-yellow-300 rounded-md p-1 mb-1">
-                <div class="flex-1">Categories</div>
-                <div class="flex-none text-right">
-                    <div v-for="category in categories">{{ category }}</div>
-                </div>
-            </div>
-            <div class="flex border border-yellow-300 rounded-md p-1 mb-1">
-                <div class="flex-1">Payment Channel</div>
-                <div class="flex-none text-right">{{ transaction.paymentChannel }}</div>
-            </div>
-        </div>
+<!--        <div v-if="showDetails" class="text-sm my-1">-->
+<!--            <div class="flex border border-yellow-300 rounded-md p-1 mb-1">-->
+<!--                <div class="flex-1">Categories</div>-->
+<!--                <div class="flex-none text-right">-->
+<!--                    <div v-for="category in categories">{{ category }}</div>-->
+<!--                </div>-->
+<!--            </div>-->
+<!--            <div class="flex border border-yellow-300 rounded-md p-1 mb-1">-->
+<!--                <div class="flex-1">Payment Channel</div>-->
+<!--                <div class="flex-none text-right">{{ transaction.paymentChannel }}</div>-->
+<!--            </div>-->
+<!--        </div>-->
     </div>
 </template>
 
@@ -57,7 +61,7 @@
                 return this.transaction.category.split(':')
             },
             classes () {
-                const classes = ['text-sm border rounded-md cursor-pointer m-1 p-1']
+                const classes = []
 
                 if (this.showDetails) {
                     classes.push('border-yellow-300 bg-yellow-50 hover:bg-yellow-100')
@@ -93,7 +97,6 @@
             },
 
             isDeposit(value) {
-                console.log('value < 0', value < 0)
                 return value < 0
             }
 

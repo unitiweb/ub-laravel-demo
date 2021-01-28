@@ -6,7 +6,7 @@
                 <div class="flex-none text-lg text-right px-3 py-2">
                     <ub-button @click="setCollapse"
                                size="sm" variant="secondary"
-                               :icon="collapsed ? 'chevronDoubleRight' : 'chevronDoubleDown'"
+                               :icon="collapsedIcon"
                                outline>
                     </ub-button>
                 </div>
@@ -32,7 +32,7 @@
             <div class="flex-none text-lg text-right px-3 py-2">
                 <ub-button @click="setCollapse"
                            size="sm" variant="secondary"
-                           :icon="collapsed ? 'chevronDoubleRight' : 'chevronDoubleDown'"
+                           :icon="collapsedIcon"
                            outline>
                 </ub-button>
             </div>
@@ -67,8 +67,8 @@
                 type: Object
             },
             collapsed: {
-                type: Boolean,
-                default: false
+                type: Number,
+                default: 3
             }
         },
 
@@ -78,6 +78,16 @@
                     return 'bg-yellow-100'
                 }
                 return ' bg-gray-100 hover:bg-gray-200'
+            },
+
+            collapsedIcon () {
+                if (this.collapsed === 1) {
+                    return 'chevronDoubleRight'
+                } else if (this.collapsed === 2) {
+                    return 'chevronDoubleDown'
+                }
+
+                return 'chevronDown'
             }
         },
 
@@ -85,6 +95,7 @@
             setCollapse () {
                 this.$emit('collapsed')
             },
+
             modifyIncome () {
                 if (!this.income.unassigned) {
                     this.$emit('modify-income')

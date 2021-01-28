@@ -20,6 +20,11 @@ export default {
         return request('get', ['financial', 'institutions'], null, relations)
     },
 
+    // Get all financial institutions
+    financialInstitution: (institutionId, relations) => {
+        return request('get', ['financial', 'institutions', institutionId], null, relations)
+    },
+
     // // Get all financial accounts
     // financialAccounts: (institutionId, relations) => {
     //     return request('get', ['financial', 'institutions', institutionId, 'accounts'], null, relations)

@@ -1,5 +1,6 @@
 import { request } from '@/scripts/http/utils'
 import sha256 from '@/scripts/helpers/sha256'
+import store from '@/store'
 
 /**
  * Profile and Settings
@@ -20,7 +21,16 @@ export default {
     updateEmail: (email) => request('patch', ['profile', 'email'], { email }),
 
     // Update user specific settings
-    updateSettings: (settings) => request('patch', ['profile', 'settings'], settings),
+    updateSettings: async (settings) => {
+        try {
+            const response = await request('patch', ['profile', 'settings'], settings)
+            // Send the new settings to the api
+            await store.dispatch('updateSettings', response.data)
+            return response
+        } catch ({ error }) {
+            console.log('error', error)
+        }
+    },
 
     // Update user specific site
     updateSite: (site) => request('patch', ['profile', 'site'], site),

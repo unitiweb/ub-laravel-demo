@@ -11,8 +11,11 @@
                         <div v-if="['incomes', 'groups'].includes(currentState.left)">
                             <budget-right-header>
                                 <template v-slot:left>
-                                    <ub-button @click="viewIncomes" size="sm" icon-left="currencyDollar" :variant="currentState.left === 'incomes' ? 'primary' : 'secondary'" outline></ub-button>
-                                    <ub-button @click="viewGroups" size="sm" icon-left="viewBoard" :variant="currentState.left === 'groups' ? 'success' : 'secondary'" outline></ub-button>
+                                    <ub-button @click="viewIncomes" size="sm" icon="currencyDollar" :variant="currentState.left === 'incomes' ? 'primary' : 'secondary'" outline></ub-button>
+                                    <ub-button @click="viewGroups" size="sm" icon="viewBoard" :variant="currentState.left === 'groups' ? 'success' : 'secondary'" outline></ub-button>
+                                </template>
+                                <template v-slot:right>
+                                    <ub-button @click="viewTransactions" size="sm" icon="creditCard" :variant="currentState.left === 'transactions' ? 'primary' : 'secondary'" outline></ub-button>
                                 </template>
                             </budget-right-header>
                             <incomes v-if="currentState.left === 'incomes'" :active-income="activeIncome" :active-row="activeRow" :budget="budget" @modify-income="modifyIncome" @modify-entry="modifyEntry"/>
@@ -26,6 +29,7 @@
                         <income-form v-if="currentState.right === 'modify-income'" class="object-top" :income="currentState.data" @done="done"/>
                         <group-form v-if="currentState.right === 'modify-group'" class="object-top" :group="currentState.data" :budget="budget" @done="done"/>
                         <entry-form v-if="currentState.right === 'modify-entry'" class="object-top" :entry="currentState.data" :budget="budget" :incomes="incomes" :groups="groups" @done="done"/>
+                        <budget-transactions v-if="currentState.right === 'transactions'"></budget-transactions>
                     </div>
                 </template>
             </budget-divided>
@@ -55,7 +59,7 @@
     import BudgetCreate from '@/views/dashboard/budget/BudgetCreate'
     import Modal from "@/components/ui/modal/Modal";
     import BudgetDivided from '@/components/budget/BudgetDivided'
-    import TransitionSlide from '@/components/transitions/TransitionSlide'
+    import BudgetTransactions from '@/views/dashboard/budget/BudgetTransactions'
     import moment from "moment"
     import { mapGetters, mapActions } from 'vuex'
 
@@ -74,7 +78,7 @@
             EntryForm,
             BudgetCreate,
             Modal,
-            TransitionSlide
+            BudgetTransactions
         },
 
         data () {
@@ -95,12 +99,11 @@
         },
 
         computed: {
-
-            ...mapGetters(['budget', 'lastView', 'lastMonth']),
+            ...mapGetters(['budget', 'settings']),
 
             currentState () {
                 if (this.state.left === null) {
-                    this.state.left = this.lastView
+                    this.state.left = this.settings.view
                 }
                 return this.state
             },
@@ -138,7 +141,7 @@
 
         methods: {
 
-            ...mapActions(['setBudget', 'setLastView']),
+            ...mapActions(['setBudget']),
 
             async viewChanged (view, reload) {
                 if (reload) {
@@ -162,21 +165,23 @@
 
             async viewIncomes () {
                 await this.$http.updateSettings({ view: 'incomes' })
-                await this.setLastView('incomes')
                 await this.loadBudget()
             },
 
             async viewGroups () {
                 await this.$http.updateSettings({ view: 'groups' })
-                await this.setLastView('groups')
                 await this.loadBudget()
+            },
+
+            async viewTransactions () {
+                this.setState('budget', 'transactions', {})
             },
 
             async redirectIfNoDate () {
                 const year = this.$route.params.year
                 const month = this.$route.params.month
                 if (!year || !month) {
-                    const date = moment(this.lastMonth)
+                    const date = moment(this.settings.month)
                     const year = date.format('YYYY')
                     const month = date.format('MM')
                     await this.$router.push({ name: 'budget', params: { year, month }})
@@ -189,7 +194,7 @@
 
                 // Reset the relations if view is groups
                 let relations = 'incomes'
-                if (this.lastView === 'groups') {
+                if (this.settings.view === 'groups') {
                     relations = 'groups'
                 }
 
@@ -210,7 +215,7 @@
                     if (error.code === 404) {
                         await this.setBudget(null)
                     } else {
-                        console.log('error', error.code)
+                        console.log('error', error)
                     }
                     this.budgetLoaded = false
                 }
@@ -225,7 +230,7 @@
 
             setState (left = null, right = null, data = null) {
                 if (left === 'budget') {
-                    left = this.lastView
+                    left = this.settings.view
                 }
                 this.state = { left, right, data }
             },

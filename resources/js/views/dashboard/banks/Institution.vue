@@ -58,7 +58,6 @@
                 for (let i = 0; i < this.institution.accounts.length; i++) {
                     const account = this.institution.accounts[i]
                     if (account.enabled === true) {
-                        console.log('account.enabled', account.enabled)
                         this.collapsed = true
                         break;
                     }

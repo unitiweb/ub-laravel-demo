@@ -1,6 +1,6 @@
 <template>
     <div>
-        <institution v-for="institution in institutions"
+        <institution v-for="institution in bankInstitutions"
                      :key="institution.institutionId"
                      :institution="institution"
                      :active="active"
@@ -26,7 +26,7 @@
         },
 
         computed: {
-            ...mapGetters(['institutions'])
+            ...mapGetters(['bankInstitutions'])
         },
 
         methods: {

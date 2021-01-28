@@ -29,5 +29,7 @@ class Settings extends BaseModel
         'siteId',
         'view',
         'month',
+        'institution',
+        'account',
     ];
 }

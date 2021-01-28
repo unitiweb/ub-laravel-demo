@@ -1,6 +1,6 @@
 <template>
     <div>
-        <budget-right-header title="Budget Income">
+        <budget-right-header>
             <template v-slot:left>
                 <ub-button v-if="income.id" @click="deleteIncome" outline variant="danger" icon="trash" class="float-left" size="sm"></ub-button>
             </template>
@@ -10,6 +10,7 @@
             </template>
         </budget-right-header>
         <div class="bg-gray-100 border border-gray-300 rounded-md shadow-md p-4 grid grid-cols-2 gap-6">
+            <div class="col-span-2 text-lg text-center font-bold">Income Details</div>
             <div class="col-span-2">
                 <f-input label="Income Name"
                          placeholder="entry name"

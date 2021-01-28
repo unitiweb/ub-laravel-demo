@@ -1,8 +1,8 @@
 <template>
     <div>
-        <budget-right-header title="Budget Status">
-        </budget-right-header>
+        <budget-right-header></budget-right-header>
         <div class="bg-gray-100 border border-gray-300 rounded-md shadow-md p-4 grid grid-cols-2 gap-6">
+            <div class="col-span-2 text-lg text-center font-bold">Budget Stats</div>
             <div>
                 Stats will go here
             </div>
