@@ -1,7 +1,6 @@
 import Vuex from 'vuex'
 import Vue from 'vue'
 import config from '@/config'
-import $http from '@/scripts/http'
 import moment from 'moment'
 
 // Add Vuex to the Vue instance
@@ -36,14 +35,13 @@ export default new Vuex.Store({
         },
         loading: false,
         site: {},
-        settings: {},
         budgetDate: null,
         budget: null,
-        institutions: null,
+        bankInstitutions: [],
+        bankInstitution: null,
+        bankAccount: null,
         user: {},
-        page: {
-            title: ''
-        }
+        settings: {}
     },
     getters: {
         loading: state => {
@@ -91,6 +89,9 @@ export default new Vuex.Store({
         site: state => {
             return state.site
         },
+        settings: state => {
+            return state.settings
+        },
         budget: state => {
             return state.budget
         },
@@ -108,17 +109,14 @@ export default new Vuex.Store({
                 return moment().format('YYYY-MM-DD')
             }
         },
-        institutions: state => {
-            return state.institutions
+        bankInstitutions: state => {
+            return state.bankInstitutions
         },
-        lastView: state => {
-            return state.settings.view || 'incomes'
+        bankInstitution: state => {
+            return state.bankInstitution
         },
-        lastMonth: state => {
-            return state.settings.month || moment().format('YYYY-MM-DD')
-        },
-        page: state => {
-            return state.page
+        bankAccount: state => {
+            return state.bankAccount
         }
     },
     mutations: {
@@ -147,7 +145,7 @@ export default new Vuex.Store({
         avatar (state, avatar) {
             state.user.avatar = avatar
         },
-        settings (state, settings) {
+        async settings (state, settings) {
             state.settings = settings
         },
         tokens (state, tokens) {
@@ -169,14 +167,14 @@ export default new Vuex.Store({
         budgetDate (state, date) {
             state.budgetDate = date
         },
-        institutions (state, institutions) {
-            state.institutions = institutions
+        bankInstitutions (state, institutions) {
+            state.bankInstitutions = institutions
         },
-        lastView (state, view) {
-            state.settings.view = view
+        bankInstitution (state, institution) {
+            state.bankInstitution = institution
         },
-        page (state, payload) {
-            state.page.title = payload.title
+        bankAccount (state, account) {
+            state.bankAccount = account
         }
     },
     actions: {
@@ -228,11 +226,16 @@ export default new Vuex.Store({
             }
             commit('site', site)
         },
+        async updateSettings ({ commit, getters }, payload) {
+            const settings = getters.settings
+            // Update only the given values
+            for (const [key, value] of Object.entries(payload)) {
+                settings[key] = value
+            }
+            await commit('settings', settings)
+        },
         setBudget ({ commit }, payload) {
             commit('budget', payload)
-        },
-        setInstitutions ({ commit }, payload) {
-            commit('institutions', payload)
         },
         appLoaded ({ commit }, payload) {
             commit('appLoaded', payload)
@@ -240,8 +243,14 @@ export default new Vuex.Store({
         budgetDate ({ commit }, date) {
             commit('budgetDate', date)
         },
-        setLastView ({ commit }, view) {
-            commit('lastView', view)
+        setBankInstitutions ({ commit }, institutions) {
+            commit('bankInstitutions', institutions)
+        },
+        setBankInstitution ({ commit }, payload) {
+            commit('bankInstitution', payload)
+        },
+        setBankAccount ({ commit }, payload) {
+            commit('bankAccount', payload)
         }
     }
 })

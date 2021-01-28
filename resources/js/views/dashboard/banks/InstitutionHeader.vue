@@ -49,12 +49,7 @@
             setCollapse () {
                 this.$emit('toggle-collapsed')
             }
-        },
-
-        mounted () {
-            console.log('institution', this.institution)
         }
-
     }
 
 </script>

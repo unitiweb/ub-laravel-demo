@@ -58,11 +58,11 @@
         },
 
         computed: {
-            ...mapGetters(['institutions'])
+            ...mapGetters(['bankInstitutions'])
         },
 
         methods: {
-            ...mapActions(['setInstitutions']),
+            ...mapActions(['setBankInstitutions']),
 
             setState (right, data) {
                 this.state = {right, data}
@@ -72,7 +72,7 @@
                 try {
                     this.loading = true
                     const { data } = await this.$http.financialInstitutions('accounts')
-                    this.setInstitutions(data)
+                    this.setBankInstitutions(data)
                     this.loading = false
                     this.loaded = true
                 } catch ({ error }) {
@@ -95,13 +95,9 @@
                 const max = 20
                 let count = 0;
                 this.showLoading = true
-                const institutionsCount = this.institutions.length
+                const institutionsCount = this.bankInstitutions.length
                 const interval = setInterval(() => {
-                    // console.log('--- setInterval')
-                    // console.log(institutionsCount, ' : ', this.institutions.length, ' : ', count, ' : ', max)
-                    // console.log('expression', this.institutions.length >= institutionsCount || count === max)
-                    // this.loadInstitutions()
-                    if (this.institutions.length > institutionsCount || count === max) {
+                    if (this.bankInstitutions.length > institutionsCount || count === max) {
                         this.showLoading = false
                         if (count === max) {
                             this.showRefreshAlert = true

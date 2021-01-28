@@ -13,6 +13,8 @@ use Illuminate\Http\Resources\Json\JsonResource;
  *
  * @property string view
  * @property string month
+ * @property mixed institution
+ * @property mixed account
  */
 class SettingsResource extends JsonResource
 {
@@ -28,6 +30,8 @@ class SettingsResource extends JsonResource
         return [
             'view' => $this->view,
             'month' => $this->month,
+            'institution' => $this->institution ? (int)$this->institution : null,
+            'account' => $this->account ? (int)$this->account : null,
         ];
     }
 }

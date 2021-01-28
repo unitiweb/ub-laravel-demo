@@ -1,7 +1,7 @@
 <template>
     <div>
         <form @submit.prevent="save">
-            <budget-right-header title="Budget Entry">
+            <budget-right-header>
                 <template v-slot:left>
                     <ub-button v-if="entry.id" @click="showDelete = true" outline variant="danger" size="sm" icon="trash" class="float-left"></ub-button>
                 </template>
@@ -12,6 +12,7 @@
             </budget-right-header>
 
             <div class="bg-gray-100 border border-gray-300 rounded-md shadow-md p-4 grid grid-cols-2 gap-6">
+                <div class="col-span-2 text-lg text-center font-bold">Budget Details</div>
                 <div v-if="errors.length >= 1" class="col-span-2">
                     {{ errors[0] }}
                 </div>

@@ -71,7 +71,7 @@ Route::prefix('financial')->name('financial.')->group(function () {
     /**
      * Financial institution routes
      */
-    Route::apiResource('institutions', InstitutionController::class)->only('index');
+    Route::apiResource('institutions', InstitutionController::class)->only('index', 'show');
     /**
      * Financial institution account routes
      */

@@ -25,8 +25,8 @@ class SettingsController extends ApiController
     public function update(SettingsUpdateRequest $request): SettingsResource
     {
         $data = $request->validated();
-
         $user = AuthService::getUser();
+
         $settings = Settings::where('userId', $user->id)->firstOrFail();
         $settings->update($data);
 
