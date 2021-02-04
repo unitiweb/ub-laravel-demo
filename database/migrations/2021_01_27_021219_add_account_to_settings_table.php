@@ -27,8 +27,8 @@ class AddAccountToSettingsTable extends Migration
     public function down()
     {
         Schema::table('settings', function (Blueprint $table) {
-            $table->removeColumn('institution');
-            $table->removeColumn('account');
+            $table->dropColumn('institution');
+            $table->dropColumn('account');
         });
     }
 }

@@ -3,7 +3,6 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
-use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasOne;
 
 /**
@@ -24,6 +23,7 @@ use Illuminate\Database\Eloquent\Relations\HasOne;
  * @property mixed pending
  * @property mixed categoryId
  * @property mixed category
+ * @property bankAccount account
  */
 class BankTransaction extends BaseModel
 {

@@ -2,6 +2,8 @@
 
 namespace App\Http\Resources;
 
+use App\Http\Resources\Financial\BankTransactionResource;
+use App\Models\BankTransaction;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
 
@@ -50,6 +52,9 @@ class BudgetEntryResource extends JsonResource
             'order' => $this->order,
             'income' => new BudgetIncomeResource($this->whenLoaded('income')),
             'group' => new BudgetGroupResource($this->whenLoaded('group')),
+            'transactions' => BankTransactionResource::collection($this->whenLoaded('transactions'))
+
+//            'matches' => BankTransactionMatchResource::collection($this->whenLoaded('matches')),
         ];
     }
 }

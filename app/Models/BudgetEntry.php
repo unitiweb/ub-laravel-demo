@@ -2,7 +2,11 @@
 
 namespace App\Models;
 
+use App\Facades\Services\AuthService;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\HasManyThrough;
+use Illuminate\Database\Eloquent\Relations\HasOne;
 
 /**
  * Model for the BudgetEntries table
@@ -11,10 +15,12 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
  * @property int siteId
  * @property int budgetIncomeId
  * @property int budgetGroupId
+ * @property int|null bankTransactionLinkId
  * @property string name
  * @property bool goal
  * @property bool paid
  * @property bool cleared
+ * @property float amount
  */
 class BudgetEntry extends BaseModel
 {
@@ -44,6 +50,7 @@ class BudgetEntry extends BaseModel
         'paid',
         'cleared',
         'order',
+        'transactionMatch',
         'url',
     ];
 
@@ -111,5 +118,16 @@ class BudgetEntry extends BaseModel
     public function category(): BelongsTo
     {
         return $this->belongsTo(Category::class, 'categoryId');
+    }
+
+    /**
+     * Get the transaction for this entry
+     *
+     * @return HasMany
+     */
+    public function transactions(): HasMany
+    {
+        return $this->hasMany(BankTransactionLink::class, 'budgetEntryId')
+            ->join('bankTransactions', 'bankTransactionLink.bankTransactionId', '=', 'bankTransactions.id');
     }
 }

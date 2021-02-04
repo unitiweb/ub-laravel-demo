@@ -44,13 +44,11 @@
             </div>
             <div class="col-span-2">
                 <div v-if="bankAccount" class="overscroll-y-auto">
-                    <draggable handle=".transaction-handle" :list="transactions" v-bind="dragOptions" @change="dragChanged">
-                        <transaction v-for="transaction in transactions"
-                                     :key="`trans-${transaction.id}`"
-                                     :account="bankAccount"
-                                     :transaction="transaction">
-                        </transaction>
-                    </draggable>
+                    <transaction v-for="transaction in transactions"
+                                 :key="`trans-${transaction.id}`"
+                                 :account="bankAccount"
+                                 :transaction="transaction">
+                    </transaction>
                 </div>
             </div>
         </div>
@@ -63,6 +61,7 @@
     import Draggable from 'vuedraggable'
     import TransitionFade from '@/components/transitions/TransitionFade'
     import Transaction from '@/views/dashboard/banks/Transaction'
+    import DropZone from '@/components/ui/dragdrop/DropZone'
     import { mapActions, mapGetters } from 'vuex'
 
     export default {
@@ -72,7 +71,8 @@
             BudgetRightHeader,
             Draggable,
             TransitionFade,
-            Transaction
+            Transaction,
+            DropZone
         },
 
         data () {
@@ -102,18 +102,6 @@
 
         methods: {
             ...mapActions(['setBankInstitutions', 'setBankInstitution', 'setBankAccount']),
-
-            /**
-             * Triggered when an entry row drag is dropped
-             */
-            dragChanged (evt) {
-                console.log('evt: transaction', evt)
-                // if (evt.added) {
-                //     this.addedTo(evt.added.newIndex, evt.added.element)
-                // } else if (evt.moved) {
-                //     this.moveTo(evt.moved.oldIndex, evt.moved.newIndex, evt.moved.element)
-                // }
-            },
 
             toggleBankMenu () {
                 this.showBankMenu = !this.showBankMenu
@@ -183,9 +171,3 @@
         }
     }
 </script>
-
-<style lang="scss" scope>
-    //.drop-on-top {
-    //    border: 3px black solid;
-    //}
-</style>

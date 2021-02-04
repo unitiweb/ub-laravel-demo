@@ -1,7 +1,15 @@
 <template>
     <div>
-        <income v-for="(income, index) in incomes"
+        <income v-for="(income, index) in budget.incomes"
                 :key="`income-${index}`"
+                :income="income"
+                :active="isActive(income)"
+                :active-row="activeRow"
+                @modify-income="modifyIncome"
+                @modify-entry="modifyEntry">
+        </income>
+        <income v-for="(income, index) in unassignedIncomeEntries"
+                :key="`unassigned-income-${index}`"
                 :income="income"
                 :active="isActive(income)"
                 :active-row="activeRow"
@@ -13,6 +21,7 @@
 
 <script>
     import Income from '@/views/dashboard/budget/Income'
+    import { mapGetters } from 'vuex'
 
     export default {
 
@@ -21,9 +30,6 @@
         },
 
         props: {
-            budget: {
-                type: Object
-            },
             activeIncome: {
                 type: [String, Number],
                 default: null
@@ -35,6 +41,7 @@
         },
 
         computed: {
+            ...mapGetters(['budget']),
 
             budgetDate () {
                 const year = this.$route.params.year
@@ -42,9 +49,10 @@
                 return `${year}-${month}-01`
             },
 
-            incomes () {
+            unassignedIncomeEntries () {
+                const incomes = []
                 if (this.budget.unassignedIncomeEntries && this.budget.unassignedIncomeEntries.length >= 1) {
-                    this.budget.incomes.push({
+                    incomes.push({
                         id: null,
                         unassigned: true,
                         name: 'Unassigned',
@@ -53,7 +61,7 @@
                     })
                 }
 
-                return this.budget.incomes
+                return incomes
             },
 
             dragOptions() {

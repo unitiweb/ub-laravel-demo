@@ -31,12 +31,12 @@ class BankInstitutionResource extends JsonResource
     {
         $institution = $this->resource->institution;
         return [
-            'id' => $institution->id,
-            'institutionId' => $institution->institutionId,
-            'name' => $institution->name,
-            'url' => $institution->url,
-            'logo' => $institution->logo,
-            'primaryColor' => $institution->primaryColor,
+            'id' => $this->id,
+            'institutionId' => $this->institutionId,
+            'name' => $this->name,
+            'url' => $this->url,
+            'logo' => $this->logo,
+            'primaryColor' => $this->primaryColor,
             'accounts' => BankAccountResource::collection($this->whenLoaded('accounts'))
         ];
     }

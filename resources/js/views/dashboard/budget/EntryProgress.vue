@@ -58,18 +58,7 @@ export default {
             } else {
                 return 'secondary'
             }
-        },
-        // classes () {
-        //     if (this.value.cleared) {
-        //         return 'bg-green-300 border-green-300'
-        //     } else if (this.value.paid) {
-        //         return 'bg-yellow-300 border-yellow-300'
-        //     } else if (this.value.goal) {
-        //         return 'bg-red-300 border-red-300'
-        //     } else {
-        //         return this.defaultStatusClasses
-        //     }
-        // }
+        }
     },
 
     methods: {
@@ -102,13 +91,19 @@ export default {
                 this.updateState({ goal: true })
             }
         },
-        updateState (data) {
-            this.$http.updateEntry(this.month, this.value.id, data)
-                .then(({ data }) => {
-                    this.$emit('updated', data)
-                }).catch(({ error }) => {
-                    console.log('error', error)
-                })
+        async updateState (status) {
+            try {
+                if (!status.cleared) {
+                    // Since the status is not cleared we need to remove the transaction
+                    // since an entry cannot be cleared and be linked to a transaction
+                    //ToDo: We need to have a modal confirming that the transaction will be un-linked
+                    status.bankTransactionId = null
+                }
+                const { data } = await this.$http.updateEntry(this.month, this.value.id, status, 'income,group,transactions')
+                this.$emit('updated', data)
+            } catch ({ error }) {
+                console.log('error', error)
+            }
         }
     }
 

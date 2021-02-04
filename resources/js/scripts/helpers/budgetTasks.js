@@ -4,33 +4,52 @@ import store from '@/store'
  * Remove the given entry from the budget
  *
  * @param entry
- *
- * @returns string|null
+ * @returns {budget}
  */
 export const budgetRemoveEntry = async (entry) => {
     const budget = store.getters.budget
 
-    if (!budget) return null
-
-    // If we are in incomes view then remove the entry from there
+    // If entry is in the incomes view then remove
     if (budget.incomes) {
-        for (const [k, v] of Object.entries(budget.incomes)) {
-            for (const [key, value] of Object.entries(budget.incomes[k].entries)) {
-                if (value.id === entry.id) {
-                    delete budget.incomes[k].entries[key]
+        for (let i = 0; i < budget.incomes.length; i++) {
+            for (let ii = 0; ii < budget.incomes[i].entries.length; ii++) {
+                if (budget.incomes[i].entries[ii].id === entry.id) {
+                    budget.incomes[i].entries.splice(ii, ii + 1)
+                    i = budget.incomes.length
+                    break;
                 }
+            }
+        }
+    } else if (budget.unassignedIncomeEntries) {
+        for (let ii = 0; ii < budget.unassignedIncomeEntries.length; ii++) {
+            if (budget.unassignedIncomeEntries[ii].id === entry.id) {
+                budget.unassignedIncomeEntries.splice(ii, ii + 1)
+                break;
             }
         }
     }
 
-    // If we are in groups view then remove the entry from there
+    // If entry is in the groups view then remove
     if (budget.groups) {
-        for (const [k, v] of Object.entries(budget.groups)) {
-            for (const [key, value] of Object.entries(budget.groups[k].entries)) {
-                if (value.id === entry.id) {
-                    delete budget.groups[k].entries[key]
+        for (let i = 0; i < budget.groups.length; i++) {
+            for (let ii = 0; ii < budget.groups[i].entries.length; ii++) {
+                if (budget.groups[i].entries[ii].id === entry.id) {
+                    budget.groups[i].entries.splice(ii, ii + 1)
+                    i = budget.groups.length
+                    break;
                 }
             }
         }
+    } else if (budget.unassignedGroupEntries) {
+        for (let ii = 0; ii < budget.unassignedGroupEntries.length; ii++) {
+            if (budget.unassignedGroupEntries[ii].id === entry.id) {
+                budget.unassignedGroupEntries.splice(ii, ii + 1)
+                break;
+            }
+        }
     }
+
+    console.log('budget', budget)
+
+    return budget
 }

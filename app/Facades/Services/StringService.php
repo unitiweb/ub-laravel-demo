@@ -10,6 +10,8 @@ use Illuminate\Support\Facades\Facade;
  *
  * @package App\Facades\Services
  *
+ * @method static string digitsOnly(string $string)
+ * @method static string makeSlug(...$args)
  * @method static Collection parseBase64Image(string $base64Image)
  */
 class StringService extends Facade

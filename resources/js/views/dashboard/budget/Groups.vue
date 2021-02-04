@@ -1,7 +1,15 @@
 <template>
     <div>
-        <group v-for="(group, index) in groups"
+        <group v-for="(group, index) in budget.groups"
                :key="`group-${index}`"
+               :group="group"
+               :active="isActive(group)"
+               :active-row="activeRow"
+               @modify-group="modifyGroup"
+               @modify-entry="modifyEntry">
+        </group>
+        <group v-for="(group, index) in unassignedGroupEntries"
+               :key="`unassigned-group-${index}`"
                :group="group"
                :active="isActive(group)"
                :active-row="activeRow"
@@ -13,6 +21,7 @@
 
 <script>
     import Group from '@/views/dashboard/budget/Group'
+    import { mapGetters } from 'vuex'
 
     export default {
 
@@ -21,9 +30,6 @@
         },
 
         props: {
-            budget: {
-                type: Object
-            },
             activeGroup: {
                 type: [String, Number],
                 default: null
@@ -35,6 +41,7 @@
         },
 
         computed: {
+            ...mapGetters(['budget']),
 
             budgetDate () {
                 const year = this.$route.params.year
@@ -42,9 +49,10 @@
                 return `${year}-${month}-01`
             },
 
-            groups () {
+            unassignedGroupEntries () {
+                const groups = []
                 if (this.budget.unassignedGroupEntries && this.budget.unassignedGroupEntries.length >= 1) {
-                    this.budget.groups.push({
+                    groups.push({
                         id: null,
                         unassigned: true,
                         name: 'Unassigned',
@@ -53,9 +61,8 @@
                     })
                 }
 
-                return this.budget.groups
+                return groups
             }
-
         },
 
         methods: {

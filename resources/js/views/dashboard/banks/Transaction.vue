@@ -1,7 +1,9 @@
 <template>
 <!--    <div @click="showDetails = !showDetails" :class="classes">-->
-    <div class="select-none">
-        <div class="transaction-handle flex text-sm border rounded-md cursor-pointer m-1 p-2" :class="classes">
+<!--    <div draggable class="select-none" @dragstart="startDrag($event, transaction)">-->
+    <drag-element action="assign-transaction" :draggable="draggable" :element-data="transaction">
+
+        <div class="transaction-handle flex text-sm border rounded-md m-1 p-2" :class="classes">
 <!--            <div class="flex-none border-r pl-0 pr-1 pt-3">-->
 <!--                <icon name="menu" fill size="4" class="cursor-move text-gray-300 hover:text-gray-700"></icon>-->
 <!--            </div>-->
@@ -33,13 +35,19 @@
 <!--                <div class="flex-none text-right">{{ transaction.paymentChannel }}</div>-->
 <!--            </div>-->
 <!--        </div>-->
-    </div>
+    </drag-element>
+<!--    </div>-->
 </template>
 
 <script>
+    import DragElement from '@/components/ui/dragdrop/DragElement';
     import moment from "moment"
 
     export default {
+
+        components: {
+            DragElement
+        },
 
         props: {
             account: {
@@ -47,6 +55,10 @@
             },
             transaction: {
                 type: Object
+            },
+            draggable: {
+                type: Boolean,
+                default: true
             }
         },
 
@@ -69,6 +81,10 @@
                     classes.push('border-gray-200 bg-gray-50 hover:bg-gray-100')
                 }
 
+                if (this.draggable) {
+                    classes.push('cursor-pointer')
+                }
+
                 return classes
             },
 
@@ -84,6 +100,14 @@
         },
 
         methods: {
+
+            startDrag: (evt, transaction) => {
+                console.log('startDrag', evt, transaction)
+                evt.dataTransfer.dropEffect = 'copy'
+                evt.dataTransfer.effectAllowed = 'copy'
+                evt.dataTransfer.setData('action', 'assign-transaction')
+                evt.dataTransfer.setData('data', JSON.stringify(transaction))
+            },
 
             amount (value) {
                 let number = value

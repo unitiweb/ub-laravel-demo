@@ -2,7 +2,6 @@
 
 namespace App\Services;
 
-use App\Facades\Services\AuthService;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Str;
 
@@ -13,6 +12,36 @@ use Illuminate\Support\Str;
  */
 class StringService
 {
+    /**
+     * Strip out all characters except numbers
+     *
+     * @param string $string The string to process
+     *
+     * @return string
+     */
+    public function digitsOnly(string $string): string
+    {
+        return preg_replace('/[^a-zA-Z]/','', $string);
+    }
+
+    /**
+     * Create a match slug used for things like matching transactions with entries
+     *
+     * @param mixed ...$args An array of arguments
+     *
+     * @return string
+     */
+    public function makeSlug(...$args): string
+    {
+        $parts = [];
+
+        foreach ($args as $arg) {
+            $parts[] = Str::slug($this->digitsOnly($arg));
+    }
+
+        return implode('->', $parts);
+    }
+
     /**
      * Take in a base 64 encoded image and parse out the various parts
      *
