@@ -13,6 +13,19 @@
 
             <div class="bg-gray-100 border border-gray-300 rounded-md shadow-md p-4 grid grid-cols-2 gap-6">
                 <div class="col-span-2 text-lg text-center font-bold">Budget Details</div>
+
+                <div v-if="entry && entry.transactions && entry.transactions.length >= 1" class="col-span-2 border border-green-400 bg-green-100 rounded-md shadow-sm p-1 text-sm align-middle">
+                    <div class="font-bold border mb-1 pl-2 border-green-300 border-b border-t-0 border-l-0 border-r-0">Linked Transactions</div>
+                    <div v-for="transaction in entry.transactions" class="flex">
+                        <div class="flex-none">
+                            <icon @click="openDeleteTransactionDialog(transaction)" name="xCircle" variant="danger" class="cursor-pointer text-red-500"></icon>
+<!--                            <ub-button @click="openDeleteTransactionDialog(transaction)" variant="danger" outline size="xs" icon="x"/>-->
+                        </div>
+                        <div class="flex-1 pl-1">{{ transaction.name }}</div>
+                        <div class="flex-none text-right pr-1">{{ transaction.amount | transactionAmount }}</div>
+                    </div>
+                </div>
+
                 <div v-if="errors.length >= 1" class="col-span-2">
                     {{ errors[0] }}
                 </div>
@@ -65,6 +78,10 @@
         <modal v-if="showDelete" variant="danger" title="Are you sure?" confirm-label="Yes, Delete!" cancel-label="Oops! No" @confirm="deleteEntryConfirmed" @cancel="deleteEntryCanceled">
             Do you really want to delete this entry? It can't be undone.
         </modal>
+
+        <modal v-if="showDeleteTransaction" variant="danger" title="Are you sure?" confirm-label="Yes, Un-Link!" cancel-label="Oops! No" @confirm="deleteTransactionConfirmed" @cancel="deleteTransactionCanceled">
+            Do you really want un-link this transaction from this budget entry?
+        </modal>
     </div>
 </template>
 
@@ -74,7 +91,8 @@
     import DueDayPicker from '@/views/dashboard/budget/DueDayPicker'
     import BudgetRightHeader from '@/views/dashboard/budget/BudgetRightHeader'
     import Budget from "@/views/dashboard/budget/Budget";
-    import { budgetRemoveEntry } from '@/scripts/helpers/budgetTasks'
+    import Transaction from '@/views/dashboard/banks/Transaction'
+    import { mapActions } from 'vuex'
 
     export default {
 
@@ -82,7 +100,8 @@
             Budget,
             Modal,
             DueDayPicker,
-            BudgetRightHeader
+            BudgetRightHeader,
+            Transaction
         },
 
         props: {
@@ -106,6 +125,8 @@
         data () {
             return {
                 showDelete: false,
+                showDeleteTransaction: false,
+                deleteTransactionId: null,
                 noIncomeLabel: 'select income',
                 noGroupLabel: 'select group',
                 errors: [],
@@ -135,6 +156,7 @@
         },
 
         methods: {
+            ...mapActions(['updateBudgetEntry', 'addBudgetEntry', 'removeBudgetEntry']),
 
             currencyFilter (value) {
                 return this.$options.filters.currency(value, false)
@@ -207,14 +229,17 @@
 
                     if (this.entry.id) {
                         // Update the entry
-                        await this.$http.updateEntry(this.budgetMonth, this.entry.id, saveEntry)
+                        const { data } = await this.$http.updateEntry(this.budgetMonth, this.entry.id, saveEntry, 'income,group,transactions')
+                        console.log('EntryForm', data)
+                        await this.updateBudgetEntry(data)
                         this.$emit('done', false)
                     } else {
                         // Create a new entry
-                        await this.$http.addEntry(this.budgetMonth, saveEntry)
-                        this.$emit('done', true)
+                        const { data } = await this.$http.addEntry(this.budgetMonth, saveEntry, 'income,group,transactions')
+                        await this.addBudgetEntry(data)
+                        this.$emit('done', false)
                     }
-                } catch ({ error }) {
+                } catch (error) {
                     if (error.code === 422) {
                         console.log('error', error)
                     }
@@ -226,7 +251,7 @@
              */
             async deleteEntryConfirmed () {
                 await this.$http.deleteEntry(this.budgetMonth, this.entry.id)
-                await budgetRemoveEntry(this.entry)
+                await this.removeBudgetEntry(this.entry)
                 this.group = null
                 this.$emit('done', false)
                 this.showDelete = false
@@ -237,6 +262,40 @@
              */
             deleteEntryCanceled () {
                 this.showDelete = false
+            },
+
+            /**
+             * Since delete transaction was confirmed then actually delete the transaction
+             */
+            async deleteTransactionConfirmed () {
+                try {
+                    const { data } = await this.$http.updateEntry(this.budgetMonth, this.entry.id, {
+                        bankTransactionId: null
+                    }, 'income,group,transactions')
+                    // Update the budget entry
+                    await this.updateBudgetEntry(data)
+                } catch ({ error }) {
+                    console.log('error', error)
+                }
+
+                this.showDeleteTransaction = false
+            },
+
+            /**
+             * Cancel the delete transaction of this entry
+             */
+            deleteTransactionCanceled () {
+                this.showDeleteTransaction = false
+            },
+
+            /**
+             * Open the delete transaction dialog
+             *
+             * @param transaction
+             */
+            openDeleteTransactionDialog (transaction) {
+                this.deleteTransactionId = transaction.id
+                this.showDeleteTransaction = true;
             }
         },
 

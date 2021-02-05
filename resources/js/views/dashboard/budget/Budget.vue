@@ -18,8 +18,20 @@
                                     <ub-button @click="viewTransactions" size="sm" icon="creditCard" :variant="currentState.left === 'transactions' ? 'primary' : 'secondary'" outline></ub-button>
                                 </template>
                             </budget-right-header>
-                            <incomes v-if="currentState.left === 'incomes'" :active-income="activeIncome" :active-row="activeRow" :budget="budget" @modify-income="modifyIncome" @modify-entry="modifyEntry"/>
-                            <groups v-if="currentState.left === 'groups'" :active-group="activeGroup" :active-row="activeRow" :budget="budget" @modify-group="modifyGroup" @modify-entry="modifyEntry"/>
+                            <div>
+                                <incomes v-if="currentState.left === 'incomes'"
+                                         :active-income="activeIncome"
+                                         :active-row="activeRow"
+                                         @modify-income="modifyIncome"
+                                         @modify-entry="modifyEntry">
+                                </incomes>
+                            </div>
+                            <groups v-if="currentState.left === 'groups'"
+                                    :active-group="activeGroup"
+                                    :active-row="activeRow"
+                                    @modify-group="modifyGroup"
+                                    @modify-entry="modifyEntry">
+                            </groups>
                         </div>
                     </div>
                 </template>
@@ -164,17 +176,24 @@
             },
 
             async viewIncomes () {
+                this.activeRow = null
                 await this.$http.updateSettings({ view: 'incomes' })
                 await this.loadBudget()
             },
 
             async viewGroups () {
+                this.activeRow = null
                 await this.$http.updateSettings({ view: 'groups' })
                 await this.loadBudget()
             },
 
             async viewTransactions () {
-                this.setState('budget', 'transactions', {})
+                this.activeRow = null
+                if (this.state.right === 'transactions') {
+                    this.setState('budget')
+                } else {
+                    this.setState('budget', 'transactions')
+                }
             },
 
             async redirectIfNoDate () {
@@ -209,7 +228,7 @@
                     this.groups = budget.groups
                     // Set the last existing month in settings
                     await this.$http.updateSettings({ month: this.budget.month })
-                    this.setState('budget')
+                    this.setState('budget', 'transactions')
                     this.budgetLoaded = true
                 } catch (error) {
                     if (error.code === 404) {
@@ -270,6 +289,7 @@
             },
 
             async done (refresh) {
+                console.log('done', refresh)
                 this.setState('budget', null);
                 if (refresh) {
                     await this.loadBudget()

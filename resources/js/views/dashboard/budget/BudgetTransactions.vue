@@ -44,13 +44,11 @@
             </div>
             <div class="col-span-2">
                 <div v-if="bankAccount" class="overscroll-y-auto">
-                    <draggable handle=".transaction-handle" :list="transactions" v-bind="dragOptions" @change="dragChanged">
-                        <transaction v-for="transaction in transactions"
-                                     :key="`trans-${transaction.id}`"
-                                     :account="bankAccount"
-                                     :transaction="transaction">
-                        </transaction>
-                    </draggable>
+                    <transaction v-for="transaction in bankTransactions"
+                                 :key="`trans-${transaction.id}`"
+                                 :account="bankAccount"
+                                 :transaction="transaction">
+                    </transaction>
                 </div>
             </div>
         </div>
@@ -63,6 +61,7 @@
     import Draggable from 'vuedraggable'
     import TransitionFade from '@/components/transitions/TransitionFade'
     import Transaction from '@/views/dashboard/banks/Transaction'
+    import DropZone from '@/components/ui/dragdrop/DropZone'
     import { mapActions, mapGetters } from 'vuex'
 
     export default {
@@ -72,18 +71,18 @@
             BudgetRightHeader,
             Draggable,
             TransitionFade,
-            Transaction
+            Transaction,
+            DropZone
         },
 
         data () {
             return {
-                showBankMenu: false,
-                transactions: null
+                showBankMenu: false
             }
         },
 
         computed: {
-            ...mapGetters(['settings', 'bankInstitutions', 'bankInstitution', 'bankAccount']),
+            ...mapGetters(['settings', 'bankInstitutions', 'bankInstitution', 'bankAccount', 'bankTransactions']),
 
             dragOptions() {
                 return {
@@ -101,19 +100,7 @@
         },
 
         methods: {
-            ...mapActions(['setBankInstitutions', 'setBankInstitution', 'setBankAccount']),
-
-            /**
-             * Triggered when an entry row drag is dropped
-             */
-            dragChanged (evt) {
-                console.log('evt: transaction', evt)
-                // if (evt.added) {
-                //     this.addedTo(evt.added.newIndex, evt.added.element)
-                // } else if (evt.moved) {
-                //     this.moveTo(evt.moved.oldIndex, evt.moved.newIndex, evt.moved.element)
-                // }
-            },
+            ...mapActions(['setBankInstitutions', 'setBankInstitution', 'setBankAccount', 'setBankTransactions']),
 
             toggleBankMenu () {
                 this.showBankMenu = !this.showBankMenu
@@ -128,6 +115,7 @@
             async loadBankAccounts () {
                 try {
                     const { data } = await this.$http.financialInstitutions('accounts')
+                    console.log('loadBankAccounts', data)
                     await this.setBankInstitutions(data)
                 } catch ({ error }) {
                     console.log('error', error)
@@ -142,11 +130,8 @@
                     account: account.id
                 })
                 try {
-                    const { data } = await this.$http.financialTransactions(
-                        institution.id,
-                        account.id
-                    )
-                    this.transactions = data
+                    const { data } = await this.$http.financialTransactions(institution.id, account.id, 'entries,entries.budget')
+                    await this.setBankTransactions(data)
                 } catch ({ error }) {
                     console.log('error', error)
                 }
@@ -183,9 +168,3 @@
         }
     }
 </script>
-
-<style lang="scss" scope>
-    //.drop-on-top {
-    //    border: 3px black solid;
-    //}
-</style>

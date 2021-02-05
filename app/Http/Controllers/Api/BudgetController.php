@@ -122,6 +122,7 @@ class BudgetController extends ApiController
                 'incomes.entries',
                 'incomes.entries.income',
                 'incomes.entries.group',
+                'incomes.entries.transactions',
                 'unassignedIncomeEntries',
             ]);
         }
@@ -132,6 +133,7 @@ class BudgetController extends ApiController
                 'groups.entries',
                 'groups.entries.income',
                 'groups.entries.group',
+                'groups.entries.transactions',
                 'unassignedGroupEntries',
             ]);
         }

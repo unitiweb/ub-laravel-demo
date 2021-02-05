@@ -7,11 +7,11 @@ use App\Facades\Services\BudgetEntryService;
 use App\Facades\Services\BudgetGroupService;
 use App\Http\Requests\Api\BudgetEntryUpdateRequest;
 use App\Http\Resources\BudgetEntryResource;
+use App\Models\BankTransaction;
 use App\Models\Budget;
 use App\Models\BudgetEntry;
 use App\Models\BudgetGroup;
 use App\Models\BudgetIncome;
-use App\Models\Group;
 use Exception;
 use Illuminate\Auth\Access\AuthorizationException;
 use Illuminate\Http\Resources\Json\AnonymousResourceCollection;
@@ -37,7 +37,7 @@ class BudgetEntryController extends ApiController
     {
         $this->authorize('view', $budget);
 
-        $entries = BudgetEntry::with('group', 'income')
+        $entries = BudgetEntry::with('group', 'income', 'matches')
             ->where('budgetId', $budget->id)
             ->orderBy('dueDay', 'asc')
             ->get();
@@ -100,6 +100,9 @@ class BudgetEntryController extends ApiController
             $entry->save();
         }
 
+        // Load any relations that are include in the with parameter
+        $entry->load($this->getWith(['income', 'group', 'transactions'])->toArray());
+
         return new BudgetEntryResource($entry);
     }
 
@@ -149,12 +152,35 @@ class BudgetEntryController extends ApiController
             // Update the entry
             $entry->update($data);
 
+            // After all is save and if a bank transaction id exists
+            // Try to create or update the entry transaction link
+            if (array_key_exists('bankTransactionId', $data)) {
+                if ($data['bankTransactionId'] === null) {
+                    BudgetEntryService::unlinkEntryTransaction($budget, $entry);
+                } else {
+                    // Since a bank transaction id is given we need to create a match
+                    // Get the bank transaction
+                    $bankTransaction = BankTransaction::where('siteId', AuthService::getSite()->id)
+                        ->where('id', $data['bankTransactionId'])
+                        ->first();
+
+                    BudgetEntryService::linkEntryTransaction($budget, $entry, $bankTransaction);
+                }
+            }
+
             // Clean up budget groups by removed any budget groups
             // that don't have a corresponding entry linked to it
             BudgetGroupService::cleanBudgetGroups($budget);
         });
 
-        $entry->load('income', 'group');
+        // Load any relations that are include in the with parameter
+        $entry->load($this->getWith([
+            'income',
+            'group',
+            'transactions',
+            'transactions.entries',
+            'transactions.entries.budget'
+        ])->toArray());
 
         return new BudgetEntryResource($entry);
     }

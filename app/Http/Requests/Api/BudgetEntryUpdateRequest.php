@@ -29,6 +29,7 @@ class BudgetEntryUpdateRequest extends ApiFormRequest
             'paid' => 'boolean',
             'cleared' => 'boolean',
             'order' => 'integer',
+            'bankTransactionId' => 'sometimes|nullable|integer|exists:bankTransactions,id',
         ];
     }
 }

@@ -10,108 +10,110 @@
 </template>
 
 <script>
+    import { mapActions } from 'vuex'
 
-export default {
+    export default {
 
-    props: {
-        value: {
-            type: Object
-        },
-        month: {
-            type: String
-        }
-    },
-
-    computed: {
-        defaultStatusClasses () {
-            return 'bg-gray-300 border-gray-300'
-        },
-        icon () {
-            if (this.value.cleared) {
-                return 'check'
-            } else if (this.value.paid) {
-                return 'dotsHorizontal'
-            } else if (this.value.goal) {
-                return 'dotsHorizontal'
-            } else {
-                return 'dotsHorizontal'
+        props: {
+            value: {
+                type: Object
+            },
+            month: {
+                type: String
             }
         },
-        label () {
-            if (this.value.cleared) {
-                return 'cleared'
-            } else if (this.value.paid) {
-                return 'paid'
-            } else if (this.value.goal) {
-                return 'saved'
-            } else {
-                return 'none'
-            }
-        },
-        variant () {
-            if (this.value.cleared) {
-                return 'success'
-            } else if (this.value.paid) {
-                return 'warning'
-            } else if (this.value.goal) {
-                return 'danger'
-            } else {
-                return 'secondary'
-            }
-        },
-        // classes () {
-        //     if (this.value.cleared) {
-        //         return 'bg-green-300 border-green-300'
-        //     } else if (this.value.paid) {
-        //         return 'bg-yellow-300 border-yellow-300'
-        //     } else if (this.value.goal) {
-        //         return 'bg-red-300 border-red-300'
-        //     } else {
-        //         return this.defaultStatusClasses
-        //     }
-        // }
-    },
 
-    methods: {
-        update () {
-            const entry = this.value
-
-            if (entry.cleared) {
-                // Advance to none
-                entry.goal = false
-                entry.paid = false
-                entry.cleared = false
-                this.updateState({ goal: false })
-            } else if (entry.paid) {
-                // Advance to cleared
-                entry.goal = true
-                entry.paid = true
-                entry.cleared = true
-                this.updateState({ cleared: true })
-            } else if (entry.goal) {
-                // Advance to paid
-                entry.goal = true
-                entry.paid = true
-                entry.cleared = false
-                this.updateState({ paid: true })
-            } else {
-                // Advance to goal
-                entry.goal = true
-                entry.paid = false
-                entry.cleared = false
-                this.updateState({ goal: true })
+        computed: {
+            defaultStatusClasses () {
+                return 'bg-gray-300 border-gray-300'
+            },
+            icon () {
+                if (this.value.cleared) {
+                    return 'check'
+                } else if (this.value.paid) {
+                    return 'dotsHorizontal'
+                } else if (this.value.goal) {
+                    return 'dotsHorizontal'
+                } else {
+                    return 'dotsHorizontal'
+                }
+            },
+            label () {
+                if (this.value.cleared) {
+                    return 'cleared'
+                } else if (this.value.paid) {
+                    return 'paid'
+                } else if (this.value.goal) {
+                    return 'saved'
+                } else {
+                    return 'none'
+                }
+            },
+            variant () {
+                if (this.value.cleared) {
+                    return 'success'
+                } else if (this.value.paid) {
+                    return 'warning'
+                } else if (this.value.goal) {
+                    return 'danger'
+                } else {
+                    return 'secondary'
+                }
             }
         },
-        updateState (data) {
-            this.$http.updateEntry(this.month, this.value.id, data)
-                .then(({ data }) => {
-                    this.$emit('updated', data)
-                }).catch(({ error }) => {
+
+        methods: {
+            ...mapActions(['updateBudgetEntry', 'removeEntryFromTransaction']),
+
+            update () {
+                const entry = this.value
+
+                if (entry.cleared) {
+                    // Advance to none
+                    entry.goal = false
+                    entry.paid = false
+                    entry.cleared = false
+                    this.updateState({ goal: false })
+                } else if (entry.paid) {
+                    // Advance to cleared
+                    entry.goal = true
+                    entry.paid = true
+                    entry.cleared = true
+                    this.updateState({ cleared: true })
+                } else if (entry.goal) {
+                    // Advance to paid
+                    entry.goal = true
+                    entry.paid = true
+                    entry.cleared = false
+                    this.updateState({ paid: true })
+                } else {
+                    // Advance to goal
+                    entry.goal = true
+                    entry.paid = false
+                    entry.cleared = false
+                    this.updateState({ goal: true })
+                }
+            },
+            async updateState (status) {
+                try {
+                    if (!status.cleared) {
+                        // Since the status is not cleared we need to remove the transaction
+                        // since an entry cannot be cleared and be linked to a transaction
+                        //ToDo: We need to have a modal confirming that the transaction will be un-linked
+                        status.bankTransactionId = null
+                    }
+                    const { data: entry } = await this.$http.updateEntry(this.month, this.value.id, status, 'income,group,transactions')
+                    if (entry.cleared !== true) {
+                        entry.bankTransactionId = null
+                    }
+                    await this.updateBudgetEntry(entry)
+                    await this.removeEntryFromTransaction(entry)
+                    this.$emit('updated', entry)
+                } catch ({ error }) {
                     console.log('error', error)
-                })
+                }
+            }
         }
     }
-
-}
 
 </script>

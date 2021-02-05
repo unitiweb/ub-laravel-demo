@@ -62,6 +62,14 @@ export const currency = (value, includeSymbol = true) => {
     return formatter.format(value)
 }
 
+/**
+ * Calculate balances
+ *
+ * @param entries
+ * @param amount
+ *
+ * @returns {balances}
+ */
 export const calculateBalances = (entries, amount) => {
     const balances = {
         expenses: 0,
@@ -78,4 +86,10 @@ export const calculateBalances = (entries, amount) => {
     balances.leftOver = amount - balances.expenses
 
     return balances
+}
+
+export const updateObject = (obj1, obj2) => {
+    for (const [key, value] of Object.entries(obj2)) {
+        obj1[key] = value
+    }
 }

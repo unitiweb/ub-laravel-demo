@@ -2,6 +2,9 @@ import Vuex from 'vuex'
 import Vue from 'vue'
 import config from '@/config'
 import moment from 'moment'
+import { updateObject} from '@/scripts/helpers/utils'
+import budgetTasks from '@/scripts/budgetTasks'
+import sortEntries from "@/scripts/budgetTasks/tasks/sortEntries";
 
 // Add Vuex to the Vue instance
 Vue.use(Vuex)
@@ -40,6 +43,7 @@ export default new Vuex.Store({
         bankInstitutions: [],
         bankInstitution: null,
         bankAccount: null,
+        bankTransactions: null,
         user: {},
         settings: {}
     },
@@ -117,6 +121,9 @@ export default new Vuex.Store({
         },
         bankAccount: state => {
             return state.bankAccount
+        },
+        bankTransactions: state => {
+            return state.bankTransactions
         }
     },
     mutations: {
@@ -175,6 +182,9 @@ export default new Vuex.Store({
         },
         bankAccount (state, account) {
             state.bankAccount = account
+        },
+        bankTransactions (state, transactions) {
+            state.bankTransactions = transactions
         }
     },
     actions: {
@@ -213,26 +223,73 @@ export default new Vuex.Store({
         user ({ commit, getters }, payload) {
             const user = getters.user
             // Update only the given values
-            for (const [key, value] of Object.entries(payload)) {
-                user[key] = value
-            }
+            updateObject(user, payload)
             commit('user', user)
         },
         site ({ commit, getters }, payload) {
             const site = getters.site
             // Update only the given values
-            for (const [key, value] of Object.entries(payload)) {
-                site[key] = value
-            }
+            updateObject(site, payload)
             commit('site', site)
         },
         async updateSettings ({ commit, getters }, payload) {
             const settings = getters.settings
             // Update only the given values
-            for (const [key, value] of Object.entries(payload)) {
-                settings[key] = value
-            }
+            updateObject(settings, payload)
             await commit('settings', settings)
+        },
+        /**
+         * Update the budget entry with the given entry
+         * Check both the incomes and groups arrays
+         */
+        async updateBudgetEntry ({ commit, getters }, entry) {
+            let budget = getters.budget
+            budget = await budgetTasks.updateEntry(budget, entry)
+            budget = await budgetTasks.moveEntry(budget)
+            budget = await budgetTasks.sortEntries(budget)
+            commit('budget', budget)
+        },
+        async addBudgetEntry ({ commit, getters }, entry) {
+            const budget = getters.budget
+            // Create sort function
+            const sortEntries = (data) => {
+                data.sort(function(a, b) {
+                    if (a.dueDay === b.dueDay) {
+                        return a.name.localeCompare(b.name)
+                    }
+                    return a.dueDay - b.dueDay;
+                });
+            }
+            // Handle the entry incomes
+            if (entry.income) {
+                for (let i = 0; budget.incomes.length; i++) {
+                    if (budget.incomes[i].id === entry.income.id) {
+                        budget.incomes[i].entries.push(entry)
+                        sortEntries(budget.incomes[i].entries)
+                        break;
+                    }
+                }
+            } else if (budget.unassignedIncomeEntries) {
+                budget.unassignedIncomeEntries.push(entry)
+                sortEntries(budget.unassignedIncomeEntries)
+            }
+            if (entry.group) {
+                for (let i = 0; budget.groups.length; i++) {
+                    if (budget.groups[i].id === entry.group.id) {
+                        budget.groups[i].entries.push(entry)
+                        sortEntries(budget.groups[i].entries)
+                        break;
+                    }
+                }
+            } else if (budget.unassignedGroupEntries) {
+                budget.unassignedGroupEntries.push(entry)
+                sortEntries(budget.unassignedGroupEntries)
+            }
+            commit('budget', budget)
+        },
+        async removeBudgetEntry ({ commit, getters }, entry) {
+            const budget = await budgetTasks.deleteEntry(getters.budget, entry)
+            commit('budget', budget)
         },
         setBudget ({ commit }, payload) {
             commit('budget', payload)
@@ -251,6 +308,34 @@ export default new Vuex.Store({
         },
         setBankAccount ({ commit }, payload) {
             commit('bankAccount', payload)
+        },
+        setBankTransactions ({ commit }, payload) {
+            commit('bankTransactions', payload)
+        },
+        updateBankTransaction ({ commit, getters }, transaction) {
+            const transactions = getters.bankTransactions
+            for (let i = 0; i < transactions.length; i++) {
+                if (transactions[i].id === transaction.id) {
+                    for (const [key, value] of Object.entries(transaction)) {
+                        transactions[i][key] = value
+                    }
+                    break;
+                }
+            }
+            commit('bankTransactions', transactions)
+        },
+        removeEntryFromTransaction({ commit, getters }, entry) {
+            const transactions = getters.bankTransactions
+            for (let i = 0; i < transactions.length; i++) {
+                console.log('transactions.entries', transactions.entries)
+                for (let ii = 0; ii < transactions[i].entries.length; ii++) {
+                    if (transactions[i].entries[ii].id === entry.id) {
+                        transactions[i].entries = []
+                        break
+                    }
+                }
+            }
+            commit('bankTransactions', transactions)
         }
     }
 })

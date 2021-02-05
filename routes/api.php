@@ -57,30 +57,17 @@ Route::prefix('profile')->name('profile.')->group(function () {
     Route::patch('/settings', [SettingsController::class, 'update'])->name('settings');
 });
 
-/**
- * Financial routes
- */
 Route::prefix('financial')->name('financial.')->group(function () {
-    /**
-     * Financial token routes
-     */
     Route::prefix('token')->name('token.')->group(function () {
         Route::post('/link',  [FinancialController::class, 'linkToken'])->name('link');
         Route::post('/public', [FinancialController::class, 'exchangePublicToken'])->name('public');
     });
-    /**
-     * Financial institution routes
-     */
     Route::apiResource('institutions', InstitutionController::class)->only('index', 'show');
-    /**
-     * Financial institution account routes
-     */
     Route::apiResource('institutions/{bankInstitution}/accounts', AccountController::class)->only('index', 'show', 'update');
-    /**
-     * Financial institution account transaction routes
-     */
-    Route::apiResource('institutions/{bankInstitution}/accounts/{bankAccount}/transactions', TransactionController::class)->only('index', 'store');
+    Route::apiResource('institutions/{bankInstitution}/accounts/{bankAccount}/transactions', TransactionController::class)->only('index', 'show');
 });
+
+
 
 Route::get('/mailable', function () {
     $user = \App\Facades\Services\AuthService::getUser();

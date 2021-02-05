@@ -1,5 +1,5 @@
 <template>
-    <div class="border border-gray-300 rounded-md shadow-md m-1">
+    <div class="border border-gray-300 rounded-md shadow-md mx-1 mb-6">
         <div>
             <income-header class="sticky top-0" :income="income" :collapsed="collapsed" @collapsed="toggleCollapsed" @modify-income="modifyIncome" @create-entry="createEntry"></income-header>
             <div v-if="this.income.entries.length === 0" class="text-gray-400 text-gray-50 text-sm px-4 py-1">

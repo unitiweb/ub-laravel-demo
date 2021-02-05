@@ -1,5 +1,5 @@
 <template>
-    <div class="border border-gray-300 rounded-md shadow-md m-1">
+    <div class="border border-gray-300 rounded-md shadow-md m-1 mb-6">
         <div>
             <div :class="groupClasses" class="sticky top-0 flex border border-t-0 border-l-0 border-r-0 border-b border-gray-300 rounded-md rounded-b-none">
                 <div class="flex-none text-lg text-right px-3 py-2">

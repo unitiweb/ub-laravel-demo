@@ -2,6 +2,7 @@
 
 namespace App\Http\Resources\Financial;
 
+use App\Http\Resources\BudgetEntryResource;
 use App\Http\Resources\CategoryResource;
 use App\Services\TokenService;
 use Exception;
@@ -39,19 +40,15 @@ class BankTransactionResource extends JsonResource
     {
         return [
             'id' => $this->id,
-            'siteId' => $this->siteId,
-            'bankAccessTokenId' => $this->bankAccessTokenId,
-            'bankAccountId' => $this->bankAccountId,
-            'transactionId' => $this->transactionId,
+            'name' => $this->name,
             'amount' => $this->amount,
+            'pending' => $this->pending,
+            'category' => $this->category,
             'transactionDate' => $this->transactionDate,
             'paymentChannel' => $this->paymentChannel,
             'isoCurrencyCode' => $this->isoCurrencyCode,
-            'name' => $this->name,
-            'pending' => $this->pending,
-            'category' => $this->category,
             'account' => new BankAccountResource($this->whenLoaded('account')),
-//            'category' => new CategoryResource($this->whenLoaded('category')),
+            'entries' => BudgetEntryResource::collection($this->whenLoaded('entries')),
         ];
     }
 }

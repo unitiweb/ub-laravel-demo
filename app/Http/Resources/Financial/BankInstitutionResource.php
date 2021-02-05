@@ -30,6 +30,7 @@ class BankInstitutionResource extends JsonResource
     public function toArray($request)
     {
         $institution = $this->resource->institution;
+
         return [
             'id' => $institution->id,
             'institutionId' => $institution->institutionId,
