@@ -228,7 +228,7 @@
                     this.groups = budget.groups
                     // Set the last existing month in settings
                     await this.$http.updateSettings({ month: this.budget.month })
-                    this.setState('budget', 'transactions')
+                    this.setState('budget')
                     this.budgetLoaded = true
                 } catch (error) {
                     if (error.code === 404) {
