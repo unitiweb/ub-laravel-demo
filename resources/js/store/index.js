@@ -43,6 +43,7 @@ export default new Vuex.Store({
         bankInstitutions: [],
         bankInstitution: null,
         bankAccount: null,
+        bankTransactions: null,
         user: {},
         settings: {}
     },
@@ -120,6 +121,9 @@ export default new Vuex.Store({
         },
         bankAccount: state => {
             return state.bankAccount
+        },
+        bankTransactions: state => {
+            return state.bankTransactions
         }
     },
     mutations: {
@@ -178,6 +182,9 @@ export default new Vuex.Store({
         },
         bankAccount (state, account) {
             state.bankAccount = account
+        },
+        bankTransactions (state, transactions) {
+            state.bankTransactions = transactions
         }
     },
     actions: {
@@ -301,6 +308,34 @@ export default new Vuex.Store({
         },
         setBankAccount ({ commit }, payload) {
             commit('bankAccount', payload)
+        },
+        setBankTransactions ({ commit }, payload) {
+            commit('bankTransactions', payload)
+        },
+        updateBankTransaction ({ commit, getters }, transaction) {
+            const transactions = getters.bankTransactions
+            for (let i = 0; i < transactions.length; i++) {
+                if (transactions[i].id === transaction.id) {
+                    for (const [key, value] of Object.entries(transaction)) {
+                        transactions[i][key] = value
+                    }
+                    break;
+                }
+            }
+            commit('bankTransactions', transactions)
+        },
+        removeEntryFromTransaction({ commit, getters }, entry) {
+            const transactions = getters.bankTransactions
+            for (let i = 0; i < transactions.length; i++) {
+                console.log('transactions.entries', transactions.entries)
+                for (let ii = 0; ii < transactions[i].entries.length; ii++) {
+                    if (transactions[i].entries[ii].id === entry.id) {
+                        transactions[i].entries = []
+                        break
+                    }
+                }
+            }
+            commit('bankTransactions', transactions)
         }
     }
 })

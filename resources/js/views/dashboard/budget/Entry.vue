@@ -132,7 +132,7 @@
         },
 
         methods: {
-            ...mapActions(['updateBudgetEntry']),
+            ...mapActions(['updateBudgetEntry', 'updateBankTransaction']),
 
             async dropped (data) {
                 if (data.action === 'assign-transaction') {
@@ -140,30 +140,38 @@
                 }
             },
 
-            async assignTransaction (transaction) {
-                const amount = transaction.data.amount
+            async assignTransaction ({ action, data: { account, transaction }}) {
+                const amount = transaction.amount
 
-                if (amount < 0) {
+                if (transaction.amount < 0) {
                     // This is a deposit and can't be used
-                    console.log('this is a deposit and cannot be used')
                     this.dialog = 'is-deposit'
                     return;
                 }
 
-                if (this.entry.amount !== amount) {
+                if (this.entry.amount !== transaction.amount) {
                     // the transaction amount does not equal the entry amount
                     this.dialog = 'not-equal'
                     return;
                 }
 
                 // Update the entry to use this transaction
-                const { data } = await this.$http.updateEntry(this.budgetMonth, this.entry.id, {
-                    bankTransactionId: transaction.data.id,
+                const { data: entryData } = await this.$http.updateEntry(this.budgetMonth, this.entry.id, {
+                    bankTransactionId: transaction.id,
                     goal: true,
                     paid: true,
                     cleared: true
                 }, 'income,group,transactions')
-                await this.updateBudgetEntry(data)
+                await this.updateBudgetEntry(entryData)
+
+                const { data: transactionData } = await this.$http.financialTransaction(
+                    account.bankInstitutionId,
+                    account.id,
+                    transaction.id,
+                    'entries,entries.budget'
+                )
+                //ToDo: Need to send
+                await this.updateBankTransaction(transactionData)
             },
 
             updateAmount () {
@@ -178,11 +186,6 @@
             },
 
             updateStatus (entry) {
-                if (entry.cleared !== true) {
-                    entry.bankTransactionId = null
-                }
-                console.log('updateStatus', entry);
-                this.updateBudgetEntry(entry)
                 this.$emit('calculate', entry)
             },
 

@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\HasOne;
 
 /**
@@ -91,5 +92,11 @@ class BankTransaction extends BaseModel
     public function category(): HasOne
     {
         return $this->hasOne(Category::class, 'categoryId');
+    }
+
+    public function entries(): HasMany
+    {
+        return $this->hasMany(BankTransactionLink::class, 'bankTransactionId')
+            ->join('budgetEntries', 'bankTransactionLink.budgetEntryId', '=', 'budgetEntries.id');
     }
 }

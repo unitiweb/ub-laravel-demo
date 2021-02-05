@@ -85,6 +85,7 @@
                         this.account.id
                     )
                     this.transactions = data
+                    console.log('this.transactions', this.transactions)
                 } catch ({ error }) {
                     console.log('error', error)
                 }

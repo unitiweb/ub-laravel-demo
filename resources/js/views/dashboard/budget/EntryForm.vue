@@ -14,8 +14,8 @@
             <div class="bg-gray-100 border border-gray-300 rounded-md shadow-md p-4 grid grid-cols-2 gap-6">
                 <div class="col-span-2 text-lg text-center font-bold">Budget Details</div>
 
-                <div v-if="entry && entry.transactions && entry.transactions.length >= 1" class="col-span-2 border border-gray-300 bg-white rounded-md shadow-sm p-1 text-sm align-middle">
-                    <div class="font-bold border mb-1 pl-2 border-gray-200 border-b border-t-0 border-l-0 border-r-0">Linked Transactions</div>
+                <div v-if="entry && entry.transactions && entry.transactions.length >= 1" class="col-span-2 border border-green-400 bg-green-100 rounded-md shadow-sm p-1 text-sm align-middle">
+                    <div class="font-bold border mb-1 pl-2 border-green-300 border-b border-t-0 border-l-0 border-r-0">Linked Transactions</div>
                     <div v-for="transaction in entry.transactions" class="flex">
                         <div class="flex-none">
                             <icon @click="openDeleteTransactionDialog(transaction)" name="xCircle" variant="danger" class="cursor-pointer text-red-500"></icon>

@@ -189,7 +189,11 @@
 
             async viewTransactions () {
                 this.activeRow = null
-                this.setState('budget', 'transactions', {})
+                if (this.state.right === 'transactions') {
+                    this.setState('budget')
+                } else {
+                    this.setState('budget', 'transactions')
+                }
             },
 
             async redirectIfNoDate () {

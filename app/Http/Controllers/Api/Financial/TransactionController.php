@@ -41,7 +41,9 @@ class TransactionController extends ApiController
         $startDate = isset($data['startDate']) ? new Carbon($data['startDate']) : new Carbon;
         $endDate = isset($data['endDate']) ? new Carbon($data['endDate']) : (new Carbon)->subDays(45);
 
-        $transactions = BankTransaction::where('bankAccountId', $bankAccount->id)
+        $with = $this->getWith(['account', 'entries', 'entries.budget']);
+        $transactions = BankTransaction::with($with->toArray())
+            ->where('bankAccountId', $bankAccount->id)
             ->whereBetween('transactionDate', [$endDate, $startDate])
             ->orderBy('transactionDate', 'desc')
             ->orderBy('id', 'desc')
@@ -51,16 +53,28 @@ class TransactionController extends ApiController
         return BankTransactionResource::collection($transactions);
     }
 
-    public function show()
+    /**
+     * Get a single bank transaction
+     *
+     * @param BankInstitution $bankInstitution
+     * @param BankAccount $bankAccount
+     * @param BankTransaction $bankTransaction
+     *
+     * @return BankTransactionResource
+     */
+    public function show(BankInstitution $bankInstitution, BankAccount $bankAccount, BankTransaction $bankTransaction)
     {
-//        return new BankTransactionResource($this->transaction);
+        $with = $this->getWith(['account', 'entries', 'entries.budget']);
+        $bankTransaction->load($with->toArray());
+
+        return new BankTransactionResource($bankTransaction);
     }
 
-    public function store(BankInstitution $bankInstitution, BankAccount $bankAccount)
-    {
-
-        FinancialSyncJob::dispatch($bankAccount->bankAccessToken);
-
-        return response()->noContent();
-    }
+//    public function store(BankInstitution $bankInstitution, BankAccount $bankAccount)
+//    {
+//
+//        FinancialSyncJob::dispatch($bankAccount->bankAccessToken);
+//
+//        return response()->noContent();
+//    }
 }

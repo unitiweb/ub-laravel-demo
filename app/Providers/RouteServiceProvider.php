@@ -2,6 +2,8 @@
 
 namespace App\Providers;
 
+use App\Models\BankInstitution;
+use App\Models\BankTransaction;
 use App\Models\Budget;
 use Carbon\Carbon;
 use Illuminate\Cache\RateLimiting\Limit;
@@ -38,6 +40,10 @@ class RouteServiceProvider extends ServiceProvider
     public function boot()
     {
         $this->configureRateLimiting();
+
+        // Map the system-recording api resource to the Recording model
+        Route::model('institution', BankInstitution::class);
+        Route::model('transaction', BankTransaction::class);
 
         $this->routes(function () {
             // The api routes

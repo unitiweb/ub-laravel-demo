@@ -174,7 +174,13 @@ class BudgetEntryController extends ApiController
         });
 
         // Load any relations that are include in the with parameter
-        $entry->load($this->getWith(['income', 'group', 'transactions'])->toArray());
+        $entry->load($this->getWith([
+            'income',
+            'group',
+            'transactions',
+            'transactions.entries',
+            'transactions.entries.budget'
+        ])->toArray());
 
         return new BudgetEntryResource($entry);
     }

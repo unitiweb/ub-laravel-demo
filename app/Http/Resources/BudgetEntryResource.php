@@ -50,11 +50,10 @@ class BudgetEntryResource extends JsonResource
             'paid' => (bool) $this->paid,
             'cleared' => (bool) $this->cleared,
             'order' => $this->order,
+            'budget' => new BudgetResource($this->whenLoaded('budget')),
             'income' => new BudgetIncomeResource($this->whenLoaded('income')),
             'group' => new BudgetGroupResource($this->whenLoaded('group')),
             'transactions' => BankTransactionResource::collection($this->whenLoaded('transactions'))
-
-//            'matches' => BankTransactionMatchResource::collection($this->whenLoaded('matches')),
         ];
     }
 }

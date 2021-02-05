@@ -44,7 +44,7 @@
             </div>
             <div class="col-span-2">
                 <div v-if="bankAccount" class="overscroll-y-auto">
-                    <transaction v-for="transaction in transactions"
+                    <transaction v-for="transaction in bankTransactions"
                                  :key="`trans-${transaction.id}`"
                                  :account="bankAccount"
                                  :transaction="transaction">
@@ -77,13 +77,12 @@
 
         data () {
             return {
-                showBankMenu: false,
-                transactions: null
+                showBankMenu: false
             }
         },
 
         computed: {
-            ...mapGetters(['settings', 'bankInstitutions', 'bankInstitution', 'bankAccount']),
+            ...mapGetters(['settings', 'bankInstitutions', 'bankInstitution', 'bankAccount', 'bankTransactions']),
 
             dragOptions() {
                 return {
@@ -101,7 +100,7 @@
         },
 
         methods: {
-            ...mapActions(['setBankInstitutions', 'setBankInstitution', 'setBankAccount']),
+            ...mapActions(['setBankInstitutions', 'setBankInstitution', 'setBankAccount', 'setBankTransactions']),
 
             toggleBankMenu () {
                 this.showBankMenu = !this.showBankMenu
@@ -116,6 +115,7 @@
             async loadBankAccounts () {
                 try {
                     const { data } = await this.$http.financialInstitutions('accounts')
+                    console.log('loadBankAccounts', data)
                     await this.setBankInstitutions(data)
                 } catch ({ error }) {
                     console.log('error', error)
@@ -130,11 +130,8 @@
                     account: account.id
                 })
                 try {
-                    const { data } = await this.$http.financialTransactions(
-                        institution.id,
-                        account.id
-                    )
-                    this.transactions = data
+                    const { data } = await this.$http.financialTransactions(institution.id, account.id, 'entries,entries.budget')
+                    await this.setBankTransactions(data)
                 } catch ({ error }) {
                     console.log('error', error)
                 }

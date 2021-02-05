@@ -17,7 +17,7 @@
             },
             elementData: {
                 type: Object,
-                default: {}
+                default: () => {}
             },
             effect: {
                 type: String,

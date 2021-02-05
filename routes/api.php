@@ -64,7 +64,7 @@ Route::prefix('financial')->name('financial.')->group(function () {
     });
     Route::apiResource('institutions', InstitutionController::class)->only('index', 'show');
     Route::apiResource('institutions/{bankInstitution}/accounts', AccountController::class)->only('index', 'show', 'update');
-    Route::apiResource('institutions/{bankInstitution}/accounts/{bankAccount}/transactions', TransactionController::class)->only('index', 'store');
+    Route::apiResource('institutions/{bankInstitution}/accounts/{bankAccount}/transactions', TransactionController::class)->only('index', 'show');
 });
 
 
