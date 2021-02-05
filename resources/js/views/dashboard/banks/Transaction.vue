@@ -118,7 +118,7 @@
             },
 
             transactionDate () {
-                return moment(this.transaction.transactionDate).format('YYYY-MM-DD')
+                return moment(this.transaction.transactionDate).format('MMMM Do')
             }
         },
 
