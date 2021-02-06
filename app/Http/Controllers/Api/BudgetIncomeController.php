@@ -3,9 +3,12 @@
 namespace App\Http\Controllers\Api;
 
 use App\Facades\Services\AuthService;
+use App\Facades\Services\BudgetEntryService;
+use App\Facades\Services\BudgetIncomeService;
 use App\Http\Requests\Api\BudgetIncomeStoreRequest;
 use App\Http\Requests\Api\BudgetIncomeUpdateRequest;
 use App\Http\Resources\BudgetIncomeResource;
+use App\Models\BankTransaction;
 use App\Models\Budget;
 use App\Models\BudgetEntry;
 use App\Models\BudgetIncome;
@@ -106,6 +109,25 @@ class BudgetIncomeController extends ApiController
 
         $data = $request->validated();
         $income->update($data);
+
+        // After all is save and if a bank transaction id exists
+        // Try to create or update the entry transaction link
+        if (array_key_exists('bankTransactionId', $data)) {
+            if ($data['bankTransactionId'] === null) {
+                BudgetIncomeService::unlinkTransaction($budget, $income);
+            } else {
+                // Since a bank transaction id is given we need to create a match
+                // Get the bank transaction
+                $bankTransaction = BankTransaction::where('siteId', AuthService::getSite()->id)
+                    ->where('id', $data['bankTransactionId'])
+                    ->first();
+
+                BudgetIncomeService::linkTransaction($budget, $income, $bankTransaction);
+            }
+        }
+
+        $withs = $this->getWith(['transaction', 'budget']);
+        $income->load($withs->toArray());
 
         return new BudgetIncomeResource($income);
     }

@@ -3,6 +3,7 @@
 namespace App\Http\Resources\Financial;
 
 use App\Http\Resources\BudgetEntryResource;
+use App\Http\Resources\BudgetIncomeResource;
 use App\Http\Resources\CategoryResource;
 use App\Services\TokenService;
 use Exception;
@@ -49,6 +50,7 @@ class BankTransactionResource extends JsonResource
             'isoCurrencyCode' => $this->isoCurrencyCode,
             'account' => new BankAccountResource($this->whenLoaded('account')),
             'entries' => BudgetEntryResource::collection($this->whenLoaded('entries')),
+            'income' => new BudgetIncomeResource($this->whenLoaded('income')),
         ];
     }
 }

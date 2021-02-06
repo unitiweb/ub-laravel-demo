@@ -119,6 +119,7 @@ class BudgetController extends ApiController
         if ($with->contains('incomes')) {
             $budget->load([
                 'incomes',
+                'incomes.transaction',
                 'incomes.entries',
                 'incomes.entries.income',
                 'incomes.entries.group',

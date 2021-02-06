@@ -1,8 +1,8 @@
 <template>
     <drag-element action="assign-transaction" :draggable="isDraggable" :element-data="dragPayload">
-        <div class="transaction-handle text-sm border rounded-md mb-2" :class="classes">
+        <div class="transaction-handle select-none text-sm border rounded-md mb-2" :class="classes">
             <div class="flex m-1 p-1 pb-0">
-                <div v-if="isDraggable" class="flex-none border-r pl-0 pr-1 pt-3">
+                <div v-if="isDraggable" class="flex-none border-r pl-0 pr-1 pt-2">
                     <icon name="menu" fill size="4" class="cursor-move text-gray-300 hover:text-gray-700"></icon>
                 </div>
                 <div class="flex-1 pl-2">
@@ -21,12 +21,21 @@
                     </div>
                 </div>
             </div>
+            <div v-if="transaction.income" class="py-1 mt-1 text-xs bg-green-100 text-green-600 border border-green-200 border-b-0 border-l-0 border-r-0 rounded-b-md">
+                <div class="px-2">
+                    <div class="flex">
+                        <div class="flex-none">{{ transaction.income.name }}</div>
+                        <div class="flex-1 text-center">{{ makeBudgetDate(transaction.income.budget.month) }}</div>
+                        <div class="flex-none text-right">+{{ transaction.income.amount | currency }}</div>
+                    </div>
+                </div>
+            </div>
             <div v-if="transaction.entries && transaction.entries.length > 0" class="py-1 mt-1 text-xs bg-green-100 text-green-600 border border-green-200 border-b-0 border-l-0 border-r-0 rounded-b-md">
                 <div v-for="entry in transaction.entries" :key="`entry-${entry.id}`" class="px-2">
                     <div class="flex">
                         <div class="flex-none">{{ entry.name }}</div>
                         <div class="flex-1 text-center">{{ makeBudgetDate(entry.budget.month) }}</div>
-                        <div class="flex-none text-right">{{ entry.amount | currency }}</div>
+                        <div class="flex-none text-right">-{{ entry.amount | currency }}</div>
                     </div>
                 </div>
             </div>
@@ -76,27 +85,29 @@
                 return this.transaction.category.split(':')
             },
 
-            notAvailable () {
-                if (this.transaction && this.transaction.entries) {
-                    return this.transaction.entries.length >= 1
+            isAvailable () {
+                if (this.transaction && this.transaction.entries && this.transaction.entries.length > 0) {
+                    return false
+                } else if (this.transaction && this.transaction.income) {
+                    return false
                 }
 
-                return false
+                return true
             },
 
             isDraggable () {
-                if (this.draggable && this.notAvailable) {
-                    return false;
+                if (this.draggable) {
+                    return this.isAvailable;
                 }
 
-                return this.draggable
+                return false
             },
             classes () {
                 const classes = []
 
                 if (this.showDetails) {
                     classes.push('border-yellow-300 bg-yellow-50 hover:bg-yellow-100')
-                } else if (this.notAvailable) {
+                } else if (!this.isAvailable) {
                     classes.push('bg-green-50 border-green-200 bg-green-50')
                 } else {
                     classes.push('border-gray-200 bg-gray-50 hover:bg-gray-100')

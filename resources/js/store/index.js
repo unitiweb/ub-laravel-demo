@@ -324,7 +324,7 @@ export default new Vuex.Store({
             }
             commit('bankTransactions', transactions)
         },
-        removeEntryFromTransaction({ commit, getters }, entry) {
+        removeEntryFromTransaction ({ commit, getters }, entry) {
             const transactions = getters.bankTransactions
             for (let i = 0; i < transactions.length; i++) {
                 console.log('transactions.entries', transactions.entries)
@@ -336,6 +336,20 @@ export default new Vuex.Store({
                 }
             }
             commit('bankTransactions', transactions)
+        },
+        updateBudgetIncome ({ commit, getters }, income) {
+            const budget = getters.budget
+            if (budget.incomes) {
+                for (let i = 0; i < budget.incomes.length; i++) {
+                    if (budget.incomes[i].id === income.id) {
+                        for (const [key, value] of Object.entries(income)) {
+                            budget.incomes[i][key] = value
+                        }
+                        break;
+                    }
+                }
+                commit('budget', budget)
+            }
         }
     }
 })

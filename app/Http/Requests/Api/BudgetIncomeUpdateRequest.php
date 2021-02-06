@@ -19,7 +19,8 @@ class BudgetIncomeUpdateRequest extends ApiFormRequest
         return [
             'name' => 'sometimes|required|string|max:30',
             'dueDay' => 'sometimes|required|integer|min:1|max:31',
-            'amount' => 'sometimes|required|numeric'
+            'amount' => 'sometimes|required|numeric',
+            'bankTransactionId' => 'sometimes|nullable|integer|exists:bankTransactions,id',
         ];
     }
 }

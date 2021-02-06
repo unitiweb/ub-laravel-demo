@@ -1,7 +1,9 @@
 <template>
     <div class="border border-gray-300 rounded-md shadow-md mx-1 mb-6">
         <div>
-            <income-header class="sticky top-0" :income="income" :collapsed="collapsed" @collapsed="toggleCollapsed" @modify-income="modifyIncome" @create-entry="createEntry"></income-header>
+            <drop-zone @dropped="dropped" :opacity="0.2">
+                <income-header class="sticky top-0" :income="income" :collapsed="collapsed" @collapsed="toggleCollapsed" @modify-income="modifyIncome" @create-entry="createEntry"></income-header>
+            </drop-zone>
             <div v-if="this.income.entries.length === 0" class="text-gray-400 text-gray-50 text-sm px-4 py-1">
                 no entries
             </div>
@@ -18,6 +20,12 @@
                 <budget-balances :balances="balances" class="border border-b rounded-md rounded-t-none"></budget-balances>
             </div>
         </div>
+        <modal v-if="dialog === 'is-debit'" title="Amount is a Debit" variant="warning" hide-cancel confirm-label="Okay" @confirm="dialog = null">
+            The transaction is a debit and can't be used to link an income.
+        </modal>
+        <modal v-if="dialog === 'not-equal'" title="Amounts not Equal" variant="warning" confirm-label="Yes, Change Amount" cancel-label="No, Cancel" @confirm="droppedConfirmIncomeLink" @cancel="dialog = null">
+            The deposit transaction amount and income amount are not the same. Do you want to change the income amount to match the deposit amount.
+        </modal>
         <modal v-if="changeDueDay"
                variant="info"
                title="Modify Due Day"
@@ -57,18 +65,21 @@
     import IncomeHeader from '@/views/dashboard/budget/IncomeHeader'
     import DueDay from '@/components/ui/DueDay'
     import Draggable from 'vuedraggable'
+    import DropZone from '@/components/ui/dragdrop/DropZone';
     import Entry from '@/views/dashboard/budget/Entry'
     import DueDayPicker from '@/views/dashboard/budget/DueDayPicker'
     import BudgetBalances from '@/views/dashboard/budget/BudgetBalances'
     import Modal from "@/components/ui/modal/Modal";
     import moment from "moment";
     import { calculateBalances } from '@/scripts/helpers/utils'
+    import { mapActions } from 'vuex'
 
     export default {
 
         components: {
             IncomeHeader,
             Draggable,
+            DropZone,
             Entry,
             DueDayPicker,
             BudgetBalances,
@@ -93,10 +104,12 @@
         data () {
             return {
                 drag: false,
+                dialog: null,
                 collapsed: 2,
                 dragging: null,
                 changeDueDay: null,
-                balances: null
+                balances: null,
+                transaction: null
             }
         },
 
@@ -139,6 +152,59 @@
         },
 
         methods: {
+            ...mapActions(['updateBudgetIncome', 'updateBankTransaction']),
+
+            async dropped (data) {
+                if (data.action === 'assign-transaction') {
+                    this.transaction = data.data.transaction
+                    const transactionAmount = this.swapAmount(data.data.transaction.amount)
+                    const incomeAmount = this.income.amount
+                    if (transactionAmount < 0) {
+                        this.dialog = 'is-debit'
+                        this.transaction = null
+                    } else if (incomeAmount !== transactionAmount) {
+                        this.dialog = 'not-equal'
+                    } else {
+                        await this.updateIncomeWithTransaction(this.transaction)
+                        this.transaction = null
+                        this.dialog = null
+                    }
+                }
+            },
+
+            async droppedConfirmIncomeLink () {
+                const amount = Math.abs(this.transaction.amount)
+                await this.updateIncomeWithTransaction(this.transaction, amount)
+                this.transaction = null
+                this.dialog = null
+            },
+
+            async updateIncomeWithTransaction (transaction, amount = null) {
+                try {
+                    const update = { bankTransactionId: this.transaction.id }
+                    if (amount !== null) update.amount = amount
+                    const { data: income } = await this.$http.updateIncome(this.budgetDate, this.income.id, update, 'budget,transaction')
+                    console.log('update income', income)
+                    this.updateBudgetIncome({
+                        id: income.id,
+                        amount: income.amount,
+                        transaction: transaction
+                    })
+                    transaction.income = income
+                    this.updateBankTransaction(transaction)
+                } catch ({ error }) {
+                    console.log('error', error)
+                }
+            },
+
+            swapAmount(amount) {
+                if (amount < 0) {
+                    return Math.abs(amount)
+                } else if (amount > 0) {
+                    return -Math.abs(amount)
+                }
+                return 0
+            },
 
             isActive (entry) {
                 return entry.id === this.activeRow

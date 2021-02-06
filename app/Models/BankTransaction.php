@@ -94,9 +94,25 @@ class BankTransaction extends BaseModel
         return $this->hasOne(Category::class, 'categoryId');
     }
 
+    /**
+     * Entries linked to this transaction
+     *
+     * @return HasMany
+     */
     public function entries(): HasMany
     {
         return $this->hasMany(BankTransactionLink::class, 'bankTransactionId')
             ->join('budgetEntries', 'bankTransactionLink.budgetEntryId', '=', 'budgetEntries.id');
+    }
+
+    /**
+     * Entries linked to this transaction
+     *
+     * @return HasOne
+     */
+    public function income(): HasOne
+    {
+        return $this->hasOne(BankTransactionLink::class, 'bankTransactionId')
+            ->join('budgetIncomes', 'bankTransactionLink.budgetIncomeId', '=', 'budgetIncomes.id');
     }
 }

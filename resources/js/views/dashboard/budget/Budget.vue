@@ -41,7 +41,7 @@
                         <income-form v-if="currentState.right === 'modify-income'" class="object-top" :income="currentState.data" @done="done"/>
                         <group-form v-if="currentState.right === 'modify-group'" class="object-top" :group="currentState.data" :budget="budget" @done="done"/>
                         <entry-form v-if="currentState.right === 'modify-entry'" class="object-top" :entry="currentState.data" :budget="budget" :incomes="incomes" :groups="groups" @done="done"/>
-                        <budget-transactions v-if="currentState.right === 'transactions'"></budget-transactions>
+                        <budget-transactions v-if="currentState.right === 'transactions'" @done="done"></budget-transactions>
                     </div>
                 </template>
             </budget-divided>
