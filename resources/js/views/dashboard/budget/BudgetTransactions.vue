@@ -42,6 +42,13 @@
                     No Account Selected
                 </div>
             </div>
+            <div class="col-span-2 mb-2">
+                <f-input v-model="filter" left-icon="search" @input="debouncedTransactionsFilter">
+                    <template v-slot:right-add-on>
+                        <icon name="x" size="5" class="text-red-500 cursor-pointer" @click="clearFilter"/>
+                    </template>
+                </f-input>
+            </div>
             <div class="col-span-2">
                 <div v-if="bankAccount" class="overscroll-y-auto">
                     <transaction v-for="transaction in bankTransactions"
@@ -63,6 +70,7 @@
     import Transaction from '@/views/dashboard/banks/Transaction'
     import DropZone from '@/components/ui/dragdrop/DropZone'
     import { mapActions, mapGetters } from 'vuex'
+    import _ from 'lodash'
 
     export default {
 
@@ -77,7 +85,9 @@
 
         data () {
             return {
-                showBankMenu: false
+                showBankMenu: false,
+                filter: '',
+                debouncedTransactionsFilter: _.debounce(this.transactionFilter, 1000),
             }
         },
 
@@ -102,6 +112,10 @@
         methods: {
             ...mapActions(['setBankInstitutions', 'setBankInstitution', 'setBankAccount', 'setBankTransactions']),
 
+            back () {
+                this.$emit('done')
+            },
+
             toggleBankMenu () {
                 this.showBankMenu = !this.showBankMenu
             },
@@ -122,15 +136,22 @@
                 }
             },
 
-            async loadTransactions(institution, account) {
-                await this.setBankInstitution(institution)
-                await this.setBankAccount(account)
+            async loadTransactions(institution = null, account = null, filter = null) {
+                if (institution) await this.setBankInstitution(institution)
+                else institution = this.bankInstitution
+
+                if (account) await this.setBankAccount(account)
+                else account = this.bankInstitution
+
                 await this.$http.updateSettings({
                     institution: institution.id,
                     account: account.id
                 })
                 try {
-                    const { data } = await this.$http.financialTransactions(institution.id, account.id, 'entries,entries.budget,income,income.budget')
+                    if (!filter) {
+                        filter = ''
+                    }
+                    const { data } = await this.$http.financialTransactions(institution.id, account.id, filter, 'entries,entries.budget,income,income.budget')
                     await this.setBankTransactions(data)
                 } catch ({ error }) {
                     console.log('error', error)
@@ -156,9 +177,15 @@
                 }
             },
 
-            back () {
-                this.$emit('done')
+            async transactionFilter () {
+                await this.loadTransactions(null, null, this.filter)
+            },
+
+            async clearFilter () {
+                this.filter = ''
+                await this.loadTransactions(null, null, this.filter)
             }
+
         },
 
         mounted () {
