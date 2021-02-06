@@ -2,7 +2,7 @@
     <div>
         <budget-right-header>
             <template v-slot:left>
-<!--                <ub-button v-if="group.id" @click="deleteGroup" outline variant="danger" icon="trash" class="float-left" size="sm"></ub-button>-->
+                <ub-button @click="back" variant="secondary" outline icon="chevronLeft" class="float-left" size="sm"></ub-button>
             </template>
             <template v-slot:right>
                 <div class="relative inline-block text-left">
@@ -130,7 +130,7 @@
                     account: account.id
                 })
                 try {
-                    const { data } = await this.$http.financialTransactions(institution.id, account.id, 'entries,entries.budget')
+                    const { data } = await this.$http.financialTransactions(institution.id, account.id, 'entries,entries.budget,income,income.budget')
                     await this.setBankTransactions(data)
                 } catch ({ error }) {
                     console.log('error', error)
@@ -154,8 +154,11 @@
                 } catch ({ error }) {
                     console.log('error', error)
                 }
-            }
+            },
 
+            back () {
+                this.$emit('done')
+            }
         },
 
         mounted () {

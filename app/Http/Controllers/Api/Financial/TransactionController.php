@@ -41,7 +41,7 @@ class TransactionController extends ApiController
         $startDate = isset($data['startDate']) ? new Carbon($data['startDate']) : new Carbon;
         $endDate = isset($data['endDate']) ? new Carbon($data['endDate']) : (new Carbon)->subDays(45);
 
-        $with = $this->getWith(['account', 'entries', 'entries.budget']);
+        $with = $this->getWith(['account', 'entries', 'entries.budget', 'income', 'income.budget']);
         $transactions = BankTransaction::with($with->toArray())
             ->where('bankAccountId', $bankAccount->id)
             ->whereBetween('transactionDate', [$endDate, $startDate])

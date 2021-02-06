@@ -35,6 +35,7 @@ class BankTransactionLink extends BaseModel
         'siteId',
         'budgetId',
         'budgetEntryId',
+        'budgetIncomeId',
         'bankTransactionId',
     ];
 

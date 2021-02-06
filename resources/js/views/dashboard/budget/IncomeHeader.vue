@@ -74,10 +74,15 @@
 
         computed: {
             incomeClasses () {
+                const classes = []
                 if (this.active && !this.income.unassigned) {
-                    return 'bg-yellow-100'
+                    classes.push('bg-yellow-100 hover:bg-yellow-200')
+                } else if (this.income.transaction) {
+                    classes.push('bg-green-50 hover:bg-green-100')
+                } else {
+                    classes.push('bg-gray-100 hover:bg-gray-200')
                 }
-                return ' bg-gray-100 hover:bg-gray-200'
+                return classes
             },
 
             collapsedIcon () {

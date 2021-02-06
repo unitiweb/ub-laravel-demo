@@ -4,6 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Support\Collection;
 
 /**
@@ -13,6 +14,10 @@ use Illuminate\Support\Collection;
  *
  * @property int id
  * @property int siteId
+ * @property int budgetId
+ * @property int bankTransactionLinkId
+ * @property string name
+ * @property double amount
  */
 class BudgetIncome extends BaseModel
 {
@@ -66,5 +71,16 @@ class BudgetIncome extends BaseModel
         return $this->hasMany(BudgetEntry::class, 'budgetIncomeId')
             ->orderby('dueDay', 'asc')
             ->orderBy('name', 'asc');
+    }
+
+    /**
+     * Get the transaction for this entry
+     *
+     * @return HasOne
+     */
+    public function transaction(): HasOne
+    {
+        return $this->hasOne(BankTransactionLink::class, 'budgetIncomeId')
+            ->join('bankTransactions', 'bankTransactionLink.bankTransactionId', '=', 'bankTransactions.id');
     }
 }
