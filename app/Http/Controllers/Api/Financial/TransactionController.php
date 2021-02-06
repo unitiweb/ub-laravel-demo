@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Api\Financial;
 
 use App\Http\Controllers\Api\ApiController;
+use App\Http\Requests\Api\Financial\BankTransactionsGetRequest;
 use App\Http\Resources\Financial\BankTransactionResource;
 use App\Jobs\FinancialSyncJob;
 use App\Models\BankAccessToken;
@@ -35,20 +36,46 @@ class TransactionController extends ApiController
         $data = $this->validate($request, [
             'startDate' => 'date_format:Y-m-d',
             'endDate' => 'date_format:Y-m-d',
+            'filter' => 'string|nullable'
         ]);
+        $filter = $data['filter'] ?? null;
+        $startDate = $data['startDate'] ?? null;
+        $endDate = $data['endDate'] ?? null;
 
         // Set the start and end dates as Carbon instances if they exist
-        $startDate = isset($data['startDate']) ? new Carbon($data['startDate']) : new Carbon;
-        $endDate = isset($data['endDate']) ? new Carbon($data['endDate']) : (new Carbon)->subDays(45);
 
         $with = $this->getWith(['account', 'entries', 'entries.budget', 'income', 'income.budget']);
-        $transactions = BankTransaction::with($with->toArray())
-            ->where('bankAccountId', $bankAccount->id)
-            ->whereBetween('transactionDate', [$endDate, $startDate])
+        $query = BankTransaction::with($with->toArray());
+
+        if ($startDate) {
+            $startDate = isset($data['startDate']) ? new Carbon($data['startDate']) : new Carbon;
+            $query->where('transactionDate', '>=', $startDate);
+        }
+
+        if ($endDate) {
+            $endDate = isset($data['startDate']) ? new Carbon($data['startDate']) : new Carbon;
+            $query->where('transactionDate', '<=', $endDate);
+        }
+
+        if ($filter) {
+            $query->where(function ($query) use ($filter) {
+                $query->orWhere('name', 'like', "%$filter%")
+                    ->orWhere('amount', 'like', "%$filter%")
+                    ->orWhere('category', 'like', "%$filter%");
+            });
+        }
+
+        $transactions = $query->where('bankAccountId', $bankAccount->id)
             ->orderBy('transactionDate', 'desc')
             ->orderBy('id', 'desc')
-            ->limit(200)
+            ->limit(100)
             ->get();
+
+        if (isset($data['filter'])) {
+            $transactions->filter(function ($transaction) {
+
+            });
+        }
 
         return BankTransactionResource::collection($transactions);
     }

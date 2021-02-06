@@ -17,9 +17,6 @@ window.Vue.use(UiComponents)
 import Filters from "@/filters";
 window.Vue.use(Filters)
 
-// import VeeValidator from '@/plugins/VeeValidator'
-// window.Vue.use(VeeValidator)
-
 import Croppa from 'vue-croppa'
 import 'vue-croppa/dist/vue-croppa.css'
 window.Vue.use(Croppa)
