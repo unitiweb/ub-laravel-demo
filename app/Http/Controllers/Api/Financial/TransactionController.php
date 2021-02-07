@@ -3,15 +3,11 @@
 namespace App\Http\Controllers\Api\Financial;
 
 use App\Http\Controllers\Api\ApiController;
-use App\Http\Requests\Api\Financial\BankTransactionsGetRequest;
 use App\Http\Resources\Financial\BankTransactionResource;
-use App\Jobs\FinancialSyncJob;
-use App\Models\BankAccessToken;
 use App\Models\BankAccount;
 use App\Models\BankInstitution;
 use App\Models\BankTransaction;
 use Carbon\Carbon;
-use Carbon\CarbonImmutable;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\AnonymousResourceCollection;
 use Illuminate\Validation\ValidationException;
@@ -34,27 +30,25 @@ class TransactionController extends ApiController
     public function index(Request $request, BankInstitution $bankInstitution, BankAccount $bankAccount): AnonymousResourceCollection
     {
         $data = $this->validate($request, [
-            'startDate' => 'date_format:Y-m-d',
-            'endDate' => 'date_format:Y-m-d',
+            'from' => 'date_format:Y-m-d',
+            'to' => 'date_format:Y-m-d',
             'filter' => 'string|nullable'
         ]);
         $filter = $data['filter'] ?? null;
-        $startDate = $data['startDate'] ?? null;
-        $endDate = $data['endDate'] ?? null;
+        $from = $data['from'] ?? null;
+        $to = $data['to'] ?? null;
 
         // Set the start and end dates as Carbon instances if they exist
 
         $with = $this->getWith(['account', 'entries', 'entries.budget', 'income', 'income.budget']);
         $query = BankTransaction::with($with->toArray());
 
-        if ($startDate) {
-            $startDate = isset($data['startDate']) ? new Carbon($data['startDate']) : new Carbon;
-            $query->where('transactionDate', '>=', $startDate);
+        if ($from) {
+            $query->where('transactionDate', '>=', $from);
         }
 
-        if ($endDate) {
-            $endDate = isset($data['startDate']) ? new Carbon($data['startDate']) : new Carbon;
-            $query->where('transactionDate', '<=', $endDate);
+        if ($to) {
+            $query->where('transactionDate', '<=', $to);
         }
 
         if ($filter) {
