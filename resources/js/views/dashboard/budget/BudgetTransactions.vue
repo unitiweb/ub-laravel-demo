@@ -70,7 +70,8 @@
     import Transaction from '@/views/dashboard/banks/Transaction'
     import DropZone from '@/components/ui/dragdrop/DropZone'
     import { mapActions, mapGetters } from 'vuex'
-    import _ from 'lodash'
+    import moment from 'moment'
+    import { debounce } from 'lodash'
 
     export default {
 
@@ -87,7 +88,7 @@
             return {
                 showBankMenu: false,
                 filter: '',
-                debouncedTransactionsFilter: _.debounce(this.transactionFilter, 1000),
+                debouncedTransactionsFilter: debounce(this.transactionFilter, 1000),
             }
         },
 
@@ -106,6 +107,19 @@
                     swapThreshold: 0,
                     dragoverBubble: true
                 };
+            },
+
+            budgetFrom () {
+                const year = this.$route.params.year
+                const month = this.$route.params.month
+                return `${year}-${month}-01`
+            },
+
+            budgetTo () {
+                const year = this.$route.params.year
+                const month = this.$route.params.month
+                const lastDay = moment(this.budgetFrom).daysInMonth()
+                return `${year}-${month}-${lastDay}`
             }
         },
 
@@ -136,7 +150,7 @@
                 }
             },
 
-            async loadTransactions(institution = null, account = null, filter = null) {
+            async loadTransactions(institution = null, account = null) {
                 if (institution) await this.setBankInstitution(institution)
                 else institution = this.bankInstitution
 
@@ -148,9 +162,11 @@
                     account: account.id
                 })
                 try {
-                    if (!filter) {
-                        filter = ''
+                    const filter = {
+                        from: this.budgetFrom,
+                        to: this.budgetTo
                     }
+                    if (this.filter) filter.filter = this.filter
                     const { data } = await this.$http.financialTransactions(institution.id, account.id, filter, 'entries,entries.budget,income,income.budget')
                     await this.setBankTransactions(data)
                 } catch ({ error }) {
@@ -178,12 +194,12 @@
             },
 
             async transactionFilter () {
-                await this.loadTransactions(null, null, this.filter)
+                await this.loadTransactions()
             },
 
             async clearFilter () {
                 this.filter = ''
-                await this.loadTransactions(null, null, this.filter)
+                await this.loadTransactions()
             }
 
         },
