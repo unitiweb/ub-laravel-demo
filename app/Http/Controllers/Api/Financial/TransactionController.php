@@ -44,10 +44,12 @@ class TransactionController extends ApiController
         $query = BankTransaction::with($with->toArray());
 
         if ($from) {
+            $from = (new Carbon($from))->startOfDay();
             $query->where('transactionDate', '>=', $from);
         }
 
         if ($to) {
+            $to = (new Carbon($to))->endOfDay();
             $query->where('transactionDate', '<=', $to);
         }
 
