@@ -78,7 +78,7 @@ Route::post('/temp', [App\Http\Controllers\Api\TempController::class, 'temp']);
 
 Route::get('/debug-sentry', function () {
     throw new Exception('My first Sentry error!');
-});
+})->withoutMiddleware('api');
 
 /**
  * A catch all api route if none above are matched
