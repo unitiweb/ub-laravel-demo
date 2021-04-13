@@ -1,39 +1,65 @@
 <?php
 
-namespace App\Financials\Sync;
+namespace App\Jobs;
 
+use App\Financials\Financial;
 use App\Financials\Models\FinancialAccount;
 use App\Models\BankAccessToken;
 use App\Models\BankAccount;
 use App\Models\BankBalance;
 use App\Models\BankInstitution;
 use App\Models\BankInstitutionDetail;
+use Illuminate\Bus\Queueable;
+use Illuminate\Contracts\Queue\ShouldQueue;
+use Illuminate\Foundation\Bus\Dispatchable;
+use Illuminate\Queue\InteractsWithQueue;
+use Illuminate\Queue\SerializesModels;
+use Illuminate\Support\Facades\App;
 
 /**
- * Sync the accounts
+ * Sync the financial accounts
  *
- * @package App\Financials
+ * @package App\Jobs
  */
-class FinancialAccountSync extends FinancialSyncAbstract implements FinancialSyncInterface
+class FinancialAccountsSyncJob implements ShouldQueue
 {
+    use Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
+
     /**
      * @var BankAccessToken
      */
     protected $bankAccessToken;
 
     /**
-     * @param BankAccessToken $bankAccessToken
+     * The financial client
      *
-     * @return bool
+     * @var Financial
      */
-    public function sync(BankAccessToken $bankAccessToken): bool
+    protected $financial;
+
+    /**
+     * Create a new job instance.
+     *
+     * @param BankAccessToken $bankAccessToken
+     */
+    public function __construct(BankAccessToken $bankAccessToken)
     {
         $this->bankAccessToken = $bankAccessToken;
+        $this->financial = App::make(Financial::class);
+    }
+
+    /**
+     * Execute the job.
+     *
+     * @return void
+     */
+    public function handle()
+    {
         // Get financial accounts
-        $accounts = $this->financial->getAccounts($bankAccessToken);
+        $accounts = $this->financial->getAccounts($this->bankAccessToken);
 
         // Get bank accounts
-        $bankAccounts = BankAccount::where('siteId', $bankAccessToken->siteId)->get();
+        $bankAccounts = BankAccount::where('siteId', $this->bankAccessToken->siteId)->get();
 
         // Iterate through the financial accounts to sync with bank account records
         $accounts->each(function ($financialAccount) use ($bankAccounts) {
@@ -41,8 +67,6 @@ class FinancialAccountSync extends FinancialSyncAbstract implements FinancialSyn
             $bankAccount = $this->upsertBankAccount($bankAccount, $financialAccount);
             $this->upsertBankBalances($bankAccount, $financialAccount);
         });
-
-        return true;
     }
 
     /**
@@ -55,7 +79,7 @@ class FinancialAccountSync extends FinancialSyncAbstract implements FinancialSyn
      */
     protected function upsertBankAccount(?BankAccount $bankAccount, FinancialAccount $financialAccount): BankAccount
     {
-        // Don't update the bank account if it exists and enabled is false
+        // Don't update the bank account if it exists and enabled
         if ($bankAccount && $bankAccount->enabled === false) {
             return $bankAccount;
         }
@@ -69,6 +93,7 @@ class FinancialAccountSync extends FinancialSyncAbstract implements FinancialSyn
             $bankAccount->bankInstitutionId = $this->getInstitutionId($financialAccount);
             $bankAccount->accountId = $financialAccount->accountId;
             $bankAccount->enabled = false;
+            $bankAccount->save();
         }
 
         // Fields for updating the bank account
@@ -90,7 +115,7 @@ class FinancialAccountSync extends FinancialSyncAbstract implements FinancialSyn
         if (!$bankInstitutionDetail = BankInstitutionDetail::where('institutionId', $financialAccount->institutionId)->first()) {
             $institution = $this->financial->getInstitution($this->bankAccessToken, 'ins_24');
             $bankInstitutionDetail = BankInstitutionDetail::create([
-               'institutionId' => $institution->institutionId,
+                'institutionId' => $institution->institutionId,
                 'name' => $institution->name,
                 'url' => $institution->url,
                 'logo' => $institution->logo,
