@@ -58,8 +58,8 @@
             <div class="col-span-2">
                 <div class="transaction-box-height overflow-auto">
                     <div v-if="bankAccount">
-                        <transaction v-for="transaction in bankTransactions"
-                                     :key="`trans-${transaction.id}`"
+                        <transaction v-for="transaction in transactions"
+                                     :key="`trans-${n}-${transaction.id}`"
                                      :account="bankAccount"
                                      :transaction="transaction">
                         </transaction>
@@ -98,6 +98,7 @@
             return {
                 showBankMenu: false,
                 filter: '',
+                filteredTransactions: [],
                 fromDate: null,
                 toDate: null,
                 fromDateChecked: false,
@@ -133,6 +134,18 @@
                 const month = this.$route.params.month
                 const lastDay = moment(this.budgetFrom).daysInMonth()
                 return `${year}-${month}-${lastDay}`
+            },
+
+            transactions () {
+                const filtered = this.bankTransactions
+
+                if (this.filter && this.filter.length >= 3) {
+                    filtered.filter(t => {
+                        return t.name.includes(this.filter)
+                    })
+                }
+
+                return filtered
             }
         },
 
