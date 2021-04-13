@@ -1,8 +1,8 @@
 <template>
     <div class="border border-gray-300 rounded-md shadow-md mx-1 mb-6">
         <div>
-            <drop-zone @dropped="dropped" :opacity="0.2">
-                <income-header class="sticky top-0" :income="income" :collapsed="collapsed" @collapsed="toggleCollapsed" @modify-income="modifyIncome" @create-entry="createEntry"></income-header>
+            <drop-zone @dropped="dropped" :opacity="0.2" class="sticky top-0">
+                <income-header :income="income" :collapsed="collapsed" @collapsed="toggleCollapsed" @modify-income="modifyIncome" @create-entry="createEntry"></income-header>
             </drop-zone>
             <div v-if="this.income.entries.length === 0" class="text-gray-400 text-gray-50 text-sm px-4 py-1">
                 no entries
