@@ -58,8 +58,9 @@
             <div class="col-span-2">
                 <div class="transaction-box-height overflow-auto">
                     <div v-if="bankAccount">
-                        <transaction v-for="transaction in transactions"
-                                     :key="`trans-${n}-${transaction.id}`"
+                        <transaction v-for="transaction in bankTransactions"
+                                     v-show="transaction.show"
+                                     :key="`trans-${transaction.id}`"
                                      :account="bankAccount"
                                      :transaction="transaction">
                         </transaction>
@@ -71,6 +72,7 @@
 </template>
 
 <script>
+    import Spinner from '@/components/ui/Spinner'
     import Modal from "@/components/ui/modal/Modal";
     import BudgetRightHeader from '@/views/dashboard/budget/BudgetRightHeader'
     import Draggable from 'vuedraggable'
@@ -85,6 +87,7 @@
     export default {
 
         components: {
+            Spinner,
             Modal,
             BudgetRightHeader,
             Draggable,
@@ -98,11 +101,10 @@
             return {
                 showBankMenu: false,
                 filter: '',
-                filteredTransactions: [],
                 fromDate: null,
                 toDate: null,
                 fromDateChecked: false,
-                debouncedTransactionsFilter: debounce(this.transactionFilter, 1000),
+                debouncedTransactionsFilter: debounce(this.transactionFilter, 500),
             }
         },
 
@@ -134,18 +136,6 @@
                 const month = this.$route.params.month
                 const lastDay = moment(this.budgetFrom).daysInMonth()
                 return `${year}-${month}-${lastDay}`
-            },
-
-            transactions () {
-                const filtered = this.bankTransactions
-
-                if (this.filter && this.filter.length >= 3) {
-                    filtered.filter(t => {
-                        return t.name.includes(this.filter)
-                    })
-                }
-
-                return filtered
             }
         },
 
@@ -169,7 +159,6 @@
             async loadBankAccounts () {
                 try {
                     const { data } = await this.$http.financialInstitutions('accounts')
-                    console.log('loadBankAccounts', data)
                     await this.setBankInstitutions(data)
                 } catch ({ error }) {
                     console.log('error', error)
@@ -193,6 +182,8 @@
                     if (this.toDate) filter.toDate = this.toDate
                     if (this.filter) filter.filter = this.filter
                     const { data } = await this.$http.financialTransactions(institution.id, account.id, filter, 'entries,entries.budget,income,income.budget')
+                    // Add the show property so transactions can be shown or hidden by the filter
+                    data.map(t => t.show = true)
                     await this.setBankTransactions(data)
                 } catch ({ error }) {
                     console.log('error', error)
@@ -219,12 +210,23 @@
             },
 
             async transactionFilter () {
-                await this.loadTransactions()
+                const transactions = this.bankTransactions
+                transactions.map(trans => {
+                    if (this.filter.length >= 3) {
+                        trans.show = trans.name.toLowerCase().includes(this.filter.toLowerCase()) || trans.amount.toString().includes(this.filter)
+                    } else {
+                        trans.show = true
+                    }
+                    return trans
+                })
+                await this.setBankTransactions(transactions)
             },
 
             async clearFilter () {
                 this.filter = ''
-                await this.loadTransactions()
+                const transactions = this.bankTransactions
+                transactions.map(t => t.show = true)
+                await this.setBankTransactions(transactions)
             },
 
             setFromDateChecked (checked) {
