@@ -5,7 +5,7 @@
                 Right
             </slot>
         </div>
-        <div class="col-span-5 md:col-span-2 rounded-md rounded-r-none h-screen">
+        <div class="col-span-5 md:col-span-2 rounded-md rounded-r-none">
             <div class="sticky top-0">
                 <!--        <div class="col-span-5 md:col-span-2 bg-gray-100 border border-gray-300 rounded-md shadow-md my-1">-->
                 <slot name="right"/>
