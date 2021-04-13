@@ -4,11 +4,14 @@ namespace App\Http\Controllers;
 
 use App\Financials\Drivers\Plaid\Webhooks\PlaidWebhook;
 use App\Financials\Financial;
+use App\Jobs\FinancialAccountsSyncJob;
 use App\Jobs\FinancialSyncJob;
+use App\Models\BankAccessToken;
 use App\Models\Site;
 use Exception;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
+use Illuminate\Support\Facades\Bus;
 
 /**
  * Controller to route all the webhook requests
@@ -28,6 +31,33 @@ class WebhookController extends Controller
      */
     public function plaid(Request $request, PlaidWebhook $webhook): Response
     {
+        // Validate the webhook request
+        if (!PlaidWebhook::validate($request)) {
+            abort(401, 'Webhook validation failed');
+        }
+
+        // Get the request data
+        $data = $request->all();
+
+        // Check for any errors in the request
+        if ($error = PlaidWebhook::errorCheck($data)) {
+            abort(500, $error);
+        }
+
+        // Get the bank access token for identifying what needs to be updated
+        $bankAccessToken = PlaidWebhook::getAccessToken($data);
+
+        // Get the webhook type to be updated (ie: transactions)
+        $type = PlaidWebhook::getHookType($data);
+        switch ($type) {
+            // Dispatch transactions sync
+            case PlaidWebhook::TYPE_TRANSACTIONS:
+                Bus::chain([
+                    new FinancialAccountsSyncJob($bankAccessToken),
+                ])->dispatch();
+                break;
+        }
+
         return $webhook->process($request);
     }
 }

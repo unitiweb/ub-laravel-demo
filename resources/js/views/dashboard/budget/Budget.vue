@@ -7,8 +7,8 @@
             </div>
             <budget-divided v-if="budgetLoaded === true">
                 <template v-slot:left>
-                    <div :class="leftVisibility">
-                        <div v-if="['incomes', 'groups'].includes(currentState.left)">
+                    <div :class="leftVisibility" class="h-full">
+                        <div v-if="['incomes', 'groups'].includes(currentState.left)" class="h-full">
                             <budget-right-header>
                                 <template v-slot:left>
                                     <ub-button @click="viewIncomes" size="sm" icon="currencyDollar" :variant="currentState.left === 'incomes' ? 'primary' : 'secondary'" outline></ub-button>
@@ -36,7 +36,7 @@
                     </div>
                 </template>
                 <template v-slot:right>
-                    <div :class="rightVisibility">
+                    <div :class="rightVisibility" class="h-full">
                         <budget-stats v-if="!currentState.right" :budget="budget"/>
                         <income-form v-if="currentState.right === 'modify-income'" class="object-top" :income="currentState.data" @done="done"/>
                         <group-form v-if="currentState.right === 'modify-group'" class="object-top" :group="currentState.data" :budget="budget" @done="done"/>

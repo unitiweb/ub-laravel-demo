@@ -42,6 +42,12 @@
                     No Account Selected
                 </div>
             </div>
+            <div class="col-span-1 mb-2 mr-1">
+                <filter-date-picker v-model="fromDate" placeholder="date from"></filter-date-picker>
+            </div>
+            <div class="col-span-1 mb-2 ml-1">
+<!--                <filter-date-picker v-model="toDate" placeholder="date to"></filter-date-picker>-->
+            </div>
             <div class="col-span-2 mb-2">
                 <f-input v-model="filter" left-icon="search" @input="debouncedTransactionsFilter">
                     <template v-slot:right-add-on>
@@ -68,6 +74,7 @@
     import Draggable from 'vuedraggable'
     import TransitionFade from '@/components/transitions/TransitionFade'
     import Transaction from '@/views/dashboard/banks/Transaction'
+    import FilterDatePicker from '@/views/dashboard/budget/FilterDatePicker'
     import DropZone from '@/components/ui/dragdrop/DropZone'
     import { mapActions, mapGetters } from 'vuex'
     import moment from 'moment'
@@ -81,6 +88,7 @@
             Draggable,
             TransitionFade,
             Transaction,
+            FilterDatePicker,
             DropZone
         },
 
@@ -88,6 +96,9 @@
             return {
                 showBankMenu: false,
                 filter: '',
+                fromDate: null,
+                toDate: null,
+                fromDateChecked: false,
                 debouncedTransactionsFilter: debounce(this.transactionFilter, 1000),
             }
         },
@@ -162,10 +173,9 @@
                     account: account.id
                 })
                 try {
-                    const filter = {
-                        from: this.budgetFrom,
-                        to: this.budgetTo
-                    }
+                    const filter = {}
+                    if (this.fromDate) filter.fromDate = this.fromDate
+                    if (this.toDate) filter.toDate = this.toDate
                     if (this.filter) filter.filter = this.filter
                     const { data } = await this.$http.financialTransactions(institution.id, account.id, filter, 'entries,entries.budget,income,income.budget')
                     await this.setBankTransactions(data)
@@ -200,6 +210,15 @@
             async clearFilter () {
                 this.filter = ''
                 await this.loadTransactions()
+            },
+
+            setFromDateChecked (checked) {
+                console.log('setFromDateChecked')
+                if (checked === true) {
+                    this.fromDate = this.budgetFrom
+                } else {
+                    this.fromDate = null
+                }
             }
 
         },
@@ -211,6 +230,8 @@
             if (this.settings.institution && this.settings.account) {
                 this.loadAccount(this.settings.institution, this.settings.account)
             }
+            // this.fromDate = this.budgetFrom
+            // this.toDate = this.budgetTo
         }
     }
 </script>
