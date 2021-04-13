@@ -42,12 +42,12 @@
                     No Account Selected
                 </div>
             </div>
-            <div class="col-span-1 mb-2 mr-1">
-                <filter-date-picker v-model="fromDate" placeholder="date from"></filter-date-picker>
-            </div>
-            <div class="col-span-1 mb-2 ml-1">
-<!--                <filter-date-picker v-model="toDate" placeholder="date to"></filter-date-picker>-->
-            </div>
+<!--            <div class="col-span-1 mb-2 mr-1">-->
+<!--                <filter-date-picker v-model="fromDate" placeholder="date from"></filter-date-picker>-->
+<!--            </div>-->
+<!--            <div class="col-span-1 mb-2 ml-1">-->
+<!--&lt;!&ndash;                <filter-date-picker v-model="toDate" placeholder="date to"></filter-date-picker>&ndash;&gt;-->
+<!--            </div>-->
             <div class="col-span-2 mb-2">
                 <f-input v-model="filter" left-icon="search" @input="debouncedTransactionsFilter">
                     <template v-slot:right-add-on>
@@ -56,12 +56,14 @@
                 </f-input>
             </div>
             <div class="col-span-2">
-                <div v-if="bankAccount" class="overscroll-y-auto">
-                    <transaction v-for="transaction in bankTransactions"
-                                 :key="`trans-${transaction.id}`"
-                                 :account="bankAccount"
-                                 :transaction="transaction">
-                    </transaction>
+                <div class="transaction-box-height overflow-auto">
+                    <div v-if="bankAccount">
+                        <transaction v-for="transaction in bankTransactions"
+                                     :key="`trans-${transaction.id}`"
+                                     :account="bankAccount"
+                                     :transaction="transaction">
+                        </transaction>
+                    </div>
                 </div>
             </div>
         </div>
@@ -235,3 +237,9 @@
         }
     }
 </script>
+
+<style lang="scss" scoped>
+    .transaction-box-height {
+        height: 30rem;
+    }
+</style>
