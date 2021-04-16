@@ -2,8 +2,8 @@
 
 @task('deploy', ['on' => 'remote'])
 
-    @if ($stage)
-        @if ($stage === 'beta')
+    @if ($beta || $stage || $prod)
+        @if ($beta)
             cd /srv/beta.unitibudget.com/app
             git fetch --all
             git checkout {{ $branch ?? 'master' }}
