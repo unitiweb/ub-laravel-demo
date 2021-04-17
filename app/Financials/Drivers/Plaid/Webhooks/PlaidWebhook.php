@@ -26,16 +26,22 @@ class PlaidWebhook
      */
     public static function validate(Request $request): bool
     {
+        Log::debug('PlaidWebhook: Validate request');
         if ($jwt = $request->header('plaid-verification')) {
+            Log::debug('PlaidWebhook: Validate request: jwt: ' . $jwt);
             list($header, $payload, $signature) = explode (".", $jwt);
+            Log::debug('PlaidWebhook: Validate request: payload: ' . $payload);
             $decode = base64_decode($payload);
             $decode = json_decode($decode, true);
+            Log::debug('PlaidWebhook: Validate request: payload: decode:', ['decode' => $decode]);
             $code = $decode['request_body_sha256'];
+            Log::debug('PlaidWebhook: Validate request: payload: decode:', ['code' => $code]);
             if (hash('sha256', $request->getContent()) === $code) {
+                Log::debug('PlaidWebhook: Validate request: validated:');
                 return true;
             }
         }
-
+        Log::debug('PlaidWebhook: Validate request: validation failed:');
         return false;
     }
 

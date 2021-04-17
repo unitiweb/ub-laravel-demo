@@ -12,6 +12,7 @@ use Exception;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 use Illuminate\Support\Facades\Bus;
+use Illuminate\Support\Facades\Log;
 
 /**
  * Controller to route all the webhook requests
@@ -38,20 +39,26 @@ class WebhookController extends Controller
 
         // Get the request data
         $data = $request->all();
+        Log::debug('PlaidWebhook: request data:', $data);
 
         // Check for any errors in the request
         if ($error = PlaidWebhook::errorCheck($data)) {
+            Log::debug('PlaidWebhook: errorCheck:' . $error);
             abort(500, $error);
         }
 
         // Get the bank access token for identifying what needs to be updated
         $bankAccessToken = PlaidWebhook::getAccessToken($data);
+        Log::debug('PlaidWebhook: bankAccessToken:', $bankAccessToken->toArray());
 
         // Get the webhook type to be updated (ie: transactions)
         $type = PlaidWebhook::getHookType($data);
+        Log::debug('PlaidWebhook: getHookType: ' . $type);
+
         switch ($type) {
             // Dispatch transactions sync
             case PlaidWebhook::TYPE_TRANSACTIONS:
+                Log::debug('PlaidWebhook: TYPE_TRANSACTIONS');
                 Bus::chain([
                     new FinancialAccountsSyncJob($bankAccessToken),
                 ])->dispatch();

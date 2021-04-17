@@ -15,6 +15,7 @@ use Illuminate\Foundation\Bus\Dispatchable;
 use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Queue\SerializesModels;
 use Illuminate\Support\Facades\App;
+use Illuminate\Support\Facades\Log;
 
 /**
  * Sync the financial accounts
@@ -57,9 +58,11 @@ class FinancialAccountsSyncJob implements ShouldQueue
     {
         // Get financial accounts
         $accounts = $this->financial->getAccounts($this->bankAccessToken);
+        Log::debug('PlaidWebhook: FinancialAccountsSyncJob: accounts:', $accounts->toArray());
 
         // Get bank accounts
         $bankAccounts = BankAccount::where('siteId', $this->bankAccessToken->siteId)->get();
+        Log::debug('PlaidWebhook: FinancialAccountsSyncJob: bankAccounts', $bankAccounts->toArray());
 
         // Iterate through the financial accounts to sync with bank account records
         $accounts->each(function ($financialAccount) use ($bankAccounts) {
