@@ -153,7 +153,7 @@
 
         methods: {
 
-            ...mapActions(['setBudget']),
+            ...mapActions(['setBudget', 'refreshIncomeStats']),
 
             async viewChanged (view, reload) {
                 if (reload) {
@@ -216,7 +216,6 @@
                 if (this.settings.view === 'groups') {
                     relations = 'groups'
                 }
-
                 try {
                     this.budgetLoaded = null
                     this.activeIncome = null
@@ -224,6 +223,7 @@
                     await this.setBudget(null)
                     const budget = await this.$http.getBudget(this.budgetDate, relations)
                     await this.setBudget(budget.data)
+                    await this.refreshIncomeStats()
                     this.incomes = budget.incomes
                     this.groups = budget.groups
                     // Set the last existing month in settings
@@ -254,7 +254,8 @@
                 this.state = { left, right, data }
             },
 
-            modifyIncome (income) {
+            async modifyIncome (income) {
+                console.log('modifyIncome', income)
                 this.activeRow = null
                 if (this.activeIncome === income.id) {
                     this.activeIncome = null
@@ -295,6 +296,12 @@
                     await this.loadBudget()
                 }
             },
+
+            // async getIncomeStats () {
+            //     console.log('getIncomeStats')
+            //     const { data } = await this.$http.budgetStats(this.budgetDate, { income: true })
+            //     return data.income || []
+            // },
 
             incomeCreate () {
                 this.setState('budget', 'modify-income', {

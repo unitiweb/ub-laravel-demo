@@ -155,7 +155,7 @@
         },
 
         methods: {
-            ...mapActions(['updateBudgetEntry', 'addBudgetEntry', 'removeBudgetEntry']),
+            ...mapActions(['updateBudgetEntry', 'addBudgetEntry', 'removeBudgetEntry', 'refreshIncomeStats']),
 
             currencyFilter (value) {
                 return this.$options.filters.currency(value, false)
@@ -229,8 +229,8 @@
                     if (this.entry.id) {
                         // Update the entry
                         const { data } = await this.$http.updateEntry(this.budgetMonth, this.entry.id, saveEntry, 'income,group,transactions')
-                        console.log('EntryForm', data)
                         await this.updateBudgetEntry(data)
+                        await this.refreshIncomeStats()
                         this.$emit('done', false)
                     } else {
                         // Create a new entry

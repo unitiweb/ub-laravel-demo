@@ -2,10 +2,7 @@
 
 namespace App\Models;
 
-use App\Services\UserService;
-use Illuminate\Database\Eloquent\Builder;
 use \Illuminate\Database\Eloquent\Model;
-use Illuminate\Support\Facades\Request;
 
 /**
  * The base model with common setup and methods for all models

@@ -5,6 +5,10 @@ const currencyFilter = function (value, includeSymbol = true) {
     return currency(value, includeSymbol)
 }
 
+const percentFilter = function (value) {
+    return value + '%'
+}
+
 const transactionAmountFilter = function (value) {
     let number = value
     if (value >= 0) {
@@ -19,6 +23,7 @@ const transactionAmountFilter = function (value) {
 const Filters = {
     install(Vue) {
         Vue.filter('currency', currencyFilter)
+        Vue.filter('percent', percentFilter)
         Vue.filter('transactionAmount', transactionAmountFilter)
     }
 }

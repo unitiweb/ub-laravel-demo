@@ -2,10 +2,10 @@
 
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\HasOne;
-use Illuminate\Support\Collection;
 
 /**
  * Model for the budgetIncomes table
@@ -18,6 +18,7 @@ use Illuminate\Support\Collection;
  * @property int bankTransactionLinkId
  * @property string name
  * @property double amount
+ * @property Collection entries
  */
 class BudgetIncome extends BaseModel
 {

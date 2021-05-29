@@ -185,8 +185,8 @@
                 this.saveEntry({ name: this.entry.name })
             },
 
-            updateStatus (entry) {
-                this.$emit('calculate', entry)
+            updateStatus () {
+                this.$emit('calculate', this.entry)
             },
 
             saveEntry (values) {
@@ -206,6 +206,7 @@
             },
 
             modify () {
+                console.log('Entry::modify()', this.entry)
                 this.$emit('modify', this.entry)
             }
         }

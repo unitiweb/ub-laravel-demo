@@ -2,9 +2,9 @@ import Vuex from 'vuex'
 import Vue from 'vue'
 import config from '@/config'
 import moment from 'moment'
-import { updateObject} from '@/scripts/helpers/utils'
+import { updateObject } from '@/scripts/helpers/utils'
 import budgetTasks from '@/scripts/budgetTasks'
-import sortEntries from "@/scripts/budgetTasks/tasks/sortEntries";
+import { $http } from '@/scripts/http'
 
 // Add Vuex to the Vue instance
 Vue.use(Vuex)
@@ -45,21 +45,14 @@ export default new Vuex.Store({
         bankAccount: null,
         bankTransactions: null,
         user: {},
-        settings: {}
+        settings: {},
+        incomeStats: {}
     },
     getters: {
-        loading: state => {
-            return state.loading
-        },
-        accessToken: state => {
-            return state.auth.tokens.access || { ttl: 0, token: '' }
-        },
-        appLoaded: state => {
-            return state.auth.appLoaded
-        },
-        isLoggedIn: state => {
-            return state.auth.isLoggedIn
-        },
+        loading: state => state.loading,
+        accessToken: state => state.auth.tokens.access || { ttl: 0, token: '' },
+        appLoaded: state => state.auth.appLoaded,
+        isLoggedIn: state => state.auth.isLoggedIn,
         isLocked: state => {
             const user = localStorage.getItem(config.AUTH_USER_LOCKED)
             state.auth.isLocked = JSON.parse(user)
@@ -70,18 +63,10 @@ export default new Vuex.Store({
             state.auth.tokens.refresh.token = token
             return token
         },
-        tokensConfig: state => {
-            return state.auth.tokens.config
-        },
-        user: state => {
-            return state.user
-        },
-        fullName: state => {
-            return state.user.firstName + ' ' + state.user.lastName
-        },
-        email: state => {
-            return state.user.email
-        },
+        tokensConfig: state => state.auth.tokens.config,
+        user: state => state.user,
+        fullName: state => state.user.firstName + ' ' + state.user.lastName,
+        email: state => state.user.email,
         avatar: (state) => {
             const avatar = state.user.avatar
             if (avatar && avatar.length > 0) {
@@ -90,15 +75,9 @@ export default new Vuex.Store({
             // default if since an avatar is not set
             // return '/assets/static/img/no-photo.png'
         },
-        site: state => {
-            return state.site
-        },
-        settings: state => {
-            return state.settings
-        },
-        budget: state => {
-            return state.budget
-        },
+        site: state => state.site,
+        settings: state => state.settings,
+        budget: state => state.budget,
         budgetDate: state => {
             if (state.budget) {
                 return moment(state.budget.month, "YYYY-M-DD")
@@ -113,18 +92,11 @@ export default new Vuex.Store({
                 return moment().format('YYYY-MM-DD')
             }
         },
-        bankInstitutions: state => {
-            return state.bankInstitutions
-        },
-        bankInstitution: state => {
-            return state.bankInstitution
-        },
-        bankAccount: state => {
-            return state.bankAccount
-        },
-        bankTransactions: state => {
-            return state.bankTransactions
-        }
+        bankInstitutions: state => state.bankInstitutions,
+        bankInstitution: state => state.bankInstitution,
+        bankAccount: state => state.bankAccount,
+        bankTransactions: state => state.bankTransactions,
+        incomeStats: state => state.incomeStats
     },
     mutations: {
         loading (state, loading) {
@@ -185,6 +157,9 @@ export default new Vuex.Store({
         },
         bankTransactions (state, transactions) {
             state.bankTransactions = transactions
+        },
+        incomeStats (state, stats) {
+            state.incomeStats = stats
         }
     },
     actions: {
@@ -338,18 +313,23 @@ export default new Vuex.Store({
             commit('bankTransactions', transactions)
         },
         updateBudgetIncome ({ commit, getters }, income) {
+            // const budget = getters.budget
+            // if (budget.incomes) {
+            //     for (let i = 0; i < budget.incomes.length; i++) {
+            //         if (budget.incomes[i].id === income.id) {
+            //             for (const [key, value] of Object.entries(income)) {
+            //                 budget.incomes[i][key] = value
+            //             }
+            //             break;
+            //         }
+            //     }
+            //     commit('budget', budget)
+            // }
+        },
+        async refreshIncomeStats ({ commit, getters }) {
             const budget = getters.budget
-            if (budget.incomes) {
-                for (let i = 0; i < budget.incomes.length; i++) {
-                    if (budget.incomes[i].id === income.id) {
-                        for (const [key, value] of Object.entries(income)) {
-                            budget.incomes[i][key] = value
-                        }
-                        break;
-                    }
-                }
-                commit('budget', budget)
-            }
+            const { data: { incomes } } = await $http.budgetStats(budget.month, { incomes: true })
+            commit('incomeStats', incomes)
         }
     }
 })

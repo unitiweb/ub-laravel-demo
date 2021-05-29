@@ -63,9 +63,9 @@
         },
 
         methods: {
-            ...mapActions(['updateBudgetEntry', 'removeEntryFromTransaction']),
+            ...mapActions(['updateBudgetEntry', 'removeEntryFromTransaction', 'refreshIncomeStats']),
 
-            update () {
+            async update () {
                 const entry = this.value
 
                 if (entry.cleared) {
@@ -73,25 +73,27 @@
                     entry.goal = false
                     entry.paid = false
                     entry.cleared = false
-                    this.updateState({ goal: false })
+                    await this.updateState({ goal: false })
+                    await this.refreshIncomeStats()
                 } else if (entry.paid) {
                     // Advance to cleared
                     entry.goal = true
                     entry.paid = true
                     entry.cleared = true
-                    this.updateState({ cleared: true })
+                    await this.updateState({ cleared: true })
+                    await this.refreshIncomeStats()
                 } else if (entry.goal) {
                     // Advance to paid
                     entry.goal = true
                     entry.paid = true
                     entry.cleared = false
-                    this.updateState({ paid: true })
+                    await this.updateState({ paid: true })
                 } else {
                     // Advance to goal
                     entry.goal = true
                     entry.paid = false
                     entry.cleared = false
-                    this.updateState({ goal: true })
+                    await this.updateState({ goal: true })
                 }
             },
             async updateState (status) {
