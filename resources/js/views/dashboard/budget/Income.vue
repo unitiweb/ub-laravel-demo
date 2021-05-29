@@ -17,7 +17,7 @@
                 <entry v-for="(entry, index) in income.entries" v-if="entryVisibility(entry)" :key="`entry-${index}`" :active="isActive(entry)" :month="budgetDate" @calculate="calculate" @modify="modifyEntry" :entry="entry"></entry>
             </draggable>
             <div v-if="!this.income.unassigned" class="bg-gray-100 border border-t border-l-0 border-r-0 border-b-0 border-gray-300 rounded-md rounded-t-none">
-                <budget-balances :balances="balances" class="border border-b rounded-md rounded-t-none"></budget-balances>
+                <budget-balances :income-id="income.id" class="border border-b rounded-md rounded-t-none"></budget-balances>
             </div>
         </div>
         <modal v-if="dialog === 'is-debit'" title="Amount is a Debit" variant="warning" hide-cancel confirm-label="Okay" @confirm="dialog = null">
@@ -184,7 +184,6 @@
                     const update = { bankTransactionId: this.transaction.id }
                     if (amount !== null) update.amount = amount
                     const { data: income } = await this.$http.updateIncome(this.budgetDate, this.income.id, update, 'budget,transaction')
-                    console.log('update income', income)
                     this.updateBudgetIncome({
                         id: income.id,
                         amount: income.amount,
@@ -210,8 +209,14 @@
                 return entry.id === this.activeRow
             },
 
-            async calculate () {
-                this.balances = calculateBalances(this.income.entries, this.income.amount)
+            async calculate (entry) {
+                // try {
+                //     this.$emit('modify-entry', entry)
+                // } catch (error) {
+                //     console.log('error', error)
+                // }
+
+                // this.balances = calculateBalances(this.income.entries, this.income.amount)
             },
 
             async initialCollapse () {
@@ -251,6 +256,7 @@
             },
 
             async modifyEntry (entry) {
+                console.log('Income::modifyEntry', entry)
                 try {
                     this.$emit('modify-entry', entry)
                 } catch (error) {
@@ -266,7 +272,6 @@
              * Triggered when an entry row drag is dropped
              */
             dragChanged (evt) {
-                console.log('evt: entry', evt)
                 if (evt.added) {
                     this.addedTo(evt.added.newIndex, evt.added.element)
                 } else if (evt.moved) {

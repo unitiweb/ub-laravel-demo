@@ -6,6 +6,7 @@ use App\Http\Controllers\Api\BudgetController;
 use App\Http\Controllers\Api\BudgetEntryController;
 use App\Http\Controllers\Api\BudgetGroupController;
 use App\Http\Controllers\Api\BudgetIncomeController;
+use App\Http\Controllers\Api\BudgetStatsController;
 use App\Http\Controllers\Api\Financial\AccountController;
 use App\Http\Controllers\Api\Profile\ProfileController;
 use App\Http\Controllers\Api\Profile\SettingsController;
@@ -47,6 +48,7 @@ Route::name('budgets.')->group(function () {
     Route::apiResource('budgets/{budget}/entries', BudgetEntryController::class);
     Route::apiResource('budgets/{budget}/incomes', BudgetIncomeController::class);
     Route::apiResource('budgets/{budget}/groups', BudgetGroupController::class);
+    Route::apiResource('budgets/{budget}/stats', BudgetStatsController::class)->only(['index']);
 });
 
 Route::prefix('profile')->name('profile.')->group(function () {

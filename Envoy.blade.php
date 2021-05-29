@@ -7,6 +7,7 @@
             cd /srv/beta.unitibudget.com/app
             git fetch --all
             git checkout {{ $branch ?? 'master' }}
+            git reset --hard
             git pull origin {{ $branch ?? 'master' }}
             composer install
             npm install

@@ -18,5 +18,9 @@ export default {
     // Delete the budget
     deleteBudget: (month) => {
         return request('delete', ['budgets', month])
+    },
+
+    budgetStats: (month, params) => {
+        return request('get', ['budgets', month, 'stats'], params)
     }
 }
